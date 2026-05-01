@@ -24,7 +24,7 @@ export default function RootLayout() {
   const router = useRouter();
   const segments = useSegments();
 
-  // load the design's typefaces before showing anything
+  // app fonts
   const [fontsLoaded] = useFonts({
     Manrope_400Regular,
     Manrope_600SemiBold,
@@ -34,7 +34,7 @@ export default function RootLayout() {
     SpaceGrotesk_700Bold,
   });
 
-  // Load the current session once, then keep it in sync with auth changes.
+  // load the session once, then keep it in sync with auth changes
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       setSession(data.session);
@@ -52,8 +52,7 @@ export default function RootLayout() {
     if (ready) SplashScreen.hideAsync();
   }, [ready]);
 
-  // Logged-out users land on /welcome (can reach /login from there);
-  // logged-in users go straight into the app.
+  // signed out -> /welcome, signed in -> app
   useEffect(() => {
     if (!ready) return;
     const onAuthScreen = segments[0] === 'login' || segments[0] === 'welcome';

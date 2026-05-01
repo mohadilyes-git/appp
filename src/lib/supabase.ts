@@ -2,8 +2,8 @@ import 'react-native-url-polyfill/auto';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient } from '@supabase/supabase-js';
 
-// Values come from .env.local (see .env.example). The anon key is safe to ship
-// in the app — Row Level Security is what actually protects the data.
+// Config lives in .env.local (see .env.example). The anon key is public;
+// Row Level Security protects the data.
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL ?? '';
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? '';
 

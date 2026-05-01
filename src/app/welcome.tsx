@@ -13,7 +13,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Defs, Path, RadialGradient, Rect, Stop } from 'react-native-svg';
 
-// ---- carousel data (from the design handoff — order matters) ----------
+// ---- carousel data ----------------------------------------------------
 const SLIDES = [
   { key: 'chair', name: 'Velvet Armchair', price: '$320', badge: '+38%', photo: '🛋️' },
   { key: 'car', name: "Honda Civic '14", price: '$8,450', badge: '+22%', photo: '🚗' },
@@ -22,7 +22,7 @@ const SLIDES = [
   { key: 'laptop', name: 'MacBook Air M1', price: '$640', badge: '+35%', photo: '💻' },
 ];
 const N = SLIDES.length;
-const INTERVAL_MS = 2600;
+const INTERVAL_MS = 3600;
 
 // ---- design tokens ----------------------------------------------------
 const C = {
@@ -37,12 +37,12 @@ const C = {
   dotIdle: 'rgba(255,255,255,.35)',
 };
 
-// ---- the three-layer radial-gradient background (web CSS -> SVG) ------
+// ---- layered radial-gradient background -------------------------------
 function GlowBackground({ width, height }: { width: number; height: number }) {
   return (
     <Svg width={width} height={height} style={StyleSheet.absoluteFill}>
       <Defs>
-        {/* graphite base: #2a2d33 -> #131519 -> #07080c */}
+        {/* graphite base */}
         <RadialGradient id="base" cx="50%" cy="10%" rx="120%" ry="80%">
           <Stop offset="0%" stopColor="#2a2d33" />
           <Stop offset="45%" stopColor="#131519" />
@@ -72,7 +72,7 @@ function GlowBackground({ width, height }: { width: number; height: number }) {
   );
 }
 
-// ---- Apple glyph (from the handoff SVG, fill inherits button color) ---
+// ---- Apple logo -------------------------------------------------------
 function AppleLogo() {
   return (
     <Svg width={16} height={16} viewBox="0 0 384 512" style={{ marginTop: -2 }}>
@@ -113,16 +113,29 @@ function PulseDot() {
   );
 }
 
-// ---- one carousel card, animated between 3 positional states ----------
+// ---- carousel card ----------------------------------------------------
 function SlideCard({ slide, state }: { slide: (typeof SLIDES)[number]; state: 'active' | 'prev' | 'next' }) {
-  // animate a single progress value to the target state: next=0, active=1, prev=2
+  // slot positions: next=0, active=1, prev=2
   const target = state === 'active' ? 1 : state === 'prev' ? 2 : 0;
   const anim = useRef(new Animated.Value(target)).current;
+  const lastTarget = useRef(target);
 
   useEffect(() => {
+    const from = lastTarget.current;
+    lastTarget.current = target;
+    if (from === target) return;
+
+    // prev <-> next: both hidden, jump without animating so the card
+    // doesn't pass through the visible center
+    if (from !== 1 && target !== 1) {
+      anim.stopAnimation();
+      anim.setValue(target);
+      return;
+    }
+
     Animated.timing(anim, {
       toValue: target,
-      duration: 550,
+      duration: 750,
       easing: Easing.bezier(0.22, 0.9, 0.32, 1),
       useNativeDriver: true,
     }).start();
@@ -130,7 +143,7 @@ function SlideCard({ slide, state }: { slide: (typeof SLIDES)[number]; state: 'a
 
   const translateX = anim.interpolate({ inputRange: [0, 1, 2], outputRange: [46, 0, -46] });
   const scale = anim.interpolate({ inputRange: [0, 1, 2], outputRange: [0.9, 1, 0.9] });
-  const opacity = anim.interpolate({ inputRange: [0, 0.5, 1, 1.5, 2], outputRange: [0, 0, 1, 0, 0] });
+  const opacity = anim.interpolate({ inputRange: [0, 1, 2], outputRange: [0, 1, 0] });
 
   return (
     <Animated.View
@@ -160,7 +173,7 @@ export default function WelcomeScreen() {
   const [index, setIndex] = useState(0);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // auto-advance every 2.6s; restart on manual dot tap; clear on unmount
+  // auto-advance timer, reset on manual dot tap
   function startTimer() {
     if (timer.current) clearInterval(timer.current);
     timer.current = setInterval(() => setIndex((i) => (i + 1) % N), INTERVAL_MS);
@@ -281,10 +294,10 @@ const styles = StyleSheet.create({
   },
 
   // carousel
-  stage: { flex: 1, minHeight: 290, marginTop: 4 },
+  stage: { flex: 1, minHeight: 320, marginTop: 4 },
   slide: { ...StyleSheet.absoluteFillObject, alignItems: 'center', justifyContent: 'center' },
   card: {
-    width: 234,
+    width: 268,
     backgroundColor: '#fff',
     borderRadius: 26,
     paddingHorizontal: 12,
@@ -298,7 +311,7 @@ const styles = StyleSheet.create({
     elevation: 24,
   },
   photoWell: {
-    height: 192,
+    height: 220,
     alignSelf: 'stretch',
     borderRadius: 18,
     overflow: 'hidden',
@@ -306,7 +319,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  photoEmoji: { fontSize: 64 },
+  photoEmoji: { fontSize: 74 },
   newPill: {
     position: 'absolute',
     top: 10,
