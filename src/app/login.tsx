@@ -2,7 +2,9 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
   Alert,
+  FlatList,
   KeyboardAvoidingView,
+  Modal,
   Platform,
   Pressable,
   StyleSheet,
@@ -15,6 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import GlowBackground from '@/components/glow-background';
 import PulseDot from '@/components/pulse-dot';
+import { COUNTRIES, flagOf, type Country } from '@/lib/countries';
 import { supabase } from '@/lib/supabase';
 
 const C = {
@@ -44,6 +47,22 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [country, setCountry] = useState<Country>(
+    COUNTRIES.find((c) => c.iso === 'US') ?? COUNTRIES[0],
+  );
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [search, setSearch] = useState('');
+
+  const q = search.trim().toLowerCase();
+  const filtered = q
+    ? COUNTRIES.filter((c) => c.name.toLowerCase().includes(q) || c.dial.includes(q))
+    : COUNTRIES;
+
+  function pickCountry(c: Country) {
+    setCountry(c);
+    setPickerOpen(false);
+    setSearch('');
+  }
 
   function goBack() {
     if (router.canGoBack()) router.back();
@@ -110,8 +129,8 @@ export default function LoginScreen() {
               <>
                 <Text style={styles.fieldLabel}>Phone number</Text>
                 <View style={styles.phoneField}>
-                  <Pressable style={styles.countryBtn}>
-                    <Text style={styles.countryText}>+1</Text>
+                  <Pressable style={styles.countryBtn} onPress={() => setPickerOpen(true)}>
+                    <Text style={styles.countryText}>{country.dial}</Text>
                     <Text style={styles.countryCaret}>▾</Text>
                   </Pressable>
                   <View style={styles.divider} />
@@ -200,6 +219,47 @@ export default function LoginScreen() {
           </View>
         </KeyboardAvoidingView>
       </SafeAreaView>
+
+      {/* country code picker */}
+      <Modal
+        visible={pickerOpen}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setPickerOpen(false)}>
+        <View style={styles.sheetBackdrop}>
+          <Pressable style={styles.sheetDismiss} onPress={() => setPickerOpen(false)} />
+          <View style={styles.sheet}>
+            <View style={styles.sheetHandle} />
+            <Text style={styles.sheetTitle}>Country code</Text>
+            <TextInput
+              style={styles.sheetSearch}
+              placeholder="Search country or code"
+              placeholderTextColor={C.placeholder}
+              value={search}
+              onChangeText={setSearch}
+              autoCorrect={false}
+            />
+            <FlatList
+              data={filtered}
+              keyExtractor={(c) => c.iso}
+              keyboardShouldPersistTaps="handled"
+              renderItem={({ item }) => (
+                <Pressable
+                  style={({ pressed }) => [
+                    styles.countryRow,
+                    item.iso === country.iso && styles.countryRowSelected,
+                    pressed && { backgroundColor: 'rgba(255,255,255,.08)' },
+                  ]}
+                  onPress={() => pickCountry(item)}>
+                  <Text style={styles.countryFlag}>{flagOf(item.iso)}</Text>
+                  <Text style={styles.countryName}>{item.name}</Text>
+                  <Text style={styles.countryDial}>{item.dial}</Text>
+                </Pressable>
+              )}
+            />
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -336,4 +396,57 @@ const styles = StyleSheet.create({
   textBtnLabel: { fontFamily: 'Manrope_600SemiBold', fontSize: 13.5, color: C.textSecondary },
   textBtnLink: { fontFamily: 'Manrope_800ExtraBold', color: C.blueLight },
   pressed: { opacity: 0.85, transform: [{ translateY: -1 }] },
+
+  sheetBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,.55)' },
+  sheetDismiss: { flex: 1 },
+  sheet: {
+    maxHeight: '72%',
+    backgroundColor: '#131519',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    borderWidth: 1,
+    borderColor: C.borderSubtle,
+    paddingHorizontal: 16,
+    paddingBottom: 24,
+  },
+  sheetHandle: {
+    alignSelf: 'center',
+    width: 36,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: 'rgba(255,255,255,.2)',
+    marginTop: 10,
+  },
+  sheetTitle: {
+    fontFamily: 'Manrope_700Bold',
+    fontSize: 15,
+    color: '#fff',
+    textAlign: 'center',
+    marginTop: 12,
+    marginBottom: 12,
+  },
+  sheetSearch: {
+    height: 44,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: C.borderSubtle,
+    backgroundColor: C.field,
+    paddingHorizontal: 14,
+    fontFamily: 'Manrope_400Regular',
+    fontSize: 14.5,
+    color: '#fff',
+    marginBottom: 8,
+  },
+  countryRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    borderRadius: 10,
+  },
+  countryRowSelected: { backgroundColor: 'rgba(74,134,255,.12)' },
+  countryFlag: { fontSize: 20 },
+  countryName: { flex: 1, fontFamily: 'Manrope_600SemiBold', fontSize: 14.5, color: '#fff' },
+  countryDial: { fontFamily: 'Manrope_700Bold', fontSize: 14.5, color: C.textSecondary },
 });
