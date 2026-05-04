@@ -11,7 +11,10 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Svg, { Defs, Path, RadialGradient, Rect, Stop } from 'react-native-svg';
+import Svg, { Path } from 'react-native-svg';
+
+import GlowBackground from '@/components/glow-background';
+import PulseDot from '@/components/pulse-dot';
 
 // ---- carousel data ----------------------------------------------------
 const SLIDES = [
@@ -37,41 +40,6 @@ const C = {
   dotIdle: 'rgba(255,255,255,.35)',
 };
 
-// ---- layered radial-gradient background -------------------------------
-function GlowBackground({ width, height }: { width: number; height: number }) {
-  return (
-    <Svg width={width} height={height} style={StyleSheet.absoluteFill}>
-      <Defs>
-        {/* graphite base */}
-        <RadialGradient id="base" cx="50%" cy="10%" rx="120%" ry="80%">
-          <Stop offset="0%" stopColor="#2a2d33" />
-          <Stop offset="45%" stopColor="#131519" />
-          <Stop offset="100%" stopColor="#07080c" />
-        </RadialGradient>
-        {/* top blue glow */}
-        <RadialGradient id="glowTop" cx="50%" cy="-14%" rx="80%" ry="34%">
-          <Stop offset="0%" stopColor="#2f6fed" stopOpacity={0.55} />
-          <Stop offset="72%" stopColor="#2f6fed" stopOpacity={0} />
-        </RadialGradient>
-        {/* bottom blue glow */}
-        <RadialGradient id="glowBottom" cx="50%" cy="112%" rx="95%" ry="48%">
-          <Stop offset="0%" stopColor="#2f6fed" stopOpacity={0.85} />
-          <Stop offset="74%" stopColor="#2f6fed" stopOpacity={0} />
-        </RadialGradient>
-        {/* soft halo behind the product card */}
-        <RadialGradient id="halo" cx="50%" cy="46%" rx="55%" ry="34%">
-          <Stop offset="0%" stopColor="#78a0ff" stopOpacity={0.14} />
-          <Stop offset="70%" stopColor="#78a0ff" stopOpacity={0} />
-        </RadialGradient>
-      </Defs>
-      <Rect width={width} height={height} fill="url(#base)" />
-      <Rect width={width} height={height} fill="url(#glowTop)" />
-      <Rect width={width} height={height} fill="url(#glowBottom)" />
-      <Rect width={width} height={height} fill="url(#halo)" />
-    </Svg>
-  );
-}
-
 // ---- Apple logo -------------------------------------------------------
 function AppleLogo() {
   return (
@@ -81,35 +49,6 @@ function AppleLogo() {
         d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"
       />
     </Svg>
-  );
-}
-
-// ---- pulsing brand dot ------------------------------------------------
-function PulseDot() {
-  const pulse = useRef(new Animated.Value(0)).current;
-  useEffect(() => {
-    const loop = Animated.loop(
-      Animated.timing(pulse, {
-        toValue: 1,
-        duration: 2000,
-        easing: Easing.out(Easing.ease),
-        useNativeDriver: true,
-      }),
-    );
-    loop.start();
-    return () => loop.stop();
-  }, [pulse]);
-
-  const ringScale = pulse.interpolate({ inputRange: [0, 0.7, 1], outputRange: [1, 3.6, 3.6] });
-  const ringOpacity = pulse.interpolate({ inputRange: [0, 0.7, 1], outputRange: [0.55, 0, 0] });
-
-  return (
-    <View style={styles.pulseWrap}>
-      <Animated.View
-        style={[styles.pulseRing, { opacity: ringOpacity, transform: [{ scale: ringScale }] }]}
-      />
-      <View style={styles.pulseCore} />
-    </View>
   );
 }
 
@@ -197,7 +136,7 @@ export default function WelcomeScreen() {
     <View style={styles.root}>
       <GlowBackground width={width} height={height} />
       <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
-        {/* 1 · header */}
+        {/* header */}
         <View style={styles.header}>
           <View style={styles.brandRow}>
             <PulseDot />
@@ -210,14 +149,14 @@ export default function WelcomeScreen() {
           <Text style={styles.subhead}>Alerts for underpriced listings, the moment they go live.</Text>
         </View>
 
-        {/* 2 · carousel stage */}
+        {/* carousel */}
         <View style={styles.stage}>
           {SLIDES.map((s, k) => (
             <SlideCard key={s.key} slide={s} state={k === index ? 'active' : k === prev ? 'prev' : 'next'} />
           ))}
         </View>
 
-        {/* 3 · dot indicators */}
+        {/* dots */}
         <View style={styles.dots}>
           {SLIDES.map((s, k) => (
             <Pressable key={s.key} onPress={() => onDotPress(k)} hitSlop={8}>
@@ -226,7 +165,7 @@ export default function WelcomeScreen() {
           ))}
         </View>
 
-        {/* 4 · action stack */}
+        {/* actions */}
         <View style={styles.actions}>
           <Pressable
             style={({ pressed }) => [styles.primaryBtn, pressed && styles.pressed]}
@@ -280,17 +219,6 @@ const styles = StyleSheet.create({
     color: C.textTertiary,
     maxWidth: 250,
     textAlign: 'center',
-  },
-
-  // pulse dot
-  pulseWrap: { width: 6, height: 6, alignItems: 'center', justifyContent: 'center' },
-  pulseCore: { width: 6, height: 6, borderRadius: 3, backgroundColor: C.blueDot },
-  pulseRing: {
-    position: 'absolute',
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: C.blueDot,
   },
 
   // carousel

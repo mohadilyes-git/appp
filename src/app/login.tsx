@@ -1,6 +1,6 @@
+import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
-  ActivityIndicator,
   Alert,
   KeyboardAvoidingView,
   Platform,
@@ -8,101 +8,332 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  View,
+  useWindowDimensions,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
+import GlowBackground from '@/components/glow-background';
+import PulseDot from '@/components/pulse-dot';
 import { supabase } from '@/lib/supabase';
 
+const C = {
+  blue: '#2f6fed',
+  blueLight: '#6f9dff',
+  blueFocus: '#4a86ff',
+  headline: '#eef1f6',
+  textSecondary: 'rgba(255,255,255,.6)',
+  textTertiary: 'rgba(255,255,255,.55)',
+  label: 'rgba(255,255,255,.5)',
+  placeholder: 'rgba(255,255,255,.34)',
+  field: 'rgba(255,255,255,.06)',
+  fieldFocus: 'rgba(74,134,255,.08)',
+  chip: 'rgba(255,255,255,.08)',
+  borderSubtle: 'rgba(255,255,255,.14)',
+  borderButton: 'rgba(255,255,255,.16)',
+};
+
 export default function LoginScreen() {
+  const router = useRouter();
+  const { width, height } = useWindowDimensions();
+
+  const [mode, setMode] = useState<'phone' | 'email'>('phone');
+  const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [passwordFocused, setPasswordFocused] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
-  async function signIn() {
-    setLoading(true);
+  function goBack() {
+    if (router.canGoBack()) router.back();
+    else router.replace('/welcome');
+  }
+
+  async function logIn() {
+    if (mode === 'phone') {
+      // phone auth needs an SMS provider, not wired up yet
+      Alert.alert('Not available yet', 'Phone login is coming soon. Use email instead.');
+      return;
+    }
+    if (!email.trim() || !password) {
+      Alert.alert('Missing details', 'Enter your email and password.');
+      return;
+    }
+    setSubmitting(true);
     const { error } = await supabase.auth.signInWithPassword({
       email: email.trim(),
       password,
     });
-    setLoading(false);
-    if (error) Alert.alert('Sign in failed', error.message);
-  }
-
-  async function signUp() {
-    setLoading(true);
-    const { error } = await supabase.auth.signUp({ email: email.trim(), password });
-    setLoading(false);
-    if (error) Alert.alert('Sign up failed', error.message);
-    else Alert.alert('Account created', 'You are all set — welcome!');
+    setSubmitting(false);
+    if (error) Alert.alert('Log in failed', error.message);
   }
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <Text style={styles.title}>Reseller Alert</Text>
-      <Text style={styles.subtitle}>Log in or create an account to start watching listings.</Text>
+    <View style={styles.root}>
+      <GlowBackground width={width} height={height} topGlow={0.4} bottomGlow={0.6} halo={false} />
+      <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
+        <KeyboardAvoidingView
+          style={styles.safe}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+          {/* back */}
+          <View style={styles.backRow}>
+            <Pressable
+              style={({ pressed }) => [styles.backBtn, pressed && styles.backBtnPressed]}
+              onPress={goBack}
+              accessibilityLabel="Back"
+              hitSlop={8}>
+              <Text style={styles.backGlyph}>‹</Text>
+            </Pressable>
+          </View>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        placeholderTextColor="#999"
-        autoCapitalize="none"
-        autoCorrect={false}
-        keyboardType="email-address"
-        value={email}
-        onChangeText={setEmail}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        placeholderTextColor="#999"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
+          {/* header */}
+          <View style={styles.header}>
+            <View style={styles.brandRow}>
+              <PulseDot />
+              <Text style={styles.brandLabel}>AlertsFlip</Text>
+            </View>
+            <Text style={styles.headline}>
+              <Text style={{ color: C.headline }}>Log in with </Text>
+              <Text style={{ color: C.blueLight }}>{mode}</Text>
+            </Text>
+            <Text style={styles.subhead}>
+              {mode === 'phone'
+                ? 'Your number and password — that’s it.'
+                : 'Your email and password — that’s it.'}
+            </Text>
+          </View>
 
-      {loading ? (
-        <ActivityIndicator style={{ marginTop: 16 }} />
-      ) : (
-        <>
-          <Pressable style={styles.primaryBtn} onPress={signIn}>
-            <Text style={styles.primaryBtnText}>Log in</Text>
-          </Pressable>
-          <Pressable style={styles.secondaryBtn} onPress={signUp}>
-            <Text style={styles.secondaryBtnText}>Create account</Text>
-          </Pressable>
-        </>
-      )}
-    </KeyboardAvoidingView>
+          {/* form */}
+          <View style={styles.form}>
+            {mode === 'phone' ? (
+              <>
+                <Text style={styles.fieldLabel}>Phone number</Text>
+                <View style={styles.phoneField}>
+                  <Pressable style={styles.countryBtn}>
+                    <Text style={styles.countryText}>+1</Text>
+                    <Text style={styles.countryCaret}>▾</Text>
+                  </Pressable>
+                  <View style={styles.divider} />
+                  <TextInput
+                    style={styles.phoneInput}
+                    keyboardType="phone-pad"
+                    autoComplete="tel"
+                    placeholder="(555) 013-2764"
+                    placeholderTextColor={C.placeholder}
+                    value={phone}
+                    onChangeText={setPhone}
+                  />
+                </View>
+              </>
+            ) : (
+              <>
+                <Text style={styles.fieldLabel}>Email</Text>
+                <TextInput
+                  style={styles.input}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  autoComplete="email"
+                  placeholder="you@example.com"
+                  placeholderTextColor={C.placeholder}
+                  value={email}
+                  onChangeText={setEmail}
+                />
+              </>
+            )}
+
+            <Text style={[styles.fieldLabel, { marginTop: 14 }]}>Password</Text>
+            <View>
+              <TextInput
+                style={[styles.input, styles.passwordInput, passwordFocused && styles.inputFocused]}
+                secureTextEntry={!showPassword}
+                autoComplete="current-password"
+                placeholder="Your password"
+                placeholderTextColor={C.placeholder}
+                value={password}
+                onChangeText={setPassword}
+                onFocus={() => setPasswordFocused(true)}
+                onBlur={() => setPasswordFocused(false)}
+              />
+              <Pressable
+                style={styles.showToggle}
+                onPress={() => setShowPassword((v) => !v)}
+                hitSlop={8}>
+                <Text style={styles.showToggleText}>{showPassword ? 'Hide' : 'Show'}</Text>
+              </Pressable>
+            </View>
+
+            <Pressable
+              style={styles.forgot}
+              onPress={() => Alert.alert('Not available yet', 'Password recovery is coming soon.')}
+              hitSlop={6}>
+              <Text style={styles.forgotText}>Forgot password?</Text>
+            </Pressable>
+          </View>
+
+          {/* actions, pinned to the bottom */}
+          <View style={styles.actions}>
+            <Pressable
+              style={({ pressed }) => [styles.primaryBtn, pressed && styles.pressed]}
+              onPress={logIn}
+              disabled={submitting}>
+              <Text style={styles.primaryBtnText}>{submitting ? 'Logging in…' : 'Log in'}</Text>
+            </Pressable>
+
+            <Pressable
+              style={({ pressed }) => [styles.secondaryBtn, pressed && styles.pressed]}
+              onPress={() => setMode((m) => (m === 'phone' ? 'email' : 'phone'))}>
+              <Text style={styles.secondaryBtnText}>
+                {mode === 'phone' ? 'Use email instead' : 'Use phone instead'}
+              </Text>
+            </Pressable>
+
+            <Pressable
+              style={styles.textBtn}
+              onPress={() => Alert.alert('Not available yet', 'Registration is coming soon.')}
+              hitSlop={6}>
+              <Text style={styles.textBtnLabel}>
+                New here? <Text style={styles.textBtnLink}>Create account</Text>
+              </Text>
+            </Pressable>
+          </View>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', padding: 24, backgroundColor: '#fff', gap: 12 },
-  title: { fontSize: 32, fontWeight: '700', textAlign: 'center', color: '#111' },
-  subtitle: { fontSize: 15, textAlign: 'center', color: '#666', marginBottom: 12 },
+  root: { flex: 1, backgroundColor: '#07080c' },
+  safe: { flex: 1 },
+
+  backRow: { paddingHorizontal: 20, paddingTop: 14 },
+  backBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: C.borderSubtle,
+    backgroundColor: C.chip,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  backBtnPressed: { backgroundColor: 'rgba(255,255,255,.16)' },
+  backGlyph: { color: '#fff', fontSize: 18, marginTop: -2 },
+
+  header: { paddingHorizontal: 26, paddingTop: 14 },
+  brandRow: { flexDirection: 'row', alignItems: 'center', gap: 7 },
+  brandLabel: {
+    fontFamily: 'Manrope_700Bold',
+    fontSize: 11,
+    letterSpacing: 11 * 0.22,
+    textTransform: 'uppercase',
+    color: C.textSecondary,
+  },
+  headline: {
+    fontFamily: 'SpaceGrotesk_600SemiBold',
+    fontSize: 31,
+    lineHeight: 35,
+    letterSpacing: -0.62,
+    marginTop: 10,
+  },
+  subhead: {
+    fontFamily: 'Manrope_400Regular',
+    fontSize: 13.5,
+    lineHeight: 20,
+    color: C.textTertiary,
+    marginTop: 6,
+  },
+
+  form: { paddingHorizontal: 26, paddingTop: 26 },
+  fieldLabel: {
+    fontFamily: 'Manrope_700Bold',
+    fontSize: 11.5,
+    letterSpacing: 11.5 * 0.08,
+    textTransform: 'uppercase',
+    color: C.label,
+    marginBottom: 6,
+  },
+  phoneField: {
+    height: 50,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: C.borderSubtle,
+    backgroundColor: C.field,
+    overflow: 'hidden',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  countryBtn: {
+    height: '100%',
+    paddingHorizontal: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+  },
+  countryText: { fontFamily: 'Manrope_700Bold', fontSize: 15, color: '#fff' },
+  countryCaret: { fontSize: 9, color: C.label },
+  divider: { width: 1, height: 26, backgroundColor: C.borderSubtle },
+  phoneInput: {
+    flex: 1,
+    height: '100%',
+    paddingHorizontal: 16,
+    fontFamily: 'Manrope_400Regular',
+    fontSize: 15,
+    color: '#fff',
+  },
   input: {
+    height: 50,
+    borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 10,
-    padding: 14,
-    fontSize: 16,
-    color: '#111',
+    borderColor: C.borderSubtle,
+    backgroundColor: C.field,
+    paddingHorizontal: 16,
+    fontFamily: 'Manrope_400Regular',
+    fontSize: 15,
+    color: '#fff',
   },
+  passwordInput: { paddingRight: 62 },
+  inputFocused: { borderColor: C.blueFocus, backgroundColor: C.fieldFocus },
+  showToggle: {
+    position: 'absolute',
+    right: 10,
+    top: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    padding: 6,
+  },
+  showToggleText: { fontFamily: 'Manrope_800ExtraBold', fontSize: 12.5, color: C.blueLight },
+  forgot: { alignSelf: 'flex-end', marginTop: 10 },
+  forgotText: { fontFamily: 'Manrope_700Bold', fontSize: 12.5, color: C.blueLight },
+
+  actions: { marginTop: 'auto', gap: 10, paddingHorizontal: 22, paddingTop: 16, paddingBottom: 8 },
   primaryBtn: {
-    backgroundColor: '#5B4AE0',
-    padding: 15,
-    borderRadius: 10,
+    height: 52,
+    borderRadius: 16,
+    backgroundColor: C.blue,
     alignItems: 'center',
-    marginTop: 4,
+    justifyContent: 'center',
+    shadowColor: '#2f6fff',
+    shadowOpacity: 0.35,
+    shadowRadius: 28,
+    shadowOffset: { width: 0, height: 12 },
+    elevation: 12,
   },
-  primaryBtnText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  primaryBtnText: { fontFamily: 'Manrope_700Bold', fontSize: 15.5, color: '#fff' },
   secondaryBtn: {
-    padding: 15,
-    borderRadius: 10,
-    alignItems: 'center',
+    height: 52,
+    borderRadius: 16,
+    backgroundColor: C.field,
     borderWidth: 1,
-    borderColor: '#5B4AE0',
+    borderColor: C.borderButton,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  secondaryBtnText: { color: '#5B4AE0', fontSize: 16, fontWeight: '600' },
+  secondaryBtnText: { fontFamily: 'Manrope_700Bold', fontSize: 15.5, color: '#fff' },
+  textBtn: { alignItems: 'center', padding: 6 },
+  textBtnLabel: { fontFamily: 'Manrope_600SemiBold', fontSize: 13.5, color: C.textSecondary },
+  textBtnLink: { fontFamily: 'Manrope_800ExtraBold', color: C.blueLight },
+  pressed: { opacity: 0.85, transform: [{ translateY: -1 }] },
 });
