@@ -210,7 +210,7 @@ export default function LoginScreen() {
 
             <Pressable
               style={styles.textBtn}
-              onPress={() => Alert.alert('Not available yet', 'Registration is coming soon.')}
+              onPress={() => router.replace('/register')}
               hitSlop={6}>
               <Text style={styles.textBtnLabel}>
                 New here? <Text style={styles.textBtnLink}>Create account</Text>
