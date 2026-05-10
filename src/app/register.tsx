@@ -164,7 +164,9 @@ export default function RegisterScreen() {
 
             {/* actions */}
             <View style={styles.actions}>
-              <Pressable style={({ pressed }) => [styles.primaryBtn, pressed && styles.pressed]}>
+              <Pressable
+                style={({ pressed }) => [styles.primaryBtn, pressed && styles.pressed]}
+                onPress={() => router.push('/verify-phone')}>
                 <Text style={styles.primaryBtnText}>Create account</Text>
               </Pressable>
 
