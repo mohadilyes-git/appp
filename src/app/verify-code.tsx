@@ -37,7 +37,11 @@ const C = {
 export default function VerifyCodeScreen() {
   const router = useRouter();
   const { width, height } = useWindowDimensions();
-  const { dial, phone } = useLocalSearchParams<{ dial?: string; phone?: string }>();
+  const { dial, phone, flow } = useLocalSearchParams<{
+    dial?: string;
+    phone?: string;
+    flow?: string;
+  }>();
 
   const [code, setCode] = useState('');
   const [secondsLeft, setSecondsLeft] = useState(RESEND_SECONDS);
@@ -80,7 +84,7 @@ export default function VerifyCodeScreen() {
               hitSlop={8}>
               <Text style={styles.backGlyph}>‹</Text>
             </Pressable>
-            <Text style={styles.step}>Step 3 of 3</Text>
+            {flow !== 'recovery' && <Text style={styles.step}>Step 3 of 3</Text>}
           </View>
 
           {/* header */}

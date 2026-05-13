@@ -17,7 +17,6 @@ import CountryPicker from '@/components/country-picker';
 import GlowBackground from '@/components/glow-background';
 import PulseDot from '@/components/pulse-dot';
 import { COUNTRIES, type Country } from '@/lib/countries';
-import { supabase } from '@/lib/supabase';
 
 const C = {
   blue: '#2f6fed',
@@ -27,52 +26,52 @@ const C = {
   textSecondary: 'rgba(255,255,255,.6)',
   textTertiary: 'rgba(255,255,255,.55)',
   label: 'rgba(255,255,255,.5)',
+  switchLine: 'rgba(255,255,255,.45)',
   placeholder: 'rgba(255,255,255,.34)',
   field: 'rgba(255,255,255,.06)',
   fieldFocus: 'rgba(74,134,255,.08)',
   chip: 'rgba(255,255,255,.08)',
   borderSubtle: 'rgba(255,255,255,.14)',
-  borderButton: 'rgba(255,255,255,.16)',
 };
 
-export default function LoginScreen() {
+export default function ForgotPasswordScreen() {
   const router = useRouter();
   const { width, height } = useWindowDimensions();
 
-  const [mode, setMode] = useState<'phone' | 'email'>('phone');
-  const [phone, setPhone] = useState('');
+  const [method, setMethod] = useState<'email' | 'phone'>('email');
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [passwordFocused, setPasswordFocused] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
+  const [phone, setPhone] = useState('');
   const [country, setCountry] = useState<Country>(
     COUNTRIES.find((c) => c.iso === 'US') ?? COUNTRIES[0],
   );
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [focused, setFocused] = useState(false);
 
   function goBack() {
     if (router.canGoBack()) router.back();
-    else router.replace('/welcome');
+    else router.replace('/login');
   }
 
-  async function logIn() {
-    if (mode === 'phone') {
-      // phone auth needs an SMS provider, not wired up yet
-      Alert.alert('Not available yet', 'Phone login is coming soon. Use email instead.');
-      return;
+  function submit() {
+    if (method === 'email') {
+      if (!email.trim() || !email.includes('@')) {
+        Alert.alert('Check the email', 'Enter a valid email address.');
+        return;
+      }
+      Alert.alert(
+        'Check your inbox',
+        "If an account exists for that email, we've sent a reset link.",
+      );
+    } else {
+      if (phone.trim().length < 7) {
+        Alert.alert('Check the number', 'Enter a valid phone number.');
+        return;
+      }
+      router.push({
+        pathname: '/verify-code',
+        params: { dial: country.dial, phone: phone.trim(), flow: 'recovery' },
+      });
     }
-    if (!email.trim() || !password) {
-      Alert.alert('Missing details', 'Enter your email and password.');
-      return;
-    }
-    setSubmitting(true);
-    const { error } = await supabase.auth.signInWithPassword({
-      email: email.trim(),
-      password,
-    });
-    setSubmitting(false);
-    if (error) Alert.alert('Log in failed', error.message);
   }
 
   return (
@@ -99,23 +98,47 @@ export default function LoginScreen() {
               <PulseDot />
               <Text style={styles.brandLabel}>AlertsFlip</Text>
             </View>
-            <Text style={styles.headline}>
-              <Text style={{ color: C.headline }}>Log in with </Text>
-              <Text style={{ color: C.blueLight }}>{mode}</Text>
-            </Text>
+            {method === 'email' ? (
+              <Text style={styles.headline}>
+                <Text style={{ color: C.headline }}>Forgot your </Text>
+                <Text style={{ color: C.blueLight }}>password?</Text>
+              </Text>
+            ) : (
+              <Text style={styles.headline}>
+                <Text style={{ color: C.headline }}>Enter your </Text>
+                <Text style={{ color: C.blueLight }}>number</Text>
+              </Text>
+            )}
             <Text style={styles.subhead}>
-              {mode === 'phone'
-                ? 'Your number and password — that’s it.'
-                : 'Your email and password — that’s it.'}
+              {method === 'email'
+                ? "Enter your account email and we'll send you a reset link."
+                : "We'll text you a code to reset your password."}
             </Text>
           </View>
 
           {/* form */}
           <View style={styles.form}>
-            {mode === 'phone' ? (
+            {method === 'email' ? (
+              <>
+                <Text style={styles.fieldLabel}>Email</Text>
+                <TextInput
+                  style={[styles.input, focused && styles.inputFocused]}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  autoComplete="email"
+                  placeholder="you@email.com"
+                  placeholderTextColor={C.placeholder}
+                  value={email}
+                  onChangeText={setEmail}
+                  onFocus={() => setFocused(true)}
+                  onBlur={() => setFocused(false)}
+                />
+              </>
+            ) : (
               <>
                 <Text style={styles.fieldLabel}>Phone number</Text>
-                <View style={styles.phoneField}>
+                <View style={[styles.phoneField, focused && styles.inputFocused]}>
                   <Pressable style={styles.countryBtn} onPress={() => setPickerOpen(true)}>
                     <Text style={styles.countryText}>{country.dial}</Text>
                     <Text style={styles.countryCaret}>▾</Text>
@@ -129,78 +152,41 @@ export default function LoginScreen() {
                     placeholderTextColor={C.placeholder}
                     value={phone}
                     onChangeText={setPhone}
+                    onFocus={() => setFocused(true)}
+                    onBlur={() => setFocused(false)}
                   />
                 </View>
               </>
-            ) : (
-              <>
-                <Text style={styles.fieldLabel}>Email</Text>
-                <TextInput
-                  style={styles.input}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  autoComplete="email"
-                  placeholder="you@example.com"
-                  placeholderTextColor={C.placeholder}
-                  value={email}
-                  onChangeText={setEmail}
-                />
-              </>
             )}
 
-            <Text style={[styles.fieldLabel, { marginTop: 14 }]}>Password</Text>
-            <View>
-              <TextInput
-                style={[styles.input, styles.passwordInput, passwordFocused && styles.inputFocused]}
-                secureTextEntry={!showPassword}
-                autoComplete="current-password"
-                placeholder="Your password"
-                placeholderTextColor={C.placeholder}
-                value={password}
-                onChangeText={setPassword}
-                onFocus={() => setPasswordFocused(true)}
-                onBlur={() => setPasswordFocused(false)}
-              />
-              <Pressable
-                style={styles.showToggle}
-                onPress={() => setShowPassword((v) => !v)}
-                hitSlop={8}>
-                <Text style={styles.showToggleText}>{showPassword ? 'Hide' : 'Show'}</Text>
-              </Pressable>
-            </View>
-
             <Pressable
-              style={styles.forgot}
-              onPress={() => router.push('/forgot-password')}
+              style={styles.switchLine}
+              onPress={() => {
+                setFocused(false);
+                setMethod((m) => (m === 'email' ? 'phone' : 'email'));
+              }}
               hitSlop={6}>
-              <Text style={styles.forgotText}>Forgot password?</Text>
+              <Text style={styles.switchText}>
+                <Text style={styles.switchLink}>
+                  {method === 'email' ? 'Use mobile number instead' : 'Use your email instead'}
+                </Text>
+              </Text>
             </Pressable>
           </View>
 
-          {/* actions, pinned to the bottom */}
+          {/* actions */}
           <View style={styles.actions}>
             <Pressable
               style={({ pressed }) => [styles.primaryBtn, pressed && styles.pressed]}
-              onPress={logIn}
-              disabled={submitting}>
-              <Text style={styles.primaryBtnText}>{submitting ? 'Logging in…' : 'Log in'}</Text>
-            </Pressable>
-
-            <Pressable
-              style={({ pressed }) => [styles.secondaryBtn, pressed && styles.pressed]}
-              onPress={() => setMode((m) => (m === 'phone' ? 'email' : 'phone'))}>
-              <Text style={styles.secondaryBtnText}>
-                {mode === 'phone' ? 'Use email instead' : 'Use phone instead'}
+              onPress={submit}>
+              <Text style={styles.primaryBtnText}>
+                {method === 'email' ? 'Send reset link' : 'Send code'}
               </Text>
             </Pressable>
 
-            <Pressable
-              style={styles.textBtn}
-              onPress={() => router.replace('/register')}
-              hitSlop={6}>
+            <Pressable style={styles.textBtn} onPress={() => router.replace('/login')} hitSlop={6}>
               <Text style={styles.textBtnLabel}>
-                New here? <Text style={styles.textBtnLink}>Create account</Text>
+                Back to <Text style={styles.textBtnLink}>Log in</Text>
               </Text>
             </Pressable>
           </View>
@@ -260,17 +246,31 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     color: C.textTertiary,
     marginTop: 6,
+    minHeight: 40,
   },
 
-  form: { paddingHorizontal: 26, paddingTop: 26 },
+  form: { paddingHorizontal: 26, paddingTop: 26, gap: 12 },
   fieldLabel: {
     fontFamily: 'Manrope_700Bold',
     fontSize: 11.5,
     letterSpacing: 11.5 * 0.08,
     textTransform: 'uppercase',
     color: C.label,
-    marginBottom: 6,
+    marginBottom: -6,
   },
+  input: {
+    height: 50,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: C.borderSubtle,
+    backgroundColor: C.field,
+    paddingHorizontal: 16,
+    fontFamily: 'Manrope_400Regular',
+    fontSize: 15,
+    color: '#fff',
+    marginTop: 6,
+  },
+  inputFocused: { borderColor: C.blueFocus, backgroundColor: C.fieldFocus },
   phoneField: {
     height: 50,
     borderRadius: 14,
@@ -280,6 +280,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     flexDirection: 'row',
     alignItems: 'center',
+    marginTop: 6,
   },
   countryBtn: {
     height: '100%',
@@ -299,30 +300,9 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#fff',
   },
-  input: {
-    height: 50,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: C.borderSubtle,
-    backgroundColor: C.field,
-    paddingHorizontal: 16,
-    fontFamily: 'Manrope_400Regular',
-    fontSize: 15,
-    color: '#fff',
-  },
-  passwordInput: { paddingRight: 62 },
-  inputFocused: { borderColor: C.blueFocus, backgroundColor: C.fieldFocus },
-  showToggle: {
-    position: 'absolute',
-    right: 10,
-    top: 0,
-    bottom: 0,
-    justifyContent: 'center',
-    padding: 6,
-  },
-  showToggleText: { fontFamily: 'Manrope_800ExtraBold', fontSize: 12.5, color: C.blueLight },
-  forgot: { alignSelf: 'flex-end', marginTop: 10 },
-  forgotText: { fontFamily: 'Manrope_700Bold', fontSize: 12.5, color: C.blueLight },
+  switchLine: { alignItems: 'center', marginTop: 2 },
+  switchText: { fontFamily: 'Manrope_400Regular', fontSize: 12.5, color: C.switchLine },
+  switchLink: { fontFamily: 'Manrope_700Bold', color: C.blueLight },
 
   actions: { marginTop: 'auto', gap: 10, paddingHorizontal: 22, paddingTop: 16, paddingBottom: 8 },
   primaryBtn: {
@@ -338,16 +318,6 @@ const styles = StyleSheet.create({
     elevation: 12,
   },
   primaryBtnText: { fontFamily: 'Manrope_700Bold', fontSize: 15.5, color: '#fff' },
-  secondaryBtn: {
-    height: 52,
-    borderRadius: 16,
-    backgroundColor: C.field,
-    borderWidth: 1,
-    borderColor: C.borderButton,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  secondaryBtnText: { fontFamily: 'Manrope_700Bold', fontSize: 15.5, color: '#fff' },
   textBtn: { alignItems: 'center', padding: 6 },
   textBtnLabel: { fontFamily: 'Manrope_600SemiBold', fontSize: 13.5, color: C.textSecondary },
   textBtnLink: { fontFamily: 'Manrope_800ExtraBold', color: C.blueLight },

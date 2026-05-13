@@ -55,7 +55,14 @@ export default function RootLayout() {
   // signed out -> /welcome, signed in -> app
   useEffect(() => {
     if (!ready) return;
-    const authScreens = ['login', 'welcome', 'register', 'verify-phone', 'verify-code'];
+    const authScreens = [
+      'login',
+      'welcome',
+      'register',
+      'verify-phone',
+      'verify-code',
+      'forgot-password',
+    ];
     const onAuthScreen = authScreens.includes(segments[0] ?? '');
     if (!session && !onAuthScreen) router.replace('/welcome');
     else if (session && onAuthScreen) router.replace('/');
