@@ -1,5 +1,15 @@
 import { useState } from 'react';
-import { FlatList, Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import {
+  FlatList,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 
 import { COUNTRIES, flagOf, type Country } from '@/lib/countries';
 
@@ -25,7 +35,9 @@ export default function CountryPicker({ visible, selected, onSelect, onClose }: 
 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <View style={styles.backdrop}>
+      <KeyboardAvoidingView
+        style={styles.backdrop}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         <Pressable style={styles.dismiss} onPress={onClose} />
         <View style={styles.sheet}>
           <View style={styles.handle} />
@@ -57,7 +69,7 @@ export default function CountryPicker({ visible, selected, onSelect, onClose }: 
             )}
           />
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }
@@ -67,6 +79,7 @@ const styles = StyleSheet.create({
   dismiss: { flex: 1 },
   sheet: {
     maxHeight: '72%',
+    minHeight: 260,
     backgroundColor: '#131519',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,

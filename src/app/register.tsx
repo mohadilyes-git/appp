@@ -16,6 +16,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppleLogo, GoogleLogo } from '@/components/brand-logos';
 import GlowBackground from '@/components/glow-background';
 import PulseDot from '@/components/pulse-dot';
+import { supabase } from '@/lib/supabase';
 
 const C = {
   blue: '#2f6fed',
@@ -34,6 +35,7 @@ const C = {
   chip: 'rgba(255,255,255,.08)',
   borderSubtle: 'rgba(255,255,255,.14)',
   borderRule: 'rgba(255,255,255,.12)',
+  error: '#ff7a7a',
 };
 
 export default function RegisterScreen() {
@@ -46,6 +48,8 @@ export default function RegisterScreen() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [focused, setFocused] = useState<string | null>(null);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [submitting, setSubmitting] = useState(false);
 
   function goBack() {
     if (router.canGoBack()) router.back();
@@ -56,9 +60,57 @@ export default function RegisterScreen() {
     return {
       onFocus: () => setFocused(key),
       onBlur: () => setFocused(null),
-      style: [styles.input, focused === key && styles.inputFocused] as any,
+      style: [
+        styles.input,
+        errors[key] && styles.inputError,
+        focused === key && styles.inputFocused,
+      ] as any,
       placeholderTextColor: C.placeholder,
     };
+  }
+
+  // clear a field's error as soon as the user edits it
+  function onChange(key: string, setter: (v: string) => void) {
+    return (v: string) => {
+      setter(v);
+      if (errors[key]) setErrors((e) => ({ ...e, [key]: '' }));
+    };
+  }
+
+  async function createAccount() {
+    const next: Record<string, string> = {};
+    if (!name.trim()) next.name = 'Enter your name.';
+    if (!/^\S+@\S+\.\S+$/.test(email.trim())) next.email = 'Enter a valid email address.';
+    if (email.trim().toLowerCase() !== confirmEmail.trim().toLowerCase())
+      next.confirm = 'Emails do not match.';
+    if (password.length < 8) next.password = 'Use at least 8 characters.';
+
+    setErrors(next);
+    if (Object.keys(next).length > 0) return;
+
+    setSubmitting(true);
+    const { data, error } = await supabase.auth.signUp({
+      email: email.trim(),
+      password,
+      options: { data: { name: name.trim() } },
+    });
+    setSubmitting(false);
+
+    if (error) {
+      setErrors({ form: error.message });
+      return;
+    }
+    // supabase hides "already registered" behind a success with no identities
+    if (data.user && data.user.identities?.length === 0) {
+      setErrors({ form: 'That email is already registered. Try logging in instead.' });
+      return;
+    }
+    // no session means email confirmation is switched on
+    if (!data.session) {
+      setErrors({ form: 'Check your email to confirm your account, then log in.' });
+      return;
+    }
+    router.replace('/verify-phone');
   }
 
   return (
@@ -105,8 +157,9 @@ export default function RegisterScreen() {
                   autoComplete="name"
                   placeholder="Alex Carter"
                   value={name}
-                  onChangeText={setName}
+                  onChangeText={onChange('name', setName)}
                 />
+                {errors.name ? <Text style={styles.errorText}>{errors.name}</Text> : null}
               </View>
 
               <View>
@@ -119,8 +172,9 @@ export default function RegisterScreen() {
                   autoComplete="email"
                   placeholder="you@email.com"
                   value={email}
-                  onChangeText={setEmail}
+                  onChangeText={onChange('email', setEmail)}
                 />
+                {errors.email ? <Text style={styles.errorText}>{errors.email}</Text> : null}
               </View>
 
               <View>
@@ -132,8 +186,9 @@ export default function RegisterScreen() {
                   autoCorrect={false}
                   placeholder="Repeat your email"
                   value={confirmEmail}
-                  onChangeText={setConfirmEmail}
+                  onChangeText={onChange('confirm', setConfirmEmail)}
                 />
+                {errors.confirm ? <Text style={styles.errorText}>{errors.confirm}</Text> : null}
               </View>
 
               <View>
@@ -144,13 +199,14 @@ export default function RegisterScreen() {
                     style={[
                       styles.input,
                       styles.passwordInput,
+                      errors.password && styles.inputError,
                       focused === 'password' && styles.inputFocused,
                     ]}
                     secureTextEntry={!showPassword}
                     autoComplete="new-password"
                     placeholder="8+ characters"
                     value={password}
-                    onChangeText={setPassword}
+                    onChangeText={onChange('password', setPassword)}
                   />
                   <Pressable
                     style={styles.showToggle}
@@ -159,15 +215,20 @@ export default function RegisterScreen() {
                     <Text style={styles.showToggleText}>{showPassword ? 'Hide' : 'Show'}</Text>
                   </Pressable>
                 </View>
+                {errors.password ? <Text style={styles.errorText}>{errors.password}</Text> : null}
               </View>
             </View>
 
             {/* actions */}
             <View style={styles.actions}>
+              {errors.form ? <Text style={styles.formError}>{errors.form}</Text> : null}
               <Pressable
                 style={({ pressed }) => [styles.primaryBtn, pressed && styles.pressed]}
-                onPress={() => router.push('/verify-phone')}>
-                <Text style={styles.primaryBtnText}>Create account</Text>
+                onPress={createAccount}
+                disabled={submitting}>
+                <Text style={styles.primaryBtnText}>
+                  {submitting ? 'Creating account…' : 'Create account'}
+                </Text>
               </Pressable>
 
               <View style={styles.orRow}>
@@ -274,6 +335,22 @@ const styles = StyleSheet.create({
   },
   passwordInput: { paddingRight: 62 },
   inputFocused: { borderColor: C.blueFocus, backgroundColor: C.fieldFocus },
+  inputError: { borderColor: C.error },
+  errorText: {
+    fontFamily: 'Manrope_400Regular',
+    fontSize: 12,
+    lineHeight: 16,
+    color: C.error,
+    marginTop: 6,
+  },
+  formError: {
+    fontFamily: 'Manrope_600SemiBold',
+    fontSize: 12.5,
+    lineHeight: 17,
+    color: C.error,
+    textAlign: 'center',
+    marginBottom: 2,
+  },
   showToggle: {
     position: 'absolute',
     right: 10,

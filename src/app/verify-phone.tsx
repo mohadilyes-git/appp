@@ -1,7 +1,6 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
-  Alert,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -17,6 +16,7 @@ import CountryPicker from '@/components/country-picker';
 import GlowBackground from '@/components/glow-background';
 import PulseDot from '@/components/pulse-dot';
 import { COUNTRIES, type Country } from '@/lib/countries';
+import { supabase } from '@/lib/supabase';
 
 const C = {
   blue: '#2f6fed',
@@ -45,20 +45,36 @@ export default function VerifyPhoneScreen() {
   );
   const [pickerOpen, setPickerOpen] = useState(false);
   const [focused, setFocused] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState('');
 
-  function goBack() {
-    if (router.canGoBack()) router.back();
-    else router.replace('/register');
+  // going back from here abandons the half-finished account
+  async function goBack() {
+    await supabase.auth.signOut();
+    router.replace('/welcome');
   }
 
-  function sendCode() {
-    if (phone.trim().length < 7) {
-      Alert.alert('Check the number', 'Enter a valid phone number.');
+  async function sendCode() {
+    const digits = phone.replace(/\D/g, '');
+    if (digits.length < 6) {
+      setError('Enter a valid phone number.');
+      return;
+    }
+    const full = `${country.dial}${digits}`;
+
+    setSending(true);
+    setError('');
+    // attaching a number to the account sends the confirmation code
+    const { error: err } = await supabase.auth.updateUser({ phone: full });
+    setSending(false);
+
+    if (err) {
+      setError(err.message);
       return;
     }
     router.push({
       pathname: '/verify-code',
-      params: { dial: country.dial, phone: phone.trim() },
+      params: { dial: country.dial, phone: digits },
     });
   }
 
@@ -120,14 +136,16 @@ export default function VerifyPhoneScreen() {
             <Text style={styles.helper}>
               Only used for verification and deal alerts — never shared.
             </Text>
+            {error ? <Text style={styles.errorText}>{error}</Text> : null}
           </View>
 
           {/* action */}
           <View style={styles.actions}>
             <Pressable
               style={({ pressed }) => [styles.primaryBtn, pressed && styles.pressed]}
-              onPress={sendCode}>
-              <Text style={styles.primaryBtnText}>Send code</Text>
+              onPress={sendCode}
+              disabled={sending}>
+              <Text style={styles.primaryBtnText}>{sending ? 'Sending…' : 'Send code'}</Text>
             </Pressable>
           </View>
         </KeyboardAvoidingView>
@@ -244,6 +262,14 @@ const styles = StyleSheet.create({
     fontSize: 11.5,
     lineHeight: 17,
     color: C.helper,
+    marginTop: 10,
+  },
+
+  errorText: {
+    fontFamily: 'Manrope_600SemiBold',
+    fontSize: 12.5,
+    lineHeight: 17,
+    color: '#ff7a7a',
     marginTop: 10,
   },
 

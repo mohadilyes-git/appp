@@ -52,20 +52,23 @@ export default function RootLayout() {
     if (ready) SplashScreen.hideAsync();
   }, [ready]);
 
-  // signed out -> /welcome, signed in -> app
+  // signed out -> /welcome, signed in -> app.
+  // the verify screens sit in between: you need an account to be on them.
   useEffect(() => {
     if (!ready) return;
-    const authScreens = [
-      'login',
-      'welcome',
-      'register',
-      'verify-phone',
-      'verify-code',
-      'forgot-password',
-    ];
-    const onAuthScreen = authScreens.includes(segments[0] ?? '');
-    if (!session && !onAuthScreen) router.replace('/welcome');
-    else if (session && onAuthScreen) router.replace('/');
+    const seg = segments[0] ?? '';
+    const publicScreens = ['welcome', 'login', 'register', 'forgot-password'];
+    const onboardingScreens = ['verify-phone', 'verify-code'];
+
+    const phoneDone = Boolean(session?.user?.phone_confirmed_at);
+
+    if (!session) {
+      if (!publicScreens.includes(seg)) router.replace('/welcome');
+    } else if (!phoneDone) {
+      if (!onboardingScreens.includes(seg)) router.replace('/verify-phone');
+    } else if (publicScreens.includes(seg) || onboardingScreens.includes(seg)) {
+      router.replace('/');
+    }
   }, [ready, session, segments, router]);
 
   return <Stack screenOptions={{ headerShown: false }} />;

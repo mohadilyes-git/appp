@@ -57,20 +57,24 @@ export default function LoginScreen() {
   }
 
   async function logIn() {
-    if (mode === 'phone') {
-      // phone auth needs an SMS provider, not wired up yet
-      Alert.alert('Not available yet', 'Phone login is coming soon. Use email instead.');
+    const isPhone = mode === 'phone';
+    const digits = phone.replace(/\D/g, '');
+
+    if (isPhone ? !digits : !email.trim()) {
+      Alert.alert('Missing details', isPhone ? 'Enter your number.' : 'Enter your email.');
       return;
     }
-    if (!email.trim() || !password) {
-      Alert.alert('Missing details', 'Enter your email and password.');
+    if (!password) {
+      Alert.alert('Missing details', 'Enter your password.');
       return;
     }
+
     setSubmitting(true);
-    const { error } = await supabase.auth.signInWithPassword({
-      email: email.trim(),
-      password,
-    });
+    const { error } = await supabase.auth.signInWithPassword(
+      isPhone
+        ? { phone: `${country.dial}${digits}`, password }
+        : { email: email.trim(), password },
+    );
     setSubmitting(false);
     if (error) Alert.alert('Log in failed', error.message);
   }

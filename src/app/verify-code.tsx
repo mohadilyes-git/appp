@@ -14,6 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import GlowBackground from '@/components/glow-background';
 import PulseDot from '@/components/pulse-dot';
+import { supabase } from '@/lib/supabase';
 
 const RESEND_SECONDS = 24;
 
@@ -45,7 +46,11 @@ export default function VerifyCodeScreen() {
 
   const [code, setCode] = useState('');
   const [secondsLeft, setSecondsLeft] = useState(RESEND_SECONDS);
+  const [checking, setChecking] = useState(false);
+  const [error, setError] = useState('');
   const inputRef = useRef<TextInput>(null);
+
+  const fullPhone = dial && phone ? `${dial}${phone}` : '';
 
   const isComplete = code.length === 6;
   const activeIndex = code.length;
@@ -61,9 +66,32 @@ export default function VerifyCodeScreen() {
     else router.replace('/verify-phone');
   }
 
-  function resend() {
-    if (secondsLeft > 0) return;
+  async function resend() {
+    if (secondsLeft > 0 || !fullPhone) return;
+    setError('');
     setSecondsLeft(RESEND_SECONDS);
+    const { error: err } = await supabase.auth.updateUser({ phone: fullPhone });
+    if (err) setError(err.message);
+  }
+
+  async function verify() {
+    if (!isComplete || !fullPhone) return;
+    setChecking(true);
+    setError('');
+    const { error: err } = await supabase.auth.verifyOtp({
+      phone: fullPhone,
+      token: code,
+      type: 'phone_change',
+    });
+    setChecking(false);
+
+    if (err) {
+      setError('That code is not right. Check it and try again.');
+      setCode('');
+      return;
+    }
+    // the layout guard sees the confirmed phone and lets us into the app
+    router.replace('/');
   }
 
   const sentTo = dial && phone ? `${dial} ${phone}` : 'your number';
@@ -115,6 +143,7 @@ export default function VerifyCodeScreen() {
                     styles.codeBox,
                     code[i] != null && styles.codeBoxFilled,
                     i === activeIndex && !isComplete && styles.codeBoxActive,
+                    error ? styles.codeBoxError : null,
                   ]}>
                   <Text style={styles.codeDigit}>{code[i] ?? ''}</Text>
                 </View>
@@ -123,7 +152,10 @@ export default function VerifyCodeScreen() {
                 ref={inputRef}
                 style={styles.hiddenInput}
                 value={code}
-                onChangeText={(v) => setCode(v.replace(/\D/g, '').slice(0, 6))}
+                onChangeText={(v) => {
+                  setCode(v.replace(/\D/g, '').slice(0, 6));
+                  if (error) setError('');
+                }}
                 keyboardType="number-pad"
                 textContentType="oneTimeCode"
                 autoComplete="sms-otp"
@@ -131,6 +163,8 @@ export default function VerifyCodeScreen() {
                 autoFocus
               />
             </Pressable>
+
+            {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
             <Text style={styles.resendLine}>
               Didn't get it?{' '}
@@ -153,8 +187,9 @@ export default function VerifyCodeScreen() {
                 { opacity: isComplete ? 1 : 0.45 },
                 pressed && isComplete && styles.pressed,
               ]}
-              disabled={!isComplete}>
-              <Text style={styles.primaryBtnText}>Verify</Text>
+              onPress={verify}
+              disabled={!isComplete || checking}>
+              <Text style={styles.primaryBtnText}>{checking ? 'Verifying…' : 'Verify'}</Text>
             </Pressable>
           </View>
         </KeyboardAvoidingView>
@@ -233,9 +268,18 @@ const styles = StyleSheet.create({
   },
   codeBoxFilled: { borderColor: C.borderFilled },
   codeBoxActive: { borderColor: C.blueFocus, backgroundColor: C.fieldFocus },
+  codeBoxError: { borderColor: '#ff7a7a' },
   codeDigit: { fontFamily: 'SpaceGrotesk_700Bold', fontSize: 22, color: '#fff' },
   hiddenInput: { ...StyleSheet.absoluteFillObject, opacity: 0 },
 
+  errorText: {
+    fontFamily: 'Manrope_600SemiBold',
+    fontSize: 12.5,
+    lineHeight: 17,
+    color: '#ff7a7a',
+    textAlign: 'center',
+    marginTop: 16,
+  },
   resendLine: {
     fontFamily: 'Manrope_400Regular',
     fontSize: 12.5,
