@@ -16,16 +16,20 @@ import { useEffect, useState } from 'react';
 
 import { supabase } from '@/lib/supabase';
 
-SplashScreen.preventAutoHideAsync();
+SplashScreen.preventAutoHideAsync().catch(() => {});
+
+// how long we wait for supabase before opening the app anyway
+const STARTUP_TIMEOUT_MS = 5000;
 
 export default function RootLayout() {
   const [session, setSession] = useState<Session | null>(null);
   const [authReady, setAuthReady] = useState(false);
+  const [waitedLongEnough, setWaitedLongEnough] = useState(false);
   const router = useRouter();
   const segments = useSegments();
 
   // app fonts
-  const [fontsLoaded] = useFonts({
+  const [fontsLoaded, fontError] = useFonts({
     Manrope_400Regular,
     Manrope_600SemiBold,
     Manrope_700Bold,
@@ -36,20 +40,32 @@ export default function RootLayout() {
 
   // load the session once, then keep it in sync with auth changes
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      setAuthReady(true);
-    });
+    supabase.auth
+      .getSession()
+      .then(({ data }) => setSession(data.session))
+      .catch(() => {
+        // couldn't reach supabase, start as signed out and let the listener catch up
+      })
+      .finally(() => setAuthReady(true));
+
     const { data: sub } = supabase.auth.onAuthStateChange((_event, next) => {
       setSession(next);
     });
     return () => sub.subscription.unsubscribe();
   }, []);
 
-  const ready = authReady && fontsLoaded;
+  // a bad connection shouldn't leave people staring at the logo
+  useEffect(() => {
+    const t = setTimeout(() => setWaitedLongEnough(true), STARTUP_TIMEOUT_MS);
+    return () => clearTimeout(t);
+  }, []);
+
+  // missing fonts fall back to the system one, that's better than not opening
+  const fontsDone = fontsLoaded || Boolean(fontError);
+  const ready = (authReady && fontsDone) || waitedLongEnough;
 
   useEffect(() => {
-    if (ready) SplashScreen.hideAsync();
+    if (ready) SplashScreen.hideAsync().catch(() => {});
   }, [ready]);
 
   // signed out -> /welcome, signed in -> app.
