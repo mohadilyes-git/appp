@@ -1,7 +1,6 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
-  Alert,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -50,6 +49,9 @@ export default function LoginScreen() {
     COUNTRIES.find((c) => c.iso === 'US') ?? COUNTRIES[0],
   );
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [error, setError] = useState('');
+  const [needsConfirm, setNeedsConfirm] = useState(false);
+  const [resending, setResending] = useState(false);
 
   function goBack() {
     if (router.canGoBack()) router.back();
@@ -61,22 +63,41 @@ export default function LoginScreen() {
     const digits = phone.replace(/\D/g, '');
 
     if (isPhone ? !digits : !email.trim()) {
-      Alert.alert('Missing details', isPhone ? 'Enter your number.' : 'Enter your email.');
+      setError(isPhone ? 'Enter your number.' : 'Enter your email.');
       return;
     }
     if (!password) {
-      Alert.alert('Missing details', 'Enter your password.');
+      setError('Enter your password.');
       return;
     }
 
     setSubmitting(true);
-    const { error } = await supabase.auth.signInWithPassword(
+    setError('');
+    setNeedsConfirm(false);
+    const { error: err } = await supabase.auth.signInWithPassword(
       isPhone
         ? { phone: `${country.dial}${digits}`, password }
         : { email: email.trim(), password },
     );
     setSubmitting(false);
-    if (error) Alert.alert('Log in failed', error.message);
+    if (!err) return;
+
+    // unconfirmed email isn't really a failure, so offer a resend instead
+    if (/not confirmed/i.test(err.message)) {
+      setNeedsConfirm(true);
+      setError('Confirm your email first. We sent you a link when you signed up.');
+      return;
+    }
+    setError(err.message);
+  }
+
+  async function resendConfirmation() {
+    if (!email.trim()) return;
+    setResending(true);
+    const { error: err } = await supabase.auth.resend({ type: 'signup', email: email.trim() });
+    setResending(false);
+    setError(err ? err.message : 'Sent. Check your inbox.');
+    if (!err) setNeedsConfirm(false);
   }
 
   return (
@@ -132,7 +153,7 @@ export default function LoginScreen() {
                     placeholder="(555) 013-2764"
                     placeholderTextColor={C.placeholder}
                     value={phone}
-                    onChangeText={setPhone}
+                    onChangeText={(v) => { setPhone(v); if (error) setError(''); }}
                   />
                 </View>
               </>
@@ -148,7 +169,7 @@ export default function LoginScreen() {
                   placeholder="you@example.com"
                   placeholderTextColor={C.placeholder}
                   value={email}
-                  onChangeText={setEmail}
+                  onChangeText={(v) => { setEmail(v); if (error) setError(''); }}
                 />
               </>
             )}
@@ -162,7 +183,7 @@ export default function LoginScreen() {
                 placeholder="Your password"
                 placeholderTextColor={C.placeholder}
                 value={password}
-                onChangeText={setPassword}
+                onChangeText={(v) => { setPassword(v); if (error) setError(''); }}
                 onFocus={() => setPasswordFocused(true)}
                 onBlur={() => setPasswordFocused(false)}
               />
@@ -184,6 +205,14 @@ export default function LoginScreen() {
 
           {/* actions, pinned to the bottom */}
           <View style={styles.actions}>
+            {error ? <Text style={styles.formError}>{error}</Text> : null}
+            {needsConfirm ? (
+              <Pressable onPress={resendConfirmation} disabled={resending} hitSlop={6}>
+                <Text style={styles.resendLink}>
+                  {resending ? 'Sending…' : 'Resend confirmation email'}
+                </Text>
+              </Pressable>
+            ) : null}
             <Pressable
               style={({ pressed }) => [styles.primaryBtn, pressed && styles.pressed]}
               onPress={logIn}
@@ -327,6 +356,21 @@ const styles = StyleSheet.create({
   showToggleText: { fontFamily: 'Manrope_800ExtraBold', fontSize: 12.5, color: C.blueLight },
   forgot: { alignSelf: 'flex-end', marginTop: 10 },
   forgotText: { fontFamily: 'Manrope_700Bold', fontSize: 12.5, color: C.blueLight },
+
+  formError: {
+    fontFamily: 'Manrope_600SemiBold',
+    fontSize: 12.5,
+    lineHeight: 18,
+    color: '#ff7a7a',
+    textAlign: 'center',
+  },
+  resendLink: {
+    fontFamily: 'Manrope_700Bold',
+    fontSize: 12.5,
+    color: C.blueLight,
+    textAlign: 'center',
+    marginTop: -4,
+  },
 
   actions: { marginTop: 'auto', gap: 10, paddingHorizontal: 22, paddingTop: 16, paddingBottom: 8 },
   primaryBtn: {

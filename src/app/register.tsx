@@ -12,6 +12,7 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Svg, { Circle, Path } from 'react-native-svg';
 
 import { AppleLogo, GoogleLogo } from '@/components/brand-logos';
 import GlowBackground from '@/components/glow-background';
@@ -36,7 +37,24 @@ const C = {
   borderSubtle: 'rgba(255,255,255,.14)',
   borderRule: 'rgba(255,255,255,.12)',
   error: '#ff7a7a',
+  success: '#3ddc97',
 };
+
+function SuccessCheck() {
+  return (
+    <Svg width={76} height={76} viewBox="0 0 76 76">
+      <Circle cx="38" cy="38" r="37" fill="rgba(61,220,151,.12)" stroke={C.success} strokeWidth={1.5} />
+      <Path
+        d="M24 39.5 L33.5 49 L52 30.5"
+        fill="none"
+        stroke={C.success}
+        strokeWidth={4}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </Svg>
+  );
+}
 
 export default function RegisterScreen() {
   const router = useRouter();
@@ -50,6 +68,7 @@ export default function RegisterScreen() {
   const [focused, setFocused] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
+  const [registered, setRegistered] = useState(false);
 
   function goBack() {
     if (router.canGoBack()) router.back();
@@ -107,10 +126,39 @@ export default function RegisterScreen() {
     }
     // no session means email confirmation is switched on
     if (!data.session) {
-      setErrors({ form: 'Check your email to confirm your account, then log in.' });
+      setRegistered(true);
       return;
     }
     router.replace('/verify-phone');
+  }
+
+  if (registered) {
+    return (
+      <View style={styles.root}>
+        <GlowBackground width={width} height={height} topGlow={0.4} bottomGlow={0.6} halo={true} />
+        <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
+          <View style={styles.doneWrap}>
+            <SuccessCheck />
+            <Text style={styles.doneTitle}>Account created</Text>
+            <Text style={styles.doneBody}>
+              We sent a confirmation link to{'\n'}
+              <Text style={styles.doneEmail}>{email.trim()}</Text>
+            </Text>
+            <Text style={styles.doneHint}>
+              Open it to confirm your account, then log in to finish setting up.
+            </Text>
+          </View>
+
+          <View style={styles.actions}>
+            <Pressable
+              style={({ pressed }) => [styles.primaryBtn, pressed && styles.pressed]}
+              onPress={() => router.replace('/login')}>
+              <Text style={styles.primaryBtnText}>Go to log in</Text>
+            </Pressable>
+          </View>
+        </SafeAreaView>
+      </View>
+    );
   }
 
   return (
@@ -360,6 +408,38 @@ const styles = StyleSheet.create({
     padding: 6,
   },
   showToggleText: { fontFamily: 'Manrope_800ExtraBold', fontSize: 12.5, color: C.blueLight },
+
+  doneWrap: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 34,
+    gap: 6,
+  },
+  doneTitle: {
+    fontFamily: 'SpaceGrotesk_600SemiBold',
+    fontSize: 26,
+    letterSpacing: -0.5,
+    color: C.headline,
+    marginTop: 22,
+  },
+  doneBody: {
+    fontFamily: 'Manrope_400Regular',
+    fontSize: 14,
+    lineHeight: 21,
+    color: C.textTertiary,
+    textAlign: 'center',
+    marginTop: 6,
+  },
+  doneEmail: { fontFamily: 'Manrope_700Bold', color: '#fff' },
+  doneHint: {
+    fontFamily: 'Manrope_400Regular',
+    fontSize: 12.5,
+    lineHeight: 19,
+    color: C.legal,
+    textAlign: 'center',
+    marginTop: 12,
+  },
 
   actions: { marginTop: 'auto', gap: 10, paddingHorizontal: 22, paddingTop: 16, paddingBottom: 8 },
   primaryBtn: {
