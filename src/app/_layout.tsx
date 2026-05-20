@@ -15,6 +15,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
 
 import { supabase } from '@/lib/supabase';
+import { ThemeProvider } from '@/lib/theme-context';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
@@ -87,5 +88,9 @@ export default function RootLayout() {
     }
   }, [ready, session, segments, router]);
 
-  return <Stack screenOptions={{ headerShown: false }} />;
+  return (
+    <ThemeProvider>
+      <Stack screenOptions={{ headerShown: false }} />
+    </ThemeProvider>
+  );
 }
