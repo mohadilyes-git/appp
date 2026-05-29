@@ -29,10 +29,11 @@ export function tracking(fontSize: number, em: number) {
 }
 
 // the blue gradients look the same in both themes, white text sits on them either way
+// as const keeps these as fixed pairs and triples, which is what the gradient wants
 export const gradients = {
-  hero: ['#2f6fed', '#1c47a8', '#12295f'],
-  heroStops: [0, 0.58, 1],
-  avatar: ['#2f6fed', '#173a80'],
+  hero: ['#2f6fed', '#1c47a8', '#12295f'] as const,
+  heroStops: [0, 0.58, 1] as const,
+  avatar: ['#2f6fed', '#173a80'] as const,
 };
 
 const lightColors = {

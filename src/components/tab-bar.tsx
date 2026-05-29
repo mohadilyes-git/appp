@@ -3,7 +3,7 @@ import { BlurView } from 'expo-blur';
 import { useEffect, useRef } from 'react';
 import { Animated, Easing, Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
 
-import { BoltIcon, HomeIcon, PeopleIcon, SlidersIcon } from '@/components/tab-icons';
+import { BoltIcon, HomeIcon, PeopleIcon, SlidersIcon } from '@/components/icons';
 import { radius } from '@/lib/theme';
 import { useTheme } from '@/lib/theme-context';
 

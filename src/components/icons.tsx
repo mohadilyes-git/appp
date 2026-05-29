@@ -5,7 +5,7 @@ type IconProps = {
   size?: number;
 };
 
-// the four dock glyphs, taken straight from the design file
+// every glyph in the app, taken straight from the design file
 
 export function HomeIcon({ color, size = 28 }: IconProps) {
   return (
@@ -41,6 +41,14 @@ export function SlidersIcon({ color, size = 28 }: IconProps) {
       <Circle cx="9" cy="6.4" r="3.2" />
       <Circle cx="15.6" cy="12" r="3.2" />
       <Circle cx="7.6" cy="17.6" r="3.2" />
+    </Svg>
+  );
+}
+
+export function BellIcon({ color, size = 19 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+      <Path d="M12 2.6a6.3 6.3 0 0 1 6.3 6.3v4.4l1.7 3a1 1 0 0 1-.9 1.5H4.9a1 1 0 0 1-.9-1.5l1.7-3V8.9A6.3 6.3 0 0 1 12 2.6zM9.4 19.3h5.2a2.6 2.6 0 0 1-5.2 0z" />
     </Svg>
   );
 }
