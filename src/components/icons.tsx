@@ -45,6 +45,22 @@ export function SlidersIcon({ color, size = 28 }: IconProps) {
   );
 }
 
+export function ChevronRightIcon({ color, size = 15 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+      <Path d="M9.4 4.6 17 12l-7.6 7.4-2-2L13.2 12 7.4 6.6z" />
+    </Svg>
+  );
+}
+
+export function ArrowUpIcon({ color, size = 11 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+      <Path d="M12 4.6 20 14h-5.4v5.4H9.4V14H4z" />
+    </Svg>
+  );
+}
+
 export function BellIcon({ color, size = 19 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
