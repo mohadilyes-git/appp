@@ -19,8 +19,8 @@ import { ThemeProvider } from '@/lib/theme-context';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
-// how long we wait for supabase before opening the app anyway
-const STARTUP_TIMEOUT_MS = 5000;
+// how long we wait for the supabase session before opening the app anyway
+const SESSION_TIMEOUT_MS = 5000;
 
 export default function RootLayout() {
   const [session, setSession] = useState<Session | null>(null);
@@ -57,13 +57,18 @@ export default function RootLayout() {
 
   // a bad connection shouldn't leave people staring at the logo
   useEffect(() => {
-    const t = setTimeout(() => setWaitedLongEnough(true), STARTUP_TIMEOUT_MS);
+    const t = setTimeout(() => setWaitedLongEnough(true), SESSION_TIMEOUT_MS);
     return () => clearTimeout(t);
   }, []);
 
-  // missing fonts fall back to the system one, that's better than not opening
+  useEffect(() => {
+    if (fontError) console.warn('app fonts did not load, falling back to the system one', fontError);
+  }, [fontError]);
+
+  // fonts ship inside the app so they can't stall, only the session gets the timeout
   const fontsDone = fontsLoaded || Boolean(fontError);
-  const ready = (authReady && fontsDone) || waitedLongEnough;
+  const sessionDone = authReady || waitedLongEnough;
+  const ready = fontsDone && sessionDone;
 
   useEffect(() => {
     if (ready) SplashScreen.hideAsync().catch(() => {});
@@ -87,6 +92,9 @@ export default function RootLayout() {
       router.replace('/');
     }
   }, [ready, session, segments, router]);
+
+  // text nodes keep whatever font they were built with, so wait before rendering
+  if (!ready) return null;
 
   return (
     <ThemeProvider>
