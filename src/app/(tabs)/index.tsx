@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -44,13 +45,14 @@ const SAMPLE: ProfitSummary = {
 export default function HomeScreen() {
   const { colors, shadows } = useTheme();
   const insets = useSafeAreaInsets();
+  const router = useRouter();
 
   return (
     <ScrollView
       contentContainerStyle={[styles.scroll, { paddingTop: insets.top + 8 }]}
       showsVerticalScrollIndicator={false}>
       <GreetingRow unread />
-      <ProfitCard summary={SAMPLE} />
+      <ProfitCard summary={SAMPLE} onPress={() => router.push('/inventory')} />
 
       {/* still placeholders, the nudge row and searches come next */}
       {[90, 150].map((height, i) => (

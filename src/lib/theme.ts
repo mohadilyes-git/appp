@@ -81,6 +81,9 @@ const lightColors = {
   tabInactive: 'rgba(14,17,22,.4)',
   // the ring around the new-listings dot, sits on whatever the dock sits on
   dotRing: '#ffffff',
+
+  // stands in for an item photo until there is one
+  photoEmpty: '#e8ecf3',
 };
 
 // light sets the shape, so typescript makes sure dark fills in every single one
@@ -130,6 +133,8 @@ const darkColors: Colors = {
 
   tabInactive: 'rgba(255,255,255,.45)',
   dotRing: '#12161f',
+
+  photoEmpty: '#232a38',
 };
 
 // css blur roughly halves when you turn it into a react native shadow radius
@@ -168,6 +173,14 @@ const lightShadows = {
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 8 },
     elevation: 8,
+  },
+  // the big blue action buttons, softer than the profit card
+  cta: {
+    shadowColor: '#1c47a8',
+    shadowOpacity: 0.32,
+    shadowRadius: 17,
+    shadowOffset: { width: 0, height: 16 },
+    elevation: 12,
   },
   button: {
     shadowColor: '#193269',
@@ -216,6 +229,13 @@ const darkShadows: Shadows = {
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 8 },
     elevation: 8,
+  },
+  cta: {
+    shadowColor: '#1c47a8',
+    shadowOpacity: 0.32,
+    shadowRadius: 17,
+    shadowOffset: { width: 0, height: 16 },
+    elevation: 12,
   },
   button: {
     shadowColor: '#000000',

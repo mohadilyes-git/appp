@@ -25,6 +25,8 @@ export default function TabsLayout() {
         <Tabs.Screen name="listings" />
         <Tabs.Screen name="feed" />
         <Tabs.Screen name="settings" />
+        {/* sits inside the home tab, the dock skips it */}
+        <Tabs.Screen name="inventory" />
       </Tabs>
     </View>
   );

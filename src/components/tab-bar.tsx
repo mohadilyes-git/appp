@@ -26,9 +26,16 @@ export default function TabBar({ state, navigation }: BottomTabBarProps) {
   const { colors, shadows, resolved } = useTheme();
   const { width: screenWidth } = useWindowDimensions();
 
-  const slide = useRef(new Animated.Value(state.index)).current;
+  const slide = useRef(new Animated.Value(0)).current;
   const awake = useRef(new Animated.Value(0)).current;
   const relaxTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // screens like inventory live inside a tab, so the chip stays on its parent
+  const activeName = state.routes[state.index]?.name;
+  const activeTab = Math.max(
+    TABS.findIndex((t) => t.name === activeName),
+    0,
+  );
 
   // tapping pinches the dock in, lifts it and lets it stand a little taller
   const inset = awake.interpolate({ inputRange: [0, 1], outputRange: [RESTING.inset, AWAKE.inset] });
@@ -50,12 +57,12 @@ export default function TabBar({ state, navigation }: BottomTabBarProps) {
 
   useEffect(() => {
     Animated.timing(slide, {
-      toValue: state.index,
+      toValue: activeTab,
       duration: SLIDE_MS,
       easing: Easing.bezier(0.22, 0.9, 0.32, 1),
       useNativeDriver: false,
     }).start();
-  }, [state.index, slide]);
+  }, [activeTab, slide]);
 
   // don't leave a countdown running if the bar unmounts
   useEffect(() => {
@@ -99,10 +106,10 @@ export default function TabBar({ state, navigation }: BottomTabBarProps) {
           <View style={[styles.chip, { backgroundColor: colors.accentChip }]} />
         </Animated.View>
 
-        {state.routes.map((route, i) => {
+        {state.routes.map((route) => {
           const tab = TABS.find((t) => t.name === route.name);
           if (!tab) return null;
-          const focused = state.index === i;
+          const focused = TABS[activeTab].name === route.name;
 
           function onPress() {
             wake();

@@ -53,6 +53,23 @@ export function ChevronRightIcon({ color, size = 15 }: IconProps) {
   );
 }
 
+export function ChevronLeftIcon({ color, size = 17 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+      <Path d="M14.6 4.6 7 12l7.6 7.4 2-2L10.8 12l5.8-5.4z" />
+    </Svg>
+  );
+}
+
+export function PlusIcon({ color, size = 17 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+      <Rect x="10.6" y="4" width="2.8" height="16" rx="1.4" />
+      <Rect x="4" y="10.6" width="16" height="2.8" rx="1.4" />
+    </Svg>
+  );
+}
+
 export function ArrowUpIcon({ color, size = 11 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
