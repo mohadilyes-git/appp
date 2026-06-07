@@ -78,6 +78,31 @@ export function ArrowUpIcon({ color, size = 11 }: IconProps) {
   );
 }
 
+export function CameraIcon({ color, size = 21 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+      <Path d="M9.4 3.6h5.2l1.1 1.9h3.5a1.8 1.8 0 0 1 1.8 1.8v11a1.8 1.8 0 0 1-1.8 1.8H4.8A1.8 1.8 0 0 1 3 18.3v-11a1.8 1.8 0 0 1 1.8-1.8h3.5zM12 8.6a4.3 4.3 0 1 0 0 8.6 4.3 4.3 0 0 0 0-8.6zm0 2.1a2.2 2.2 0 1 1 0 4.4 2.2 2.2 0 0 1 0-4.4z" />
+    </Svg>
+  );
+}
+
+export function PhotosIcon({ color, size = 21 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+      <Path d="M7.2 3.4h13.4v13.4H7.2z" opacity={0.45} />
+      <Path d="M3.4 7.2h13.4v13.4H3.4zm2.1 11.3h9.2l-2.9-3.9-1.9 2.3-1.3-1.4z" />
+    </Svg>
+  );
+}
+
+export function CloseIcon({ color, size = 9 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+      <Path d="M18.3 7.1 16.9 5.7 12 10.6 7.1 5.7 5.7 7.1 10.6 12l-4.9 4.9 1.4 1.4 4.9-4.9 4.9 4.9 1.4-1.4-4.9-4.9z" />
+    </Svg>
+  );
+}
+
 export function BellIcon({ color, size = 19 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>

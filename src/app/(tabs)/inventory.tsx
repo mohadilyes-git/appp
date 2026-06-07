@@ -57,7 +57,9 @@ export default function InventoryScreen() {
       </View>
 
       {/* add actions go first, before the summary */}
-      <Pressable style={({ pressed }) => [shadows.cta, pressed && styles.lifted]}>
+      <Pressable
+        onPress={() => router.push('/add-item')}
+        style={({ pressed }) => [shadows.cta, pressed && styles.lifted]}>
         <LinearGradient
           colors={gradients.hero}
           locations={gradients.heroStops}

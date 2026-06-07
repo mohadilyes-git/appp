@@ -84,6 +84,27 @@ const lightColors = {
 
   // stands in for an item photo until there is one
   photoEmpty: '#e8ecf3',
+
+  // form fields
+  surfaceField: 'rgba(14,17,22,.04)',
+  borderField: 'rgba(14,17,22,.1)',
+  textPlaceholder: 'rgba(14,17,22,.34)',
+  textHint: 'rgba(14,17,22,.4)',
+
+  // empty photo slots
+  slotBg: 'rgba(47,111,237,.06)',
+  slotBorder: 'rgba(47,111,237,.4)',
+  ghostBorder: 'rgba(14,17,22,.14)',
+  ghostFg: 'rgba(14,17,22,.24)',
+
+  negative: '#be2828',
+  negativeTint: 'rgba(190,40,40,.08)',
+  negativeBorder: 'rgba(190,40,40,.2)',
+  positiveBorder: 'rgba(19,124,74,.2)',
+
+  // the fade behind a pinned action bar, so content scrolls under it
+  barFadeFrom: 'rgba(240,243,248,0)',
+  barFadeTo: 'rgba(240,243,248,.96)',
 };
 
 // light sets the shape, so typescript makes sure dark fills in every single one
@@ -135,6 +156,24 @@ const darkColors: Colors = {
   dotRing: '#12161f',
 
   photoEmpty: '#232a38',
+
+  surfaceField: 'rgba(255,255,255,.06)',
+  borderField: 'rgba(255,255,255,.12)',
+  textPlaceholder: 'rgba(255,255,255,.35)',
+  textHint: 'rgba(255,255,255,.42)',
+
+  slotBg: 'rgba(122,162,255,.09)',
+  slotBorder: 'rgba(122,162,255,.45)',
+  ghostBorder: 'rgba(255,255,255,.14)',
+  ghostFg: 'rgba(255,255,255,.26)',
+
+  negative: '#ff7a7a',
+  negativeTint: 'rgba(255,122,122,.1)',
+  negativeBorder: 'rgba(255,122,122,.24)',
+  positiveBorder: 'rgba(62,207,142,.24)',
+
+  barFadeFrom: 'rgba(9,12,18,0)',
+  barFadeTo: 'rgba(9,12,18,.94)',
 };
 
 // css blur roughly halves when you turn it into a react native shadow radius
