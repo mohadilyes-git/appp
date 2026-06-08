@@ -33,7 +33,14 @@
           "imageWidth": 76
         }
       ],
-      "expo-font"
+      "expo-font",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "AlertsFlip needs your photos so you can add pictures of the items you track.",
+          "cameraPermission": "AlertsFlip needs the camera so you can photograph the items you track."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

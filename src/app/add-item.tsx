@@ -25,6 +25,8 @@ import { font, gradients, radius, tracking } from '@/lib/theme';
 import { useTheme } from '@/lib/theme-context';
 
 const MAX_PHOTOS = 6;
+// a touch longer than the sheet's slide out
+const SHEET_CLOSE_MS = 320;
 
 export default function AddItemScreen() {
   const router = useRouter();
@@ -68,25 +70,33 @@ export default function AddItemScreen() {
     setPhotos((current) => current.filter((_, i) => i !== index));
   }
 
-  async function takePhoto() {
+  // ios won't open the picker while the sheet is still closing, so let it finish first
+  function afterSheetCloses(run: () => void) {
     setSheetOpen(false);
-    const permission = await ImagePicker.requestCameraPermissionsAsync();
-    if (!permission.granted) return;
-    const result = await ImagePicker.launchCameraAsync({ mediaTypes: ['images'], quality: 0.8 });
-    if (!result.canceled) addPhotos(result.assets.map((a) => a.uri));
+    setTimeout(run, SHEET_CLOSE_MS);
   }
 
-  async function chooseFromLibrary() {
-    setSheetOpen(false);
-    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permission.granted) return;
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
-      allowsMultipleSelection: true,
-      selectionLimit: MAX_PHOTOS - photos.length,
-      quality: 0.8,
+  function takePhoto() {
+    afterSheetCloses(async () => {
+      const permission = await ImagePicker.requestCameraPermissionsAsync();
+      if (!permission.granted) return;
+      const result = await ImagePicker.launchCameraAsync({ mediaTypes: ['images'], quality: 0.8 });
+      if (!result.canceled) addPhotos(result.assets.map((a) => a.uri));
     });
-    if (!result.canceled) addPhotos(result.assets.map((a) => a.uri));
+  }
+
+  function chooseFromLibrary() {
+    afterSheetCloses(async () => {
+      const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!permission.granted) return;
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsMultipleSelection: true,
+        selectionLimit: MAX_PHOTOS - photos.length,
+        quality: 0.8,
+      });
+      if (!result.canceled) addPhotos(result.assets.map((a) => a.uri));
+    });
   }
 
   function goBack() {
