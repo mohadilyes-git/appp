@@ -18,15 +18,25 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import AppBackground from '@/components/app-background';
+import ChoiceSheet from '@/components/choice-sheet';
+import DateSheet from '@/components/date-sheet';
 import { ChevronLeftIcon, CloseIcon, PlusIcon } from '@/components/icons';
 import PhotoSourceSheet from '@/components/photo-source-sheet';
-import { SEGMENTS, money, type ItemStatus } from '@/lib/inventory';
+import {
+  MARKETPLACES,
+  SEGMENTS,
+  formatBoughtDate,
+  money,
+  type ItemStatus,
+} from '@/lib/inventory';
 import { font, gradients, radius, tracking } from '@/lib/theme';
 import { useTheme } from '@/lib/theme-context';
 
 const MAX_PHOTOS = 6;
 // a touch longer than the sheet's slide out
 const SHEET_CLOSE_MS = 320;
+// the controls that sit on a photo keep one colour in both themes
+const ON_PHOTO = '#2f6fed';
 
 export default function AddItemScreen() {
   const router = useRouter();
@@ -40,6 +50,10 @@ export default function AddItemScreen() {
   const [paid, setPaid] = useState('');
   const [target, setTarget] = useState('');
   const [status, setStatus] = useState<ItemStatus>('inhand');
+  const [boughtFrom, setBoughtFrom] = useState(MARKETPLACES[0]);
+  const [dateBought, setDateBought] = useState(new Date());
+  const [marketOpen, setMarketOpen] = useState(false);
+  const [dateOpen, setDateOpen] = useState(false);
   const [notes, setNotes] = useState('');
   const [focused, setFocused] = useState<string | null>(null);
 
@@ -282,8 +296,16 @@ export default function AddItemScreen() {
           </View>
 
           <View style={styles.pair}>
-            <MetaField label="Bought from" value="Facebook" />
-            <MetaField label="Date bought" value="Today" />
+            <MetaField
+              label="Bought from"
+              value={boughtFrom}
+              onPress={() => setMarketOpen(true)}
+            />
+            <MetaField
+              label="Date bought"
+              value={formatBoughtDate(dateBought)}
+              onPress={() => setDateOpen(true)}
+            />
           </View>
 
           <View style={styles.block}>
@@ -331,6 +353,25 @@ export default function AddItemScreen() {
         onChooseLibrary={chooseFromLibrary}
         onClose={() => setSheetOpen(false)}
       />
+
+      <ChoiceSheet
+        visible={marketOpen}
+        title="Bought from"
+        options={MARKETPLACES}
+        selected={boughtFrom}
+        onSelect={(value) => {
+          setBoughtFrom(value);
+          setMarketOpen(false);
+        }}
+        onClose={() => setMarketOpen(false)}
+      />
+
+      <DateSheet
+        visible={dateOpen}
+        value={dateBought}
+        onChange={setDateBought}
+        onClose={() => setDateOpen(false)}
+      />
     </View>
   );
 }
@@ -375,20 +416,32 @@ function PriceField({
   );
 }
 
-// the pickers behind these aren't designed yet
-function MetaField({ label, value }: { label: string; value: string }) {
+function MetaField({
+  label,
+  value,
+  onPress,
+}: {
+  label: string;
+  value: string;
+  onPress: () => void;
+}) {
   const { colors } = useTheme();
   return (
     <View style={styles.pairItem}>
       <Text style={[styles.label, { color: colors.textLabel }]}>{label}</Text>
-      <View
-        style={[
+      <Pressable
+        onPress={onPress}
+        accessibilityRole="button"
+        style={({ pressed }) => [
           styles.meta,
           { backgroundColor: colors.surfaceField, borderColor: colors.borderField },
+          pressed && { borderColor: colors.accentFill },
         ]}>
-        <Text style={[styles.metaValue, { color: colors.textPrimary }]}>{value}</Text>
+        <Text style={[styles.metaValue, { color: colors.textPrimary }]} numberOfLines={1}>
+          {value}
+        </Text>
         <Text style={[styles.caret, { color: colors.textHint }]}>▾</Text>
-      </View>
+      </Pressable>
     </View>
   );
 }
@@ -436,7 +489,7 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderRadius: 10,
-    backgroundColor: 'rgba(9,12,18,.62)',
+    backgroundColor: ON_PHOTO,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -444,7 +497,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 5,
     left: 5,
-    backgroundColor: '#2f6fed',
+    backgroundColor: ON_PHOTO,
     paddingVertical: 3,
     paddingHorizontal: 6,
     borderRadius: radius.pill,

@@ -22,6 +22,29 @@ export const STATUS_LABEL: Record<ItemStatus, string> = {
   sold: 'SOLD',
 };
 
+export const MARKETPLACES = [
+  'Facebook',
+  'Gumtree',
+  'Vinted',
+  'OfferUp',
+  'eBay',
+  'Craigslist',
+  'Kijiji',
+  'Nextdoor',
+];
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+// recent days read better as words than as a date
+export function formatBoughtDate(date: Date) {
+  const midnight = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  const daysAgo = Math.round((midnight(new Date()) - midnight(date)) / DAY_MS);
+
+  if (daysAgo === 0) return 'Today';
+  if (daysAgo === 1) return 'Yesterday';
+  return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+}
+
 export function money(n: number) {
   return `$${Math.round(n).toLocaleString('en-US')}`;
 }

@@ -40,7 +40,8 @@
           "photosPermission": "AlertsFlip needs your photos so you can add pictures of the items you track.",
           "cameraPermission": "AlertsFlip needs the camera so you can photograph the items you track."
         }
-      ]
+      ],
+      "@react-native-community/datetimepicker"
     ],
     "experiments": {
       "typedRoutes": true,
