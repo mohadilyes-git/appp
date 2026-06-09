@@ -3,8 +3,10 @@ import * as ImagePicker from 'expo-image-picker';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
+  InputAccessoryView,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -37,6 +39,9 @@ const MAX_PHOTOS = 6;
 const SHEET_CLOSE_MS = 320;
 // the controls that sit on a photo keep one colour in both themes
 const ON_PHOTO = '#2f6fed';
+// the number pad and the notes box have no return key to close them with
+const DONE_BAR = 'add-item-done';
+const doneBarId = Platform.OS === 'ios' ? DONE_BAR : undefined;
 
 export default function AddItemScreen() {
   const router = useRouter();
@@ -56,6 +61,7 @@ export default function AddItemScreen() {
   const [dateOpen, setDateOpen] = useState(false);
   const [notes, setNotes] = useState('');
   const [focused, setFocused] = useState<string | null>(null);
+  const scroller = useRef<ScrollView>(null);
 
   const full = photos.length >= MAX_PHOTOS;
   // filled thumbs, then one add slot, then ghosts to finish the row
@@ -136,8 +142,10 @@ export default function AddItemScreen() {
         style={styles.root}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView
+          ref={scroller}
           contentContainerStyle={[styles.scroll, { paddingTop: insets.top + 8 }]}
           keyboardShouldPersistTaps="handled"
+          keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
           showsVerticalScrollIndicator={false}>
           <View style={styles.header}>
             <Pressable
@@ -232,6 +240,8 @@ export default function AddItemScreen() {
               onChangeText={setName}
               onFocus={() => setFocused('name')}
               onBlur={() => setFocused(null)}
+              returnKeyType="done"
+              onSubmitEditing={Keyboard.dismiss}
             />
           </View>
 
@@ -268,7 +278,9 @@ export default function AddItemScreen() {
                 {bothPrices ? `${good ? '+' : '-'}${money(Math.abs(profit))}` : '—'}
               </Text>
               {bothPrices ? (
-                <Text style={[styles.projectedPct, { color: tone.fg }]}>{roi}%</Text>
+                <Text style={[styles.projectedPct, { color: tone.fg }]}>
+                  {roi.toLocaleString('en-US')}%
+                </Text>
               ) : null}
             </View>
           </View>
@@ -310,16 +322,28 @@ export default function AddItemScreen() {
           </View>
 
           <View style={styles.block}>
-            <Text style={[styles.label, { color: colors.textLabel }]}>
-              Notes <Text style={{ color: colors.textFaint }}>· optional</Text>
-            </Text>
+            {/* multiline ignores the keyboard bar on ios, so the way out lives up here */}
+            <View style={styles.notesHead}>
+              <Text style={[styles.label, { color: colors.textLabel }]}>
+                Notes <Text style={{ color: colors.textFaint }}>· optional</Text>
+              </Text>
+              {focused === 'notes' ? (
+                <Pressable onPress={Keyboard.dismiss} hitSlop={12}>
+                  <Text style={[styles.doneText, { color: colors.accentText }]}>Done</Text>
+                </Pressable>
+              ) : null}
+            </View>
             <TextInput
               style={[styles.textarea, { color: colors.textPrimary }, fieldStyle('notes')]}
               placeholder="Needs a steam clean, small tear on the back left"
               placeholderTextColor={colors.textPlaceholder}
               value={notes}
               onChangeText={setNotes}
-              onFocus={() => setFocused('notes')}
+              onFocus={() => {
+                setFocused('notes');
+                // notes is the last field, so the bottom is where it ends up
+                setTimeout(() => scroller.current?.scrollToEnd({ animated: true }), 140);
+              }}
               onBlur={() => setFocused(null)}
               multiline
               textAlignVertical="top"
@@ -346,6 +370,20 @@ export default function AddItemScreen() {
           </Pressable>
         </View>
       </KeyboardAvoidingView>
+
+      {Platform.OS === 'ios' ? (
+        <InputAccessoryView nativeID={DONE_BAR}>
+          <View
+            style={[
+              styles.doneBar,
+              { backgroundColor: colors.surfaceCard, borderTopColor: colors.borderCard },
+            ]}>
+            <Pressable onPress={Keyboard.dismiss} hitSlop={12}>
+              <Text style={[styles.doneText, { color: colors.accentText }]}>Done</Text>
+            </Pressable>
+          </View>
+        </InputAccessoryView>
+      ) : null}
 
       <PhotoSourceSheet
         visible={sheetOpen}
@@ -411,6 +449,7 @@ function PriceField({
           onChangeText={onChangeText}
           onFocus={() => setFocused(fieldKey)}
           onBlur={() => setFocused(null)}
+          inputAccessoryViewID={doneBarId}
         />
       </View>
     </View>
@@ -575,6 +614,17 @@ const styles = StyleSheet.create({
     fontSize: 13.5,
     lineHeight: 19.6,
   },
+
+  // the accessory view collapses to nothing unless its child is given a height
+  doneBar: {
+    height: 44,
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+    paddingHorizontal: 18,
+    borderTopWidth: 1,
+  },
+  doneText: { fontFamily: font.heavy, fontSize: 15 },
+  notesHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
 
   bar: { position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: 18, paddingTop: 14, paddingBottom: 26 },
   save: { height: 52, borderRadius: radius.button, alignItems: 'center', justifyContent: 'center' },
