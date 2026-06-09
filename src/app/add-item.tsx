@@ -67,7 +67,8 @@ export default function AddItemScreen() {
   const paidNum = Number.parseFloat(paid) || 0;
   const targetNum = Number.parseFloat(target) || 0;
   const profit = targetNum - paidNum;
-  const margin = targetNum > 0 ? Math.round((profit / targetNum) * 100) : 0;
+  // return on what you spent, same as the roi on the inventory screen
+  const roi = paidNum > 0 ? Math.round((profit / paidNum) * 100) : 0;
   const good = profit >= 0;
 
   const tone = {
@@ -267,7 +268,7 @@ export default function AddItemScreen() {
                 {bothPrices ? `${good ? '+' : '-'}${money(Math.abs(profit))}` : '—'}
               </Text>
               {bothPrices ? (
-                <Text style={[styles.projectedPct, { color: tone.fg }]}>{margin}%</Text>
+                <Text style={[styles.projectedPct, { color: tone.fg }]}>{roi}%</Text>
               ) : null}
             </View>
           </View>
