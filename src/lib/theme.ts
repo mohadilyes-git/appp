@@ -101,10 +101,17 @@ const lightColors = {
   negativeTint: 'rgba(190,40,40,.08)',
   negativeBorder: 'rgba(190,40,40,.2)',
   positiveBorder: 'rgba(19,124,74,.2)',
+  // text sitting on the positive colour, dark mode's green needs dark text
+  onPositive: '#ffffff',
+
+  textBody: 'rgba(14,17,22,.72)',
+  secondaryButton: 'rgba(14,17,22,.05)',
 
   // the fade behind a pinned action bar, so content scrolls under it
   barFadeFrom: 'rgba(240,243,248,0)',
   barFadeTo: 'rgba(240,243,248,.96)',
+  // bgMid at zero alpha. 'transparent' fades through black and leaves a grey smear
+  bgMidFade: 'rgba(238,241,246,0)',
 };
 
 // light sets the shape, so typescript makes sure dark fills in every single one
@@ -171,9 +178,14 @@ const darkColors: Colors = {
   negativeTint: 'rgba(255,122,122,.1)',
   negativeBorder: 'rgba(255,122,122,.24)',
   positiveBorder: 'rgba(62,207,142,.24)',
+  onPositive: '#07130d',
+
+  textBody: 'rgba(255,255,255,.72)',
+  secondaryButton: 'rgba(255,255,255,.07)',
 
   barFadeFrom: 'rgba(9,12,18,0)',
   barFadeTo: 'rgba(9,12,18,.94)',
+  bgMidFade: 'rgba(18,22,31,0)',
 };
 
 // css blur roughly halves when you turn it into a react native shadow radius
@@ -227,6 +239,13 @@ const lightShadows = {
     shadowRadius: 4,
     shadowOffset: { width: 0, height: 2 },
     elevation: 2,
+  },
+  sold: {
+    shadowColor: '#137c4a',
+    shadowOpacity: 0.3,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 12 },
+    elevation: 10,
   },
 };
 
@@ -282,6 +301,13 @@ const darkShadows: Shadows = {
     shadowRadius: 4,
     shadowOffset: { width: 0, height: 2 },
     elevation: 2,
+  },
+  sold: {
+    shadowColor: '#3ecf8e',
+    shadowOpacity: 0.28,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 12 },
+    elevation: 10,
   },
 };
 

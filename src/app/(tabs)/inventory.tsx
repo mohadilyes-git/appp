@@ -1,3 +1,4 @@
+import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
@@ -8,6 +9,7 @@ import { BoltIcon, ChevronLeftIcon, ChevronRightIcon, PlusIcon } from '@/compone
 import {
   heldLabel,
   money,
+  profitOf,
   signedMoney,
   SAMPLE_ITEMS,
   SEGMENTS,
@@ -151,7 +153,8 @@ function Stat({ label, value, tone }: { label: string; value: string; tone?: str
 
 function ItemRow({ item }: { item: InventoryItem }) {
   const { colors, shadows } = useTheme();
-  const profit = item.target - item.paid;
+  const router = useRouter();
+  const profit = profitOf(item);
 
   const chipTone =
     item.status === 'listed'
@@ -162,14 +165,19 @@ function ItemRow({ item }: { item: InventoryItem }) {
 
   return (
     <Pressable
+      onPress={() => router.push(`/item/${item.id}`)}
       style={({ pressed }) => [
         styles.row,
         { backgroundColor: colors.surfaceCard, borderColor: colors.borderCard },
         shadows.card,
         pressed && styles.lifted,
       ]}>
-      {/* a flat tile until real photos land */}
-      <View style={[styles.thumb, { backgroundColor: colors.photoEmpty }]} />
+      {/* a flat tile stands in when the item has no photo */}
+      <View style={[styles.thumb, { backgroundColor: colors.photoEmpty }]}>
+        {item.photo ? (
+          <Image source={{ uri: item.photo }} style={StyleSheet.absoluteFill} contentFit="cover" />
+        ) : null}
+      </View>
 
       <View style={styles.rowMiddle}>
         <View style={styles.rowTop}>
@@ -266,7 +274,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 12,
   },
-  thumb: { width: 52, height: 52, borderRadius: radius.thumb },
+  thumb: { width: 52, height: 52, borderRadius: radius.thumb, overflow: 'hidden' },
   rowMiddle: { flex: 1, gap: 4, minWidth: 0 },
   rowTop: { flexDirection: 'row', alignItems: 'center', gap: 7 },
   rowName: { fontFamily: font.heavy, fontSize: 13.5, flexShrink: 1 },
