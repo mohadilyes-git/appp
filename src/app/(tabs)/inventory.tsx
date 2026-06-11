@@ -1,7 +1,7 @@
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useFocusEffect, useRouter } from 'expo-router';
+import { useCallback, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -27,6 +27,10 @@ export default function InventoryScreen() {
   const { colors, shadows } = useTheme();
 
   const [segment, setSegment] = useState<ItemStatus>('inhand');
+  const [, refresh] = useState(0);
+
+  // coming back from a delete, the list has to look again
+  useFocusEffect(useCallback(() => refresh((n) => n + 1), []));
 
   const items = SAMPLE_ITEMS;
   const totals = totalsOf(items);

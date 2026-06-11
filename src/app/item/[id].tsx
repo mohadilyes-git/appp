@@ -2,7 +2,9 @@ import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { useState } from 'react';
 import {
+  Alert,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -13,12 +15,14 @@ import {
 
 import AppBackground from '@/components/app-background';
 import { ChevronLeftIcon } from '@/components/icons';
+import SheetShell, { SHEET_OUT_MS } from '@/components/sheet-shell';
 import {
   STATUS_LABEL,
   heldLabel,
   itemById,
   money,
   profitOf,
+  removeItem,
   signedMoney,
   timelineOf,
 } from '@/lib/inventory';
@@ -34,10 +38,29 @@ export default function ItemDetailScreen() {
   const { colors, shadows, resolved } = useTheme();
 
   const item = itemById(id);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   function goBack() {
     if (router.canGoBack()) router.back();
     else router.replace('/inventory');
+  }
+
+  // the alert can't come up while the sheet is still on screen
+  function confirmDelete() {
+    setMenuOpen(false);
+    setTimeout(() => {
+      Alert.alert('Delete this item?', 'It goes for good, along with its photos.', [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => {
+            removeItem(id);
+            goBack();
+          },
+        },
+      ]);
+    }, SHEET_OUT_MS + 60);
   }
 
   if (!item) {
@@ -103,6 +126,7 @@ export default function ItemDetailScreen() {
             <ChevronLeftIcon color={colors.textPrimary} />
           </Pressable>
           <Pressable
+            onPress={() => setMenuOpen(true)}
             accessibilityRole="button"
             accessibilityLabel="More"
             hitSlop={8}
@@ -198,6 +222,17 @@ export default function ItemDetailScreen() {
         </View>
       )}
 
+      <SheetShell
+        visible={menuOpen}
+        title={item.name}
+        subtitle={`${money(item.paid)} → ${money(item.soldFor ?? item.target)}`}
+        onClose={() => setMenuOpen(false)}>
+        <Pressable
+          onPress={confirmDelete}
+          style={({ pressed }) => [styles.menuRow, pressed && { backgroundColor: colors.negativeTint }]}>
+          <Text style={[styles.menuText, { color: colors.negative }]}>Delete item</Text>
+        </Pressable>
+      </SheetShell>
     </View>
   );
 }
@@ -288,4 +323,6 @@ const styles = StyleSheet.create({
   soldAction: { borderWidth: 0 },
   actionText: { fontFamily: font.heavy, fontSize: 14.5 },
 
+  menuRow: { paddingHorizontal: 16, paddingVertical: 16, alignItems: 'center' },
+  menuText: { fontFamily: font.heavy, fontSize: 14.5 },
 });

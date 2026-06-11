@@ -200,3 +200,9 @@ export const SAMPLE_ITEMS: InventoryItem[] = [
 export function itemById(id: string) {
   return SAMPLE_ITEMS.find((i) => i.id === id);
 }
+
+// drops it for this session only, there's nothing to delete from yet
+export function removeItem(id: string) {
+  const at = SAMPLE_ITEMS.findIndex((i) => i.id === id);
+  if (at >= 0) SAMPLE_ITEMS.splice(at, 1);
+}
