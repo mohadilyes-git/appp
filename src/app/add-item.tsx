@@ -5,7 +5,6 @@ import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useRef, useState } from 'react';
 import {
-  InputAccessoryView,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -39,9 +38,6 @@ const MAX_PHOTOS = 6;
 const SHEET_CLOSE_MS = 320;
 // the controls that sit on a photo keep one colour in both themes
 const ON_PHOTO = '#2f6fed';
-// the number pad and the notes box have no return key to close them with
-const DONE_BAR = 'add-item-done';
-const doneBarId = Platform.OS === 'ios' ? DONE_BAR : undefined;
 
 export default function AddItemScreen() {
   const router = useRouter();
@@ -322,8 +318,7 @@ export default function AddItemScreen() {
           </View>
 
           <View style={styles.block}>
-            {/* multiline ignores the keyboard bar on ios, so the way out lives up here */}
-            <View style={styles.notesHead}>
+            <View style={styles.fieldHead}>
               <Text style={[styles.label, { color: colors.textLabel }]}>
                 Notes <Text style={{ color: colors.textFaint }}>· optional</Text>
               </Text>
@@ -370,20 +365,6 @@ export default function AddItemScreen() {
           </Pressable>
         </View>
       </KeyboardAvoidingView>
-
-      {Platform.OS === 'ios' ? (
-        <InputAccessoryView nativeID={DONE_BAR}>
-          <View
-            style={[
-              styles.doneBar,
-              { backgroundColor: colors.surfaceCard, borderTopColor: colors.borderCard },
-            ]}>
-            <Pressable onPress={Keyboard.dismiss} hitSlop={12}>
-              <Text style={[styles.doneText, { color: colors.accentText }]}>Done</Text>
-            </Pressable>
-          </View>
-        </InputAccessoryView>
-      ) : null}
 
       <PhotoSourceSheet
         visible={sheetOpen}
@@ -437,7 +418,14 @@ function PriceField({
   const { colors } = useTheme();
   return (
     <View style={styles.pairItem}>
-      <Text style={[styles.label, { color: colors.textLabel }]}>{label}</Text>
+      <View style={styles.fieldHead}>
+        <Text style={[styles.label, { color: colors.textLabel }]}>{label}</Text>
+        {focused === fieldKey ? (
+          <Pressable onPress={Keyboard.dismiss} hitSlop={12}>
+            <Text style={[styles.doneText, { color: colors.accentText }]}>Done</Text>
+          </Pressable>
+        ) : null}
+      </View>
       <View>
         <Text style={[styles.currency, { color: colors.textHint }]}>$</Text>
         <TextInput
@@ -449,7 +437,6 @@ function PriceField({
           onChangeText={onChangeText}
           onFocus={() => setFocused(fieldKey)}
           onBlur={() => setFocused(null)}
-          inputAccessoryViewID={doneBarId}
         />
       </View>
     </View>
@@ -615,16 +602,9 @@ const styles = StyleSheet.create({
     lineHeight: 19.6,
   },
 
-  // the accessory view collapses to nothing unless its child is given a height
-  doneBar: {
-    height: 44,
-    alignItems: 'flex-end',
-    justifyContent: 'center',
-    paddingHorizontal: 18,
-    borderTopWidth: 1,
-  },
-  doneText: { fontFamily: font.heavy, fontSize: 15 },
-  notesHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  // every field that can't be closed from the keyboard gets one of these
+  doneText: { fontFamily: font.heavy, fontSize: 13.5 },
+  fieldHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
 
   bar: { position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: 18, paddingTop: 14, paddingBottom: 26 },
   save: { height: 52, borderRadius: radius.button, alignItems: 'center', justifyContent: 'center' },
