@@ -5,6 +5,7 @@ import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useRef, useState } from 'react';
 import {
+  Alert,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -30,6 +31,7 @@ import {
   money,
   type ItemStatus,
 } from '@/lib/inventory';
+import { attachPhotos, createItem, uploadPhoto } from '@/lib/inventory-db';
 import { font, gradients, radius, tracking } from '@/lib/theme';
 import { useTheme } from '@/lib/theme-context';
 
@@ -57,6 +59,7 @@ export default function AddItemScreen() {
   const [dateOpen, setDateOpen] = useState(false);
   const [notes, setNotes] = useState('');
   const [focused, setFocused] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
   const scroller = useRef<ScrollView>(null);
 
   const full = photos.length >= MAX_PHOTOS;
@@ -119,6 +122,38 @@ export default function AddItemScreen() {
   function goBack() {
     if (router.canGoBack()) router.back();
     else router.replace('/inventory');
+  }
+
+  async function save() {
+    if (!name.trim()) {
+      Alert.alert('Give it a name', 'Even a rough one helps you find it later.');
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const item = await createItem({
+        name: name.trim(),
+        paid: Number.parseFloat(paid) || 0,
+        target: Number.parseFloat(target) || 0,
+        status,
+        boughtFrom,
+        notes: notes.trim(),
+        boughtAt: dateBought,
+      });
+
+      // the row exists first, so the photos have somewhere to belong
+      if (photos.length > 0) {
+        const paths = await Promise.all(photos.map((uri, i) => uploadPhoto(item.id, uri, i)));
+        await attachPhotos(item.id, paths);
+      }
+
+      goBack();
+    } catch (e) {
+      Alert.alert('Could not save', e instanceof Error ? e.message : 'Something went wrong.');
+    } finally {
+      setSaving(false);
+    }
   }
 
   // fields share a look, only the focused one lights up
@@ -353,14 +388,17 @@ export default function AddItemScreen() {
             locations={[0, 0.34]}
             style={StyleSheet.absoluteFill}
           />
-          <Pressable style={({ pressed }) => [shadows.cta, pressed && styles.lifted]}>
+          <Pressable
+            onPress={save}
+            disabled={saving}
+            style={({ pressed }) => [shadows.cta, pressed && styles.lifted]}>
             <LinearGradient
               colors={gradients.hero}
               locations={gradients.heroStops}
               start={{ x: 0, y: 0 }}
               end={{ x: 0.8, y: 1 }}
               style={styles.save}>
-              <Text style={styles.saveText}>Save item</Text>
+              <Text style={styles.saveText}>{saving ? 'Saving…' : 'Save item'}</Text>
             </LinearGradient>
           </Pressable>
         </View>

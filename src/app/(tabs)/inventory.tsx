@@ -1,8 +1,8 @@
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useFocusEffect, useRouter } from 'expo-router';
-import { useCallback, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useRouter } from 'expo-router';
+import { useState } from 'react';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BoltIcon, ChevronLeftIcon, ChevronRightIcon, PlusIcon } from '@/components/icons';
@@ -11,7 +11,6 @@ import {
   money,
   profitOf,
   signedMoney,
-  SAMPLE_ITEMS,
   SEGMENTS,
   STATUS_LABEL,
   totalsOf,
@@ -19,6 +18,7 @@ import {
   type ItemStatus,
 } from '@/lib/inventory';
 import { font, gradients, radius, tracking } from '@/lib/theme';
+import { useInventory } from '@/lib/use-inventory';
 import { useTheme } from '@/lib/theme-context';
 
 export default function InventoryScreen() {
@@ -27,12 +27,8 @@ export default function InventoryScreen() {
   const { colors, shadows } = useTheme();
 
   const [segment, setSegment] = useState<ItemStatus>('inhand');
-  const [, refresh] = useState(0);
+  const { items, covers, loading, error } = useInventory();
 
-  // coming back from a delete, the list has to look again
-  useFocusEffect(useCallback(() => refresh((n) => n + 1), []));
-
-  const items = SAMPLE_ITEMS;
   const totals = totalsOf(items);
   const shown = items.filter((i) => i.status === segment);
 
@@ -133,12 +129,18 @@ export default function InventoryScreen() {
       </View>
 
       <View style={styles.rows}>
-        {shown.length === 0 ? (
+        {loading ? (
+          <ActivityIndicator style={styles.spinner} color={colors.accentText} />
+        ) : error ? (
+          <Text style={[styles.empty, { color: colors.negative }]}>{error}</Text>
+        ) : shown.length === 0 ? (
           <Text style={[styles.empty, { color: colors.textTertiary }]}>
             Nothing here yet. Add an item to start tracking it.
           </Text>
         ) : (
-          shown.map((item) => <ItemRow key={item.id} item={item} />)
+          shown.map((item) => (
+            <ItemRow key={item.id} item={item} cover={covers[item.photos[0]]} />
+          ))
         )}
       </View>
     </ScrollView>
@@ -155,7 +157,7 @@ function Stat({ label, value, tone }: { label: string; value: string; tone?: str
   );
 }
 
-function ItemRow({ item }: { item: InventoryItem }) {
+function ItemRow({ item, cover }: { item: InventoryItem; cover?: string }) {
   const { colors, shadows } = useTheme();
   const router = useRouter();
   const profit = profitOf(item);
@@ -178,8 +180,8 @@ function ItemRow({ item }: { item: InventoryItem }) {
       ]}>
       {/* a flat tile stands in when the item has no photo */}
       <View style={[styles.thumb, { backgroundColor: colors.photoEmpty }]}>
-        {item.photo ? (
-          <Image source={{ uri: item.photo }} style={StyleSheet.absoluteFill} contentFit="cover" />
+        {cover ? (
+          <Image source={{ uri: cover }} style={StyleSheet.absoluteFill} contentFit="cover" />
         ) : null}
       </View>
 
@@ -270,6 +272,7 @@ const styles = StyleSheet.create({
 
   rows: { gap: 10 },
   empty: { fontFamily: font.body, fontSize: 13, textAlign: 'center', paddingVertical: 26 },
+  spinner: { paddingVertical: 26 },
   row: {
     flexDirection: 'row',
     alignItems: 'center',

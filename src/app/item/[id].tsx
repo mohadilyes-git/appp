@@ -4,6 +4,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import {
+  ActivityIndicator,
   Alert,
   Pressable,
   ScrollView,
@@ -16,20 +17,25 @@ import {
 import AppBackground from '@/components/app-background';
 import { ChevronLeftIcon } from '@/components/icons';
 import SheetShell, { SHEET_OUT_MS } from '@/components/sheet-shell';
+import SoldSheet from '@/components/sold-sheet';
 import {
   STATUS_LABEL,
   heldLabel,
-  itemById,
   money,
   profitOf,
-  removeItem,
   signedMoney,
   timelineOf,
 } from '@/lib/inventory';
+import { deleteItem, markListed, markSold } from '@/lib/inventory-db';
+import { useItem } from '@/lib/use-inventory';
 import { font, radius, tracking } from '@/lib/theme';
 import { useTheme } from '@/lib/theme-context';
 
 const PHOTO_HEIGHT = 280;
+
+function messageOf(error: unknown) {
+  return error instanceof Error ? error.message : 'Something went wrong.';
+}
 
 export default function ItemDetailScreen() {
   const router = useRouter();
@@ -37,8 +43,22 @@ export default function ItemDetailScreen() {
   const { width, height } = useWindowDimensions();
   const { colors, shadows, resolved } = useTheme();
 
-  const item = itemById(id);
+  const { item, photoUrls, loading, error, reload } = useItem(id);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [soldOpen, setSoldOpen] = useState(false);
+  const [busy, setBusy] = useState(false);
+
+  async function run(action: () => Promise<void>, failure: string) {
+    setBusy(true);
+    try {
+      await action();
+      reload();
+    } catch (e) {
+      Alert.alert(failure, messageOf(e));
+    } finally {
+      setBusy(false);
+    }
+  }
 
   function goBack() {
     if (router.canGoBack()) router.back();
@@ -54,13 +74,26 @@ export default function ItemDetailScreen() {
         {
           text: 'Delete',
           style: 'destructive',
-          onPress: () => {
-            removeItem(id);
-            goBack();
+          onPress: async () => {
+            try {
+              await deleteItem(id, item?.photos ?? []);
+              goBack();
+            } catch (e) {
+              Alert.alert('Could not delete', messageOf(e));
+            }
           },
         },
       ]);
     }, SHEET_OUT_MS + 60);
+  }
+
+  if (loading) {
+    return (
+      <View style={styles.root}>
+        <AppBackground width={width} height={height} />
+        <ActivityIndicator style={styles.missing} color={colors.accentText} />
+      </View>
+    );
   }
 
   if (!item) {
@@ -68,8 +101,8 @@ export default function ItemDetailScreen() {
       <View style={styles.root}>
         <AppBackground width={width} height={height} />
         <View style={styles.missing}>
-          <Text style={[styles.missingText, { color: colors.textTertiary }]}>
-            That item is no longer here.
+          <Text style={[styles.missingText, { color: error ? colors.negative : colors.textTertiary }]}>
+            {error || 'That item is no longer here.'}
           </Text>
           <Pressable onPress={goBack} hitSlop={10}>
             <Text style={[styles.missingLink, { color: colors.accentText }]}>Back to inventory</Text>
@@ -108,8 +141,8 @@ export default function ItemDetailScreen() {
 
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={[styles.photo, { backgroundColor: colors.photoEmpty }]}>
-          {item.photo ? (
-            <Image source={{ uri: item.photo }} style={StyleSheet.absoluteFill} contentFit="cover" />
+          {photoUrls[0] ? (
+            <Image source={{ uri: photoUrls[0] }} style={StyleSheet.absoluteFill} contentFit="cover" />
           ) : null}
           {/* the fade blends the photo into the page so the content can sit over it */}
           <LinearGradient
@@ -200,6 +233,8 @@ export default function ItemDetailScreen() {
           <View style={styles.barRow}>
             {item.status === 'inhand' ? (
               <Pressable
+                onPress={() => run(() => markListed(id), 'Could not update')}
+                disabled={busy}
                 style={({ pressed }) => [
                   styles.action,
                   { backgroundColor: colors.secondaryButton, borderColor: colors.borderField },
@@ -209,6 +244,8 @@ export default function ItemDetailScreen() {
               </Pressable>
             ) : null}
             <Pressable
+              onPress={() => setSoldOpen(true)}
+              disabled={busy}
               style={({ pressed }) => [
                 styles.action,
                 styles.soldAction,
@@ -221,6 +258,17 @@ export default function ItemDetailScreen() {
           </View>
         </View>
       )}
+
+      <SoldSheet
+        visible={soldOpen}
+        target={item.target}
+        busy={busy}
+        onClose={() => setSoldOpen(false)}
+        onConfirm={(soldFor) => {
+          setSoldOpen(false);
+          run(() => markSold(id, soldFor), 'Could not update');
+        }}
+      />
 
       <SheetShell
         visible={menuOpen}
