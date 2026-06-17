@@ -276,6 +276,15 @@ export default function ItemDetailScreen() {
         subtitle={`${money(item.paid)} → ${money(item.soldFor ?? item.target)}`}
         onClose={() => setMenuOpen(false)}>
         <Pressable
+          onPress={() => {
+            setMenuOpen(false);
+            router.push(`/add-item?id=${id}`);
+          }}
+          style={({ pressed }) => [styles.menuRow, pressed && { backgroundColor: colors.accentFaint }]}>
+          <Text style={[styles.menuText, { color: colors.textPrimary }]}>Edit item</Text>
+        </Pressable>
+        <View style={[styles.menuDivider, { backgroundColor: colors.borderCard }]} />
+        <Pressable
           onPress={confirmDelete}
           style={({ pressed }) => [styles.menuRow, pressed && { backgroundColor: colors.negativeTint }]}>
           <Text style={[styles.menuText, { color: colors.negative }]}>Delete item</Text>
@@ -372,5 +381,6 @@ const styles = StyleSheet.create({
   actionText: { fontFamily: font.heavy, fontSize: 14.5 },
 
   menuRow: { paddingHorizontal: 16, paddingVertical: 16, alignItems: 'center' },
+  menuDivider: { height: 1 },
   menuText: { fontFamily: font.heavy, fontSize: 14.5 },
 });

@@ -99,6 +99,36 @@ export async function createItem(input: NewItem) {
   return toItem(data as Row);
 }
 
+export async function updateItem(id: string, patch: NewItem) {
+  const current = await getItem(id);
+  if (!current) throw new Error('That item is no longer here.');
+
+  const now = new Date().toISOString();
+  const { error } = await supabase
+    .from('inventory_items')
+    .update({
+      name: patch.name,
+      paid: patch.paid,
+      target: patch.target,
+      status: patch.status,
+      bought_from: patch.boughtFrom,
+      notes: patch.notes || null,
+      bought_at: patch.boughtAt.toISOString(),
+      // moving forward keeps the original dates, moving back clears them
+      listed_at:
+        patch.status === 'inhand' ? null : (current.listedAt?.toISOString() ?? now),
+      sold_at: patch.status === 'sold' ? (current.soldAt?.toISOString() ?? now) : null,
+      sold_for: patch.status === 'sold' ? (current.soldFor ?? null) : null,
+    })
+    .eq('id', id);
+  if (error) throw error;
+}
+
+export async function removePhotos(paths: string[]) {
+  if (paths.length === 0) return;
+  await supabase.storage.from(BUCKET).remove(paths);
+}
+
 export async function markListed(id: string) {
   const { error } = await supabase
     .from('inventory_items')

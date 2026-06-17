@@ -1,9 +1,9 @@
 import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Alert,
   Keyboard,
@@ -31,7 +31,15 @@ import {
   money,
   type ItemStatus,
 } from '@/lib/inventory';
-import { attachPhotos, createItem, uploadPhoto } from '@/lib/inventory-db';
+import {
+  attachPhotos,
+  createItem,
+  getItem,
+  removePhotos,
+  signPhotos,
+  updateItem,
+  uploadPhoto,
+} from '@/lib/inventory-db';
 import { font, gradients, radius, tracking } from '@/lib/theme';
 import { useTheme } from '@/lib/theme-context';
 
@@ -41,13 +49,20 @@ const SHEET_CLOSE_MS = 320;
 // the controls that sit on a photo keep one colour in both themes
 const ON_PHOTO = '#2f6fed';
 
+// an already-uploaded photo carries its storage path, a fresh pick doesn't yet
+type Photo = { uri: string; path?: string };
+
 export default function AddItemScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { width, height } = useWindowDimensions();
   const { colors, shadows, resolved } = useTheme();
+  // with an id the same form edits an existing item instead of creating one
+  const { id } = useLocalSearchParams<{ id?: string }>();
+  const editing = typeof id === 'string' && id.length > 0;
 
-  const [photos, setPhotos] = useState<string[]>([]);
+  const [photos, setPhotos] = useState<Photo[]>([]);
+  const [originalPaths, setOriginalPaths] = useState<string[]>([]);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [name, setName] = useState('');
   const [paid, setPaid] = useState('');
@@ -61,6 +76,32 @@ export default function AddItemScreen() {
   const [focused, setFocused] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const scroller = useRef<ScrollView>(null);
+
+  // prefill everything from the row being edited
+  useEffect(() => {
+    if (!editing) return;
+    getItem(id)
+      .then(async (item) => {
+        if (!item) return;
+        setName(item.name);
+        setPaid(item.paid ? String(item.paid) : '');
+        setTarget(item.target ? String(item.target) : '');
+        setStatus(item.status);
+        setBoughtFrom(item.boughtFrom || MARKETPLACES[0]);
+        setDateBought(item.boughtAt);
+        setNotes(item.notes ?? '');
+        setOriginalPaths(item.photos);
+        const signed = await signPhotos(item.photos);
+        setPhotos(
+          item.photos
+            .map((path) => ({ uri: signed[path], path }))
+            .filter((photo) => Boolean(photo.uri)),
+        );
+      })
+      .catch(() => {
+        Alert.alert('Could not load the item', 'Check your connection and try again.');
+      });
+  }, [editing, id]);
 
   const full = photos.length >= MAX_PHOTOS;
   // filled thumbs, then one add slot, then ghosts to finish the row
@@ -83,7 +124,7 @@ export default function AddItemScreen() {
   };
 
   function addPhotos(uris: string[]) {
-    setPhotos((current) => [...current, ...uris].slice(0, MAX_PHOTOS));
+    setPhotos((current) => [...current, ...uris.map((uri) => ({ uri }))].slice(0, MAX_PHOTOS));
   }
 
   function removePhoto(index: number) {
@@ -132,7 +173,7 @@ export default function AddItemScreen() {
 
     setSaving(true);
     try {
-      const item = await createItem({
+      const fields = {
         name: name.trim(),
         paid: Number.parseFloat(paid) || 0,
         target: Number.parseFloat(target) || 0,
@@ -140,13 +181,20 @@ export default function AddItemScreen() {
         boughtFrom,
         notes: notes.trim(),
         boughtAt: dateBought,
-      });
+      };
 
-      // the row exists first, so the photos have somewhere to belong
-      if (photos.length > 0) {
-        const paths = await Promise.all(photos.map((uri, i) => uploadPhoto(item.id, uri, i)));
-        await attachPhotos(item.id, paths);
+      const itemId = editing ? id : (await createItem(fields)).id;
+      if (editing) await updateItem(itemId, fields);
+
+      // keep what's already up, upload what's new, in the order on screen
+      const paths: string[] = [];
+      for (let i = 0; i < photos.length; i++) {
+        paths.push(photos[i].path ?? (await uploadPhoto(itemId, photos[i].uri, i)));
       }
+      if (editing || paths.length > 0) await attachPhotos(itemId, paths);
+
+      // anything the user took off the grid comes out of storage too
+      await removePhotos(originalPaths.filter((path) => !paths.includes(path)));
 
       goBack();
     } catch (e) {
@@ -192,7 +240,9 @@ export default function AddItemScreen() {
               ]}>
               <ChevronLeftIcon color={colors.textPrimary} />
             </Pressable>
-            <Text style={[styles.screenTitle, { color: colors.textPrimary }]}>Add item</Text>
+            <Text style={[styles.screenTitle, { color: colors.textPrimary }]}>
+              {editing ? 'Edit item' : 'Add item'}
+            </Text>
           </View>
 
           <View style={styles.block}>
@@ -215,7 +265,7 @@ export default function AddItemScreen() {
                   if (cell < photos.length) {
                     return (
                       <View key={cell} style={[styles.cell, styles.thumb, { borderColor: colors.borderCard }]}>
-                        <Image source={{ uri: photos[cell] }} style={StyleSheet.absoluteFill} contentFit="cover" />
+                        <Image source={{ uri: photos[cell].uri }} style={StyleSheet.absoluteFill} contentFit="cover" />
                         <Pressable
                           onPress={() => removePhoto(cell)}
                           hitSlop={10}
@@ -398,7 +448,9 @@ export default function AddItemScreen() {
               start={{ x: 0, y: 0 }}
               end={{ x: 0.8, y: 1 }}
               style={styles.save}>
-              <Text style={styles.saveText}>{saving ? 'Saving…' : 'Save item'}</Text>
+              <Text style={styles.saveText}>
+              {saving ? 'Saving…' : editing ? 'Save changes' : 'Save item'}
+            </Text>
             </LinearGradient>
           </Pressable>
         </View>
