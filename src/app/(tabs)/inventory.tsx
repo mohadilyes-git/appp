@@ -5,15 +5,20 @@ import { useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { BoltIcon, ChevronLeftIcon, ChevronRightIcon, PlusIcon } from '@/components/icons';
+import DateRangeSheet from '@/components/date-range-sheet';
+import { BoltIcon, ChevronLeftIcon, ChevronRightIcon, CloseIcon, PlusIcon } from '@/components/icons';
 import {
   heldLabel,
+  inWindow,
   money,
   profitOf,
+  rangeEmpty,
+  rangeLabel,
   signedMoney,
   SEGMENTS,
   STATUS_LABEL,
   totalsOf,
+  type DateRange,
   type InventoryItem,
   type ItemStatus,
 } from '@/lib/inventory';
@@ -27,10 +32,18 @@ export default function InventoryScreen() {
   const { colors, shadows } = useTheme();
 
   const [segment, setSegment] = useState<ItemStatus>('inhand');
+  const [boughtRange, setBoughtRange] = useState<DateRange>({});
+  const [soldRange, setSoldRange] = useState<DateRange>({});
+  const [rangeOpen, setRangeOpen] = useState<'bought' | 'sold' | null>(null);
   const { items, covers, loading, error } = useInventory();
 
-  const totals = totalsOf(items);
-  const shown = items.filter((i) => i.status === segment);
+  const filtering = !rangeEmpty(boughtRange) || !rangeEmpty(soldRange);
+  const filtered = items.filter(
+    (i) => inWindow(i.boughtAt, boughtRange) && inWindow(i.soldAt, soldRange),
+  );
+  // the numbers follow the window, so they answer "what did that period do"
+  const totals = totalsOf(filtered);
+  const shown = filtered.filter((i) => i.status === segment);
 
   function goBack() {
     if (router.canGoBack()) router.back();
@@ -94,6 +107,21 @@ export default function InventoryScreen() {
         <ChevronRightIcon color={colors.textFaint} size={15} />
       </Pressable>
 
+      <View style={styles.filterRow}>
+        <FilterChip
+          name="Bought"
+          range={boughtRange}
+          onPress={() => setRangeOpen('bought')}
+          onClear={() => setBoughtRange({})}
+        />
+        <FilterChip
+          name="Sold"
+          range={soldRange}
+          onPress={() => setRangeOpen('sold')}
+          onClear={() => setSoldRange({})}
+        />
+      </View>
+
       <View
         style={[
           styles.panel,
@@ -135,7 +163,9 @@ export default function InventoryScreen() {
           <Text style={[styles.empty, { color: colors.negative }]}>{error}</Text>
         ) : shown.length === 0 ? (
           <Text style={[styles.empty, { color: colors.textTertiary }]}>
-            Nothing here yet. Add an item to start tracking it.
+            {filtering
+              ? 'Nothing here matches those dates.'
+              : 'Nothing here yet. Add an item to start tracking it.'}
           </Text>
         ) : (
           shown.map((item) => (
@@ -143,7 +173,61 @@ export default function InventoryScreen() {
           ))
         )}
       </View>
+
+      <DateRangeSheet
+        visible={rangeOpen !== null}
+        title={rangeOpen === 'sold' ? 'Sold between' : 'Bought between'}
+        value={rangeOpen === 'sold' ? soldRange : boughtRange}
+        onClose={() => setRangeOpen(null)}
+        onApply={(range) => {
+          if (rangeOpen === 'sold') setSoldRange(range);
+          else setBoughtRange(range);
+          setRangeOpen(null);
+        }}
+      />
     </ScrollView>
+  );
+}
+
+function FilterChip({
+  name,
+  range,
+  onPress,
+  onClear,
+}: {
+  name: string;
+  range: DateRange;
+  onPress: () => void;
+  onClear: () => void;
+}) {
+  const { colors } = useTheme();
+  const active = !rangeEmpty(range);
+
+  return (
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [
+        styles.chipBtn,
+        {
+          backgroundColor: active ? colors.accentTint : colors.surfaceField,
+          borderColor: active ? colors.accentFill : colors.borderField,
+        },
+        pressed && { opacity: 0.8 },
+      ]}>
+      <View style={styles.chipCol}>
+        <Text style={[styles.chipName, { color: colors.textLabel }]}>{name}</Text>
+        <Text
+          style={[styles.chipValue, { color: active ? colors.accentText : colors.textTertiary }]}
+          numberOfLines={1}>
+          {rangeLabel(range)}
+        </Text>
+      </View>
+      {active ? (
+        <Pressable onPress={onClear} hitSlop={10} accessibilityLabel={`Clear ${name} filter`}>
+          <CloseIcon color={colors.accentText} size={10} />
+        </Pressable>
+      ) : null}
+    </Pressable>
   );
 }
 
@@ -248,6 +332,26 @@ const styles = StyleSheet.create({
   shortcutText: { flex: 1, gap: 1, minWidth: 0 },
   shortcutTitle: { fontFamily: font.heavy, fontSize: 13.5 },
   shortcutSub: { fontFamily: font.body, fontSize: 11.5 },
+
+  filterRow: { flexDirection: 'row', gap: 10 },
+  chipBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    borderRadius: radius.thumb,
+    borderWidth: 1,
+    paddingVertical: 9,
+    paddingHorizontal: 12,
+  },
+  chipCol: { flex: 1, gap: 1, minWidth: 0 },
+  chipName: {
+    fontFamily: font.heavy,
+    fontSize: 10,
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
+  },
+  chipValue: { fontFamily: font.bold, fontSize: 12.5 },
 
   panel: {
     flexDirection: 'row',

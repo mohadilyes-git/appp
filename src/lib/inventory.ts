@@ -65,6 +65,37 @@ export function formatBoughtDate(date: Date) {
   return shortDate(date);
 }
 
+export type DateRange = { from?: Date; to?: Date };
+
+export function rangeEmpty(range: DateRange) {
+  return !range.from && !range.to;
+}
+
+// whole days on both ends, so "to 15 Jun" includes the 15th
+export function inWindow(date: Date | undefined, range: DateRange) {
+  if (rangeEmpty(range)) return true;
+  if (!date) return false;
+  if (range.from) {
+    const start = new Date(range.from);
+    start.setHours(0, 0, 0, 0);
+    if (date.getTime() < start.getTime()) return false;
+  }
+  if (range.to) {
+    const end = new Date(range.to);
+    end.setHours(23, 59, 59, 999);
+    if (date.getTime() > end.getTime()) return false;
+  }
+  return true;
+}
+
+export function rangeLabel(range: DateRange) {
+  const f = (d: Date) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+  if (rangeEmpty(range)) return 'Any time';
+  if (range.from && range.to) return `${f(range.from)} – ${f(range.to)}`;
+  if (range.from) return `From ${f(range.from)}`;
+  return `Until ${f(range.to as Date)}`;
+}
+
 export function money(n: number) {
   return `$${Math.round(n).toLocaleString('en-US')}`;
 }
