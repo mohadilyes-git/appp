@@ -137,6 +137,49 @@ export function timelineOf(item: InventoryItem): TimelineStep[] {
   ];
 }
 
+export type ProfitPoint = {
+  label: string;
+  amount: number;
+};
+
+export type ProfitSummary = {
+  invested: number;
+  estValue: number;
+  itemCount: number;
+  // oldest first, the last one is the month we're in
+  history: ProfitPoint[];
+};
+
+// the home card: monthly profit from sales, plus what the current stock is worth
+export function profitSummaryOf(items: InventoryItem[], months = 7): ProfitSummary {
+  const now = new Date();
+  const history: ProfitPoint[] = [];
+
+  for (let back = months - 1; back >= 0; back--) {
+    const month = new Date(now.getFullYear(), now.getMonth() - back, 1);
+    const amount = items.reduce((sum, item) => {
+      if (
+        item.soldAt &&
+        item.soldAt.getFullYear() === month.getFullYear() &&
+        item.soldAt.getMonth() === month.getMonth()
+      ) {
+        return sum + profitOf(item);
+      }
+      return sum;
+    }, 0);
+    history.push({ label: month.toLocaleDateString('en-US', { month: 'long' }), amount });
+  }
+
+  // sold items are money already made, the footer is about what's still in play
+  const stock = items.filter((item) => item.status !== 'sold');
+  return {
+    invested: stock.reduce((sum, item) => sum + item.paid, 0),
+    estValue: stock.reduce((sum, item) => sum + item.target, 0),
+    itemCount: stock.length,
+    history,
+  };
+}
+
 // totals cover everything owned, not just the segment on screen
 export function totalsOf(items: InventoryItem[]) {
   const invested = items.reduce((sum, i) => sum + i.paid, 0);

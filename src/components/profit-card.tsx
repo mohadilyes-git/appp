@@ -3,21 +3,9 @@ import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { ArrowUpIcon, ChevronRightIcon } from '@/components/icons';
+import { type ProfitSummary } from '@/lib/inventory';
 import { font, gradients, radius, tracking } from '@/lib/theme';
 import { useTheme } from '@/lib/theme-context';
-
-export type ProfitPoint = {
-  label: string;
-  amount: number;
-};
-
-export type ProfitSummary = {
-  invested: number;
-  estValue: number;
-  itemCount: number;
-  // oldest first, the last one is the month we're in
-  history: ProfitPoint[];
-};
 
 type Props = {
   summary: ProfitSummary;

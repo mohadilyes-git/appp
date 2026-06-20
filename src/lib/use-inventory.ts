@@ -2,7 +2,7 @@ import { useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 
 import { getItem, listItems, signPhotos } from './inventory-db';
-import type { InventoryItem } from './inventory';
+import { profitSummaryOf, type InventoryItem, type ProfitSummary } from './inventory';
 
 function messageOf(error: unknown) {
   return error instanceof Error ? error.message : 'Something went wrong.';
@@ -39,6 +39,22 @@ export function useInventory(): ListState {
   useFocusEffect(load);
 
   return { items, covers, loading, error, reload: load };
+}
+
+// the home card's numbers, no photo signing needed there
+export function useProfitSummary(): ProfitSummary {
+  const [summary, setSummary] = useState(() => profitSummaryOf([]));
+
+  const load = useCallback(() => {
+    // a failed refresh keeps the last good numbers instead of zeroing the card
+    listItems()
+      .then((rows) => setSummary(profitSummaryOf(rows)))
+      .catch(() => {});
+  }, []);
+
+  useFocusEffect(load);
+
+  return summary;
 }
 
 type ItemState = {
