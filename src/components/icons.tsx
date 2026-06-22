@@ -78,6 +78,14 @@ export function ArrowUpIcon({ color, size = 11 }: IconProps) {
   );
 }
 
+export function WarningIcon({ color, size = 18 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+      <Path d="M12 2.4a9.6 9.6 0 1 0 0 19.2 9.6 9.6 0 0 0 0-19.2zm-1.2 4.4h2.4v7.2h-2.4zm0 8.8h2.4v2.4h-2.4z" />
+    </Svg>
+  );
+}
+
 export function CameraIcon({ color, size = 21 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>

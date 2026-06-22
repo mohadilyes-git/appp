@@ -137,6 +137,15 @@ export function timelineOf(item: InventoryItem): TimelineStep[] {
   ];
 }
 
+export type Nudge = { kind: 'empty' } | { kind: 'unlisted'; count: number };
+
+// one concrete reason to act today, quiet once everything is listed or sold
+export function nudgeOf(items: InventoryItem[]): Nudge | null {
+  if (items.length === 0) return { kind: 'empty' };
+  const sitting = items.filter((item) => item.status === 'inhand').length;
+  return sitting > 0 ? { kind: 'unlisted', count: sitting } : null;
+}
+
 export type ProfitPoint = {
   label: string;
   amount: number;

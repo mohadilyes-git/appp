@@ -2,7 +2,13 @@ import { useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 
 import { getItem, listItems, signPhotos } from './inventory-db';
-import { profitSummaryOf, type InventoryItem, type ProfitSummary } from './inventory';
+import {
+  nudgeOf,
+  profitSummaryOf,
+  type InventoryItem,
+  type Nudge,
+  type ProfitSummary,
+} from './inventory';
 
 function messageOf(error: unknown) {
   return error instanceof Error ? error.message : 'Something went wrong.';
@@ -41,20 +47,25 @@ export function useInventory(): ListState {
   return { items, covers, loading, error, reload: load };
 }
 
-// the home card's numbers, no photo signing needed there
-export function useProfitSummary(): ProfitSummary {
+// the home card's numbers and the nudge, no photo signing needed there
+export function useHomeSummary(): { summary: ProfitSummary; nudge: Nudge | null } {
   const [summary, setSummary] = useState(() => profitSummaryOf([]));
+  // starts silent so the empty nudge only shows once we know it's true
+  const [nudge, setNudge] = useState<Nudge | null>(null);
 
   const load = useCallback(() => {
     // a failed refresh keeps the last good numbers instead of zeroing the card
     listItems()
-      .then((rows) => setSummary(profitSummaryOf(rows)))
+      .then((rows) => {
+        setSummary(profitSummaryOf(rows));
+        setNudge(nudgeOf(rows));
+      })
       .catch(() => {});
   }, []);
 
   useFocusEffect(load);
 
-  return summary;
+  return { summary, nudge };
 }
 
 type ItemState = {
