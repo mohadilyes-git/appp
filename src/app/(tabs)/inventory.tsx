@@ -265,7 +265,12 @@ function ItemRow({ item, cover }: { item: InventoryItem; cover?: string }) {
       {/* a flat tile stands in when the item has no photo */}
       <View style={[styles.thumb, { backgroundColor: colors.photoEmpty }]}>
         {cover ? (
-          <Image source={{ uri: cover }} style={StyleSheet.absoluteFill} contentFit="cover" />
+          <Image
+            source={{ uri: cover, cacheKey: item.photos[0] }}
+            style={StyleSheet.absoluteFill}
+            contentFit="cover"
+            transition={120}
+          />
         ) : null}
       </View>
 

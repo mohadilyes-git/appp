@@ -1,8 +1,12 @@
+import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
+
 import { supabase } from './supabase';
 import type { InventoryItem, ItemStatus } from './inventory';
 
 const BUCKET = 'item-photos';
 const SIGNED_URL_SECONDS = 60 * 60;
+// plenty for a full-screen photo, a fraction of what the camera produces
+const UPLOAD_WIDTH = 1600;
 
 // what the table actually stores, before it's turned into an InventoryItem
 type Row = {
@@ -158,7 +162,13 @@ export async function uploadPhoto(itemId: string, uri: string, index: number) {
   const userId = auth.user?.id;
   if (!userId) throw new Error('You need to be signed in to upload photos.');
 
-  const bytes = await (await fetch(uri)).arrayBuffer();
+  // shrink before it leaves the phone, a camera shot is megabytes for no reason
+  const shrunk = await manipulateAsync(uri, [{ resize: { width: UPLOAD_WIDTH } }], {
+    compress: 0.7,
+    format: SaveFormat.JPEG,
+  });
+
+  const bytes = await (await fetch(shrunk.uri)).arrayBuffer();
   const path = `${userId}/${itemId}/${Date.now()}-${index}.jpg`;
 
   const { error } = await supabase.storage

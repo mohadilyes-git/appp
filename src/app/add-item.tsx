@@ -265,7 +265,11 @@ export default function AddItemScreen() {
                   if (cell < photos.length) {
                     return (
                       <View key={cell} style={[styles.cell, styles.thumb, { borderColor: colors.borderCard }]}>
-                        <Image source={{ uri: photos[cell].uri }} style={StyleSheet.absoluteFill} contentFit="cover" />
+                        <Image
+                          source={{ uri: photos[cell].uri, cacheKey: photos[cell].path }}
+                          style={StyleSheet.absoluteFill}
+                          contentFit="cover"
+                        />
                         <Pressable
                           onPress={() => removePhoto(cell)}
                           hitSlop={10}

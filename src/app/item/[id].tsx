@@ -142,7 +142,12 @@ export default function ItemDetailScreen() {
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={[styles.photo, { backgroundColor: colors.photoEmpty }]}>
           {photoUrls[0] ? (
-            <Image source={{ uri: photoUrls[0] }} style={StyleSheet.absoluteFill} contentFit="cover" />
+            <Image
+              source={{ uri: photoUrls[0], cacheKey: item.photos[0] }}
+              style={StyleSheet.absoluteFill}
+              contentFit="cover"
+              transition={120}
+            />
           ) : null}
           {/* the fade blends the photo into the page so the content can sit over it */}
           <LinearGradient
