@@ -49,8 +49,9 @@ const SHEET_CLOSE_MS = 320;
 // the controls that sit on a photo keep one colour in both themes
 const ON_PHOTO = '#2f6fed';
 
-// an already-uploaded photo carries its storage path, a fresh pick doesn't yet
-type Photo = { uri: string; path?: string };
+// an already-uploaded photo carries its storage path, a fresh pick doesn't yet.
+// a kept photo whose signing failed has a path but no uri to show
+type Photo = { uri?: string; path?: string };
 
 export default function AddItemScreen() {
   const router = useRouter();
@@ -92,11 +93,8 @@ export default function AddItemScreen() {
         setNotes(item.notes ?? '');
         setOriginalPaths(item.photos);
         const signed = await signPhotos(item.photos);
-        setPhotos(
-          item.photos
-            .map((path) => ({ uri: signed[path], path }))
-            .filter((photo) => Boolean(photo.uri)),
-        );
+        // unsigned photos stay in the grid, dropping them here would delete them on save
+        setPhotos(item.photos.map((path) => ({ uri: signed[path], path })));
       })
       .catch(() => {
         Alert.alert('Could not load the item', 'Check your connection and try again.');
@@ -189,7 +187,9 @@ export default function AddItemScreen() {
       // keep what's already up, upload what's new, in the order on screen
       const paths: string[] = [];
       for (let i = 0; i < photos.length; i++) {
-        paths.push(photos[i].path ?? (await uploadPhoto(itemId, photos[i].uri, i)));
+        const photo = photos[i];
+        if (photo.path) paths.push(photo.path);
+        else if (photo.uri) paths.push(await uploadPhoto(itemId, photo.uri, i));
       }
       if (editing || paths.length > 0) await attachPhotos(itemId, paths);
 
@@ -265,11 +265,19 @@ export default function AddItemScreen() {
                   if (cell < photos.length) {
                     return (
                       <View key={cell} style={[styles.cell, styles.thumb, { borderColor: colors.borderCard }]}>
-                        <Image
-                          source={{ uri: photos[cell].uri, cacheKey: photos[cell].path }}
-                          style={StyleSheet.absoluteFill}
-                          contentFit="cover"
-                        />
+                        {photos[cell].uri ? (
+                          <Image
+                            source={{ uri: photos[cell].uri, cacheKey: photos[cell].path }}
+                            style={StyleSheet.absoluteFill}
+                            contentFit="cover"
+                          />
+                        ) : (
+                          <View style={styles.unavailable}>
+                            <Text style={[styles.unavailableText, { color: colors.textFaint }]}>
+                              photo{'\n'}unavailable
+                            </Text>
+                          </View>
+                        )}
                         <Pressable
                           onPress={() => removePhoto(cell)}
                           hitSlop={10}
@@ -603,6 +611,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   thumb: { borderStyle: 'solid', borderWidth: 1, overflow: 'hidden' },
+  unavailable: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  unavailableText: { fontFamily: font.body, fontSize: 9, lineHeight: 12, textAlign: 'center' },
   remove: {
     position: 'absolute',
     top: 4,
