@@ -1,23 +1,23 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { money } from '@/lib/inventory';
-import { type Search } from '@/lib/searches-db';
+import { type SearchGroup } from '@/lib/use-searches';
 import { font, radius, tracking } from '@/lib/theme';
 import { useTheme } from '@/lib/theme-context';
 
 type Props = {
-  search: Search;
-  onToggle: (id: number) => void;
+  group: SearchGroup;
+  onToggle: (key: string) => void;
 };
 
-export default function SearchRow({ search, onToggle }: Props) {
+export default function SearchRow({ group, onToggle }: Props) {
   const { colors, shadows } = useTheme();
-  const active = search.active;
+  const active = group.active;
 
   const chips: string[] = [];
-  if (search.location) chips.push(search.location.toUpperCase());
-  if (search.radiusKm) chips.push(`${search.radiusKm} KM`);
-  if (search.includeShipping) chips.push('SHIPS');
+  if (group.location) chips.push(group.location.toUpperCase());
+  if (group.radiusKm) chips.push(`${group.radiusKm} KM`);
+  if (group.includeShipping) chips.push('SHIPS');
 
   return (
     <View
@@ -34,17 +34,19 @@ export default function SearchRow({ search, onToggle }: Props) {
           <View style={styles.nameWrap}>
             <View style={[styles.dot, { backgroundColor: active ? colors.accentFill : colors.dotPaused }]} />
             <Text style={[styles.keyword, { color: colors.textPrimary }]} numberOfLines={1}>
-              {search.keyword}
+              {group.label}
             </Text>
             <Text style={[styles.cap, { color: colors.textLabel }]}>
               {active
-                ? search.priceMax != null
-                  ? `· under ${money(search.priceMax)}`
-                  : ''
+                ? group.count > 1
+                  ? `· ${group.count} models`
+                  : group.priceMax != null
+                    ? `· under ${money(group.priceMax)}`
+                    : ''
                 : '· paused'}
             </Text>
           </View>
-          <Toggle value={active} onPress={() => onToggle(search.id)} />
+          <Toggle value={active} onPress={() => onToggle(group.key)} />
         </View>
 
         {/* a paused search is one quiet line, details come back when it wakes */}
@@ -58,7 +60,7 @@ export default function SearchRow({ search, onToggle }: Props) {
               ))}
             </View>
             <View style={styles.hits}>
-              <Text style={[styles.hitsNum, { color: colors.accentText }]}>{search.hits}</Text>
+              <Text style={[styles.hitsNum, { color: colors.accentText }]}>{group.hits}</Text>
               <Text style={[styles.hitsLabel, { color: colors.textLabel }]}>hits</Text>
             </View>
           </View>

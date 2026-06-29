@@ -17,10 +17,10 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { summary, nudge } = useHomeSummary();
-  const { searches, loading, error, toggle } = useSearches();
+  const { groups, loading, error, toggle } = useSearches();
 
-  const scanning = searches.filter((s) => s.active).length;
-  const paused = searches.length - scanning;
+  const scanning = groups.filter((g) => g.active).length;
+  const paused = groups.length - scanning;
 
   return (
     <ScrollView
@@ -33,7 +33,7 @@ export default function HomeScreen() {
       <View style={styles.searchesHead}>
         <View>
           <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Your searches</Text>
-          {searches.length > 0 ? (
+          {groups.length > 0 ? (
             <Text style={[styles.sectionSub, { color: colors.textTertiary }]}>
               {scanning} scanning · {paused} paused
             </Text>
@@ -50,12 +50,12 @@ export default function HomeScreen() {
         <ActivityIndicator style={styles.spinner} color={colors.accentText} />
       ) : error ? (
         <Text style={[styles.empty, { color: colors.negative }]}>{error}</Text>
-      ) : searches.length === 0 ? (
+      ) : groups.length === 0 ? (
         <Text style={[styles.empty, { color: colors.textTertiary }]}>
           No searches yet. They&apos;ll show up here when you create them.
         </Text>
       ) : (
-        searches.map((search) => <SearchRow key={search.id} search={search} onToggle={toggle} />)
+        groups.map((group) => <SearchRow key={group.key} group={group} onToggle={toggle} />)
       )}
     </ScrollView>
   );

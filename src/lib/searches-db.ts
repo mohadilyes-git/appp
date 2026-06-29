@@ -3,6 +3,10 @@ import { supabase } from './supabase';
 export type Search = {
   id: number;
   keyword: string;
+  // what the card shows, keyword is the machine's matching term
+  label?: string;
+  groupId?: string;
+  platforms: string[];
   location?: string;
   radiusKm?: number;
   includeShipping: boolean;
@@ -17,6 +21,9 @@ export type Search = {
 type Row = {
   id: number;
   keyword: string;
+  label: string | null;
+  group_id: string | null;
+  platforms: string[] | null;
   location: string | null;
   radius_km: number | null;
   include_shipping: boolean;
@@ -28,12 +35,15 @@ type Row = {
 
 // matches(count) folds the join table into a hit counter per row
 const COLUMNS =
-  'id, keyword, location, radius_km, include_shipping, price_min, price_max, active, matches(count)';
+  'id, keyword, label, group_id, platforms, location, radius_km, include_shipping, price_min, price_max, active, matches(count)';
 
 function toSearch(row: Row): Search {
   return {
     id: row.id,
     keyword: row.keyword,
+    label: row.label ?? undefined,
+    groupId: row.group_id ?? undefined,
+    platforms: row.platforms ?? [],
     location: row.location ?? undefined,
     radiusKm: row.radius_km ?? undefined,
     includeShipping: row.include_shipping,
@@ -54,7 +64,8 @@ export async function listSearches() {
   return (data as Row[]).map(toSearch);
 }
 
-export async function setSearchActive(id: number, active: boolean) {
-  const { error } = await supabase.from('searches').update({ active }).eq('id', id);
+// a wizard search is several rows sharing a group, so pausing takes a list of ids
+export async function setSearchesActive(ids: number[], active: boolean) {
+  const { error } = await supabase.from('searches').update({ active }).in('id', ids);
   if (error) throw error;
 }
