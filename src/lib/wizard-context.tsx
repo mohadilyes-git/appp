@@ -1,0 +1,60 @@
+import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
+
+// one object built up across the steps, so going back never loses input.
+// number-ish fields stay strings while they live in text inputs.
+export type WizardState = {
+  category?: string;
+  brandId?: string;
+  productId?: string;
+  // selection keys are brand-scoped: 'iphone:13 series:Pro'
+  models: Record<string, boolean>;
+  // which brand's models are on screen right now
+  activeBrandId?: string;
+  // galaxy's line switcher
+  line: string;
+  prices: Record<string, { min: string; max: string }>;
+  keyword: { text: string; min: string; max: string };
+  radiusKm: number | null;
+  platforms: Record<string, boolean>;
+  includeWords: string[];
+  excludeWords: string[];
+};
+
+const INITIAL: WizardState = {
+  models: {},
+  line: 'S',
+  prices: {},
+  keyword: { text: '', min: '', max: '' },
+  radiusKm: 40,
+  platforms: { facebook: true, ebay: true, gumtree: true },
+  includeWords: [],
+  excludeWords: [],
+};
+
+type WizardValue = {
+  state: WizardState;
+  patch: (p: Partial<WizardState>) => void;
+  reset: () => void;
+};
+
+const WizardContext = createContext<WizardValue | null>(null);
+
+export function WizardProvider({ children }: { children: ReactNode }) {
+  const [state, setState] = useState<WizardState>(INITIAL);
+
+  const patch = useCallback((p: Partial<WizardState>) => {
+    setState((current) => ({ ...current, ...p }));
+  }, []);
+
+  const reset = useCallback(() => setState(INITIAL), []);
+
+  const value = useMemo(() => ({ state, patch, reset }), [state, patch, reset]);
+
+  return <WizardContext.Provider value={value}>{children}</WizardContext.Provider>;
+}
+
+export function useWizard() {
+  const value = useContext(WizardContext);
+  if (!value) throw new Error('useWizard has to be used inside the new-search screens');
+  return value;
+}
