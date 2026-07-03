@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import GreetingRow from '@/components/greeting-row';
@@ -39,11 +39,17 @@ export default function HomeScreen() {
             </Text>
           ) : null}
         </View>
-        {/* goes nowhere yet, the create form isn't designed */}
-        <View style={[styles.newPill, { backgroundColor: colors.accentFill }, shadows.pill]}>
+        <Pressable
+          onPress={() => router.push('/new-search')}
+          style={({ pressed }) => [
+            styles.newPill,
+            { backgroundColor: colors.accentFill },
+            shadows.pill,
+            pressed && { opacity: 0.85 },
+          ]}>
           <PlusIcon color="#fff" size={13} />
           <Text style={styles.newText}>New</Text>
-        </View>
+        </Pressable>
       </View>
 
       {loading ? (
