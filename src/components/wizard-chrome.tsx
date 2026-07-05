@@ -51,7 +51,7 @@ export function WizardHeader({ eyebrow, step, title, accent, subtitle, onBack, c
             key={i}
             style={[
               styles.segment,
-              { backgroundColor: i < step.filled ? colors.accentFill : colors.surfaceWashStrong },
+              { backgroundColor: i < step.filled ? colors.accentBrand : colors.surfaceWashStrong },
             ]}
           />
         ))}
@@ -126,10 +126,10 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
 
-  progress: { flexDirection: 'row', gap: 5, marginTop: -6 },
+  progress: { flexDirection: 'row', gap: 5, marginTop: 2 },
   segment: { flex: 1, height: 4, borderRadius: 2 },
 
-  titleBlock: { gap: 5, marginTop: -4 },
+  titleBlock: { gap: 5, marginTop: 6 },
   titleLine: { lineHeight: 28 },
   title: {
     fontFamily: font.display,

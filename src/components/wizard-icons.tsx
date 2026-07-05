@@ -31,3 +31,19 @@ export function CategoryIcon({ id, color, size = 20 }: { id: string; color: stri
     </Svg>
   );
 }
+
+export function SearchIcon({ color, size = 16 }: { color: string; size?: number }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+      <Path d="M10.6 2.6a8 8 0 1 1-5 14.2l-3.3 3.3-1.6-1.6 3.3-3.3a8 8 0 0 1 6.6-12.6zm0 2.2a5.8 5.8 0 1 0 0 11.6 5.8 5.8 0 0 0 0-11.6z" />
+    </Svg>
+  );
+}
+
+export function CheckIcon({ color, size = 12 }: { color: string; size?: number }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+      <Path d="M9.6 16.2 4.8 11.4l1.7-1.7 3.1 3.1 7.9-7.9 1.7 1.7z" />
+    </Svg>
+  );
+}

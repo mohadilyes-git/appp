@@ -22,8 +22,12 @@ export default function CategoryScreen() {
 
   const next = () => {
     if (!picked) return;
-    // placeholder until the category paths are built
-    Alert.alert('Not built yet', `The ${picked.name} questions are the next step.`);
+    if (picked.id === 'phones') {
+      router.push('/new-search/brand');
+      return;
+    }
+    // placeholder until the other category paths are built
+    Alert.alert('Not built yet', `The ${picked.name} questions are a later step.`);
   };
 
   return (
