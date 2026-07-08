@@ -109,7 +109,7 @@ const lightColors = {
 
   // the fade behind a pinned action bar, so content scrolls under it
   barFadeFrom: 'rgba(240,243,248,0)',
-  barFadeTo: 'rgba(240,243,248,.96)',
+  barFadeTo: 'rgba(240,243,248,1)',
   // bgMid at zero alpha. 'transparent' fades through black and leaves a grey smear
   bgMidFade: 'rgba(238,241,246,0)',
 };
@@ -184,7 +184,7 @@ const darkColors: Colors = {
   secondaryButton: 'rgba(255,255,255,.07)',
 
   barFadeFrom: 'rgba(9,12,18,0)',
-  barFadeTo: 'rgba(9,12,18,.94)',
+  barFadeTo: 'rgba(9,12,18,1)',
   bgMidFade: 'rgba(18,22,31,0)',
 };
 
