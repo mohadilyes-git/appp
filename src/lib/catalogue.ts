@@ -58,7 +58,7 @@ export const IPHONE: Brand = {
     { title: '13 series', prefix: '13', chips: ['Base', 'Mini', 'Pro', 'Pro Max'] },
     { title: '14 series', prefix: '14', chips: ['Base', 'Plus', 'Pro', 'Pro Max'] },
     { title: '15 series', prefix: '15', chips: ['Base', 'Plus', 'Pro', 'Pro Max'] },
-    { title: '16 series', prefix: '16', chips: ['Base', 'Plus', 'Pro', 'Pro Max'] },
+    { title: '16 series', prefix: '16', chips: ['Base', 'e', 'Plus', 'Pro', 'Pro Max'] },
     { title: '17 series', prefix: '17', chips: ['Base', 'Air', 'Pro', 'Pro Max'] },
   ],
 };
@@ -74,11 +74,11 @@ export const GALAXY: Brand = {
     { title: 'S22 series', prefix: 'S22', chips: ['Base', 'Plus', 'Ultra'] },
     { title: 'S23 series', prefix: 'S23', chips: ['Base', 'Plus', 'Ultra', 'FE'] },
     { title: 'S24 series', prefix: 'S24', chips: ['Base', 'Plus', 'Ultra', 'FE'] },
-    { title: 'S25 series', prefix: 'S25', chips: ['Base', 'Plus', 'Ultra', 'Edge'] },
+    { title: 'S25 series', prefix: 'S25', chips: ['Base', 'Plus', 'Ultra', 'Edge', 'FE'] },
     // the design only draws the S line, these three are filled in to match
-    { title: 'Z Flip', prefix: '', chips: ['Z Flip 3', 'Z Flip 4', 'Z Flip 5', 'Z Flip 6'] },
-    { title: 'Z Fold', prefix: '', chips: ['Z Fold 3', 'Z Fold 4', 'Z Fold 5', 'Z Fold 6'] },
-    { title: 'A series', prefix: '', chips: ['A14', 'A15', 'A16', 'A34', 'A54', 'A55'] },
+    { title: 'Z Flip', prefix: '', chips: ['Z Flip 3', 'Z Flip 4', 'Z Flip 5', 'Z Flip 6', 'Z Flip 7'] },
+    { title: 'Z Fold', prefix: '', chips: ['Z Fold 3', 'Z Fold 4', 'Z Fold 5', 'Z Fold 6', 'Z Fold 7'] },
+    { title: 'A series', prefix: '', chips: ['A14', 'A15', 'A16', 'A25', 'A34', 'A35', 'A36', 'A54', 'A55', 'A56'] },
     { title: 'Note', prefix: '', chips: ['Note 9', 'Note 10', 'Note 10+', 'Note 20', 'Note 20 Ultra'] },
   ],
   lines: [
@@ -313,7 +313,9 @@ export const FORD_MODELS = [
 
 // {prefix:'13', chip:'Base'} -> "iPhone 13", {prefix:'13', chip:'Pro Max'} -> "iPhone 13 Pro Max"
 export function displayName(brand: Brand, group: ModelGroup, chip: string) {
-  const model = group.prefix ? (chip === 'Base' ? group.prefix : `${group.prefix} ${chip}`) : chip;
+  // single letters glue onto the series: S10 + e is the S10e, not the "S10 e"
+  const joined = chip.length === 1 ? `${group.prefix}${chip}` : `${group.prefix} ${chip}`;
+  const model = group.prefix ? (chip === 'Base' ? group.prefix : joined) : chip;
   return brand.name ? `${brand.name} ${model}` : model;
 }
 
