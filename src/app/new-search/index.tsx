@@ -23,7 +23,7 @@ export default function CategoryScreen() {
   const next = () => {
     if (!picked) return;
     if (picked.id === 'phones') {
-      router.push('/new-search/brand');
+      router.navigate('/new-search/brand');
       return;
     }
     // placeholder until the other category paths are built

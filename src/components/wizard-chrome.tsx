@@ -1,5 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Keyboard, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { ChevronLeftIcon, CloseIcon } from '@/components/icons';
 import { font, radius, tracking } from '@/lib/theme';
@@ -42,7 +43,7 @@ export function WizardHeader({ eyebrow, step, title, accent, subtitle, onBack, c
             <ChevronLeftIcon color={colors.textPrimary} />
           )}
         </Pressable>
-        <Text style={[styles.eyebrow, { color: colors.textMuted }]}>{eyebrow}</Text>
+        <Text style={[styles.eyebrow, { color: colors.textHint }]}>{eyebrow}</Text>
       </View>
 
       <View style={styles.progress}>
@@ -77,6 +78,21 @@ type BarProps = {
 
 export function WizardBar({ label = 'Continue', onPress, disabled, onSkip }: BarProps) {
   const { colors, shadows } = useTheme();
+  const [keyboardUp, setKeyboardUp] = useState(false);
+
+  // android resizes the window, which would park this bar on top of the
+  // focused input. ios slides the keyboard over it instead, nothing to do.
+  useEffect(() => {
+    if (Platform.OS !== 'android') return;
+    const show = Keyboard.addListener('keyboardDidShow', () => setKeyboardUp(true));
+    const hide = Keyboard.addListener('keyboardDidHide', () => setKeyboardUp(false));
+    return () => {
+      show.remove();
+      hide.remove();
+    };
+  }, []);
+
+  if (keyboardUp) return null;
 
   return (
     <View style={styles.bar}>

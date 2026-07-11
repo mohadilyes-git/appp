@@ -31,9 +31,11 @@ const INITIAL: WizardState = {
   excludeWords: [],
 };
 
+type Patch = Partial<WizardState> | ((current: WizardState) => Partial<WizardState>);
+
 type WizardValue = {
   state: WizardState;
-  patch: (p: Partial<WizardState>) => void;
+  patch: (p: Patch) => void;
   reset: () => void;
 };
 
@@ -42,8 +44,9 @@ const WizardContext = createContext<WizardValue | null>(null);
 export function WizardProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<WizardState>(INITIAL);
 
-  const patch = useCallback((p: Partial<WizardState>) => {
-    setState((current) => ({ ...current, ...p }));
+  // the function form reads the freshest state, for per-keystroke writes
+  const patch = useCallback((p: Patch) => {
+    setState((current) => ({ ...current, ...(typeof p === 'function' ? p(current) : p) }));
   }, []);
 
   const reset = useCallback(() => setState(INITIAL), []);

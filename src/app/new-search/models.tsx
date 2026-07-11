@@ -70,36 +70,36 @@ export default function ModelsScreen() {
     patch({ models });
   };
 
-  const notYet = () => {
-    // placeholder until the price step is built
-    Alert.alert('Not built yet', 'The price screen is the next step.');
+  const skipPrices = () => {
+    // placeholder until the filters step is built
+    Alert.alert('Not built yet', 'The where & filters screen is a later step.');
   };
 
   return (
     <View style={styles.screen}>
       <AppBackground width={width} height={height} />
 
-      <View style={[styles.content, { paddingTop: insets.top + 8 }]}>
-        <WizardHeader
-          eyebrow="Step 3 of 5"
-          step={{ filled: 3, total: 5 }}
-          title="Pick the"
-          accent="models"
-          subtitle={
-            brand.lines
-              ? 'Switch lines up top — your picks carry across all of them.'
-              : 'Tap the ones worth flipping. Series headers select the whole row.'
-          }
-          onBack={() => router.back()}
-        />
-
+      <View style={styles.content}>
         <ScrollView
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="on-drag"
           automaticallyAdjustKeyboardInsets
-          contentContainerStyle={styles.listContent}
-          style={styles.scroll}>
+          contentContainerStyle={[styles.listContent, { paddingTop: insets.top + 8 }]}>
+          <View style={styles.headerWrap}>
+            <WizardHeader
+              eyebrow="Step 3 of 5"
+              step={{ filled: 3, total: 5 }}
+              title="Pick the"
+              accent="models"
+              subtitle={
+                brand.lines
+                  ? 'Switch lines up top — your picks carry across all of them.'
+                  : 'Tap the ones worth flipping. Series headers select the whole row.'
+              }
+              onBack={() => router.back()}
+            />
+          </View>
           <View
             style={[styles.search, { backgroundColor: colors.surfaceField, borderColor: colors.borderField }]}>
             <SearchIcon color={colors.textPlaceholder} />
@@ -211,7 +211,12 @@ export default function ModelsScreen() {
         </ScrollView>
       </View>
 
-      <WizardBar label="Set prices" onPress={notYet} disabled={count === 0} onSkip={notYet} />
+      <WizardBar
+        label="Set prices"
+        onPress={() => router.navigate('/new-search/prices')}
+        disabled={count === 0}
+        onSkip={skipPrices}
+      />
     </View>
   );
 }
@@ -235,8 +240,8 @@ function Box({ checked, size }: { checked: boolean; size: number }) {
 const styles = StyleSheet.create({
   screen: { flex: 1 },
   content: { flex: 1, paddingHorizontal: 18 },
-  scroll: { marginTop: 14 },
   listContent: { gap: 12, paddingBottom: 110 },
+  headerWrap: { marginBottom: 2 },
 
   search: {
     flexDirection: 'row',
