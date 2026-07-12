@@ -1,7 +1,6 @@
 import { Redirect, useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
-  Alert,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -66,10 +65,7 @@ export default function PricesScreen() {
     });
   };
 
-  const notYet = () => {
-    // placeholder until the filters step is built
-    Alert.alert('Not built yet', 'The where & filters screen is the next step.');
-  };
+  const next = () => router.navigate('/new-search/filters');
 
   return (
     <View style={styles.screen}>
@@ -144,7 +140,7 @@ export default function PricesScreen() {
         </ScrollView>
       </View>
 
-      <WizardBar onPress={notYet} onSkip={notYet} />
+      <WizardBar onPress={next} onSkip={next} />
     </View>
   );
 }

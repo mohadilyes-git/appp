@@ -1,7 +1,6 @@
 import { Redirect, useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
-  Alert,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -70,10 +69,8 @@ export default function ModelsScreen() {
     patch({ models });
   };
 
-  const skipPrices = () => {
-    // placeholder until the filters step is built
-    Alert.alert('Not built yet', 'The where & filters screen is a later step.');
-  };
+  // skipping prices means every model alerts at any price
+  const skipPrices = () => router.navigate('/new-search/filters');
 
   return (
     <View style={styles.screen}>

@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { Keyboard, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { ChevronLeftIcon, CloseIcon } from '@/components/icons';
-import { font, radius, tracking } from '@/lib/theme';
+import { font, gradients, radius, tracking } from '@/lib/theme';
 import { useTheme } from '@/lib/theme-context';
 
 // the saturated blue stays the same in both themes, white text sits on it either way
@@ -74,9 +74,11 @@ type BarProps = {
   onPress: () => void;
   disabled?: boolean;
   onSkip?: () => void;
+  // the last step's button gets the hero gradient instead of the flat blue
+  hero?: boolean;
 };
 
-export function WizardBar({ label = 'Continue', onPress, disabled, onSkip }: BarProps) {
+export function WizardBar({ label = 'Continue', onPress, disabled, onSkip, hero }: BarProps) {
   const { colors, shadows } = useTheme();
   const [keyboardUp, setKeyboardUp] = useState(false);
 
@@ -95,12 +97,14 @@ export function WizardBar({ label = 'Continue', onPress, disabled, onSkip }: Bar
   if (keyboardUp) return null;
 
   return (
-    <View style={styles.bar}>
+    // box-none keeps the empty parts of the band scrollable and tappable
+    <View style={styles.bar} pointerEvents="box-none">
       {/* the fade reaches full opacity before the button starts, a long ramp ghosts */}
       <LinearGradient
         colors={[colors.barFadeFrom, colors.barFadeTo]}
         locations={[0, 0.14]}
         style={StyleSheet.absoluteFill}
+        pointerEvents="none"
       />
       <View style={styles.barRow}>
         {onSkip ? (
@@ -113,10 +117,20 @@ export function WizardBar({ label = 'Continue', onPress, disabled, onSkip }: Bar
           disabled={disabled}
           style={({ pressed }) => [
             styles.continue,
+            hero && styles.continueHero,
             { opacity: disabled ? 0.45 : 1 },
             shadows.cta,
             pressed && !disabled && styles.lifted,
           ]}>
+          {hero ? (
+            <LinearGradient
+              colors={gradients.hero}
+              locations={gradients.heroStops}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 0.8, y: 1 }}
+              style={StyleSheet.absoluteFill}
+            />
+          ) : null}
           <Text style={styles.continueText}>{label}</Text>
         </Pressable>
       </View>
@@ -165,7 +179,9 @@ const styles = StyleSheet.create({
     backgroundColor: WIZARD_BLUE,
     alignItems: 'center',
     justifyContent: 'center',
+    overflow: 'hidden',
   },
+  continueHero: { height: 54, borderRadius: radius.card },
   continueText: { fontFamily: font.heavy, fontSize: 15.5, color: '#fff' },
   lifted: { transform: [{ translateY: -1 }] },
 });

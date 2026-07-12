@@ -47,3 +47,11 @@ export function CheckIcon({ color, size = 12 }: { color: string; size?: number }
     </Svg>
   );
 }
+
+export function PinIcon({ color, size = 16 }: { color: string; size?: number }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+      <Path d="M12 2.2a7.4 7.4 0 0 1 7.4 7.4c0 5.2-7.4 12.2-7.4 12.2S4.6 14.8 4.6 9.6A7.4 7.4 0 0 1 12 2.2zm0 4.6a2.9 2.9 0 1 0 0 5.8 2.9 2.9 0 0 0 0-5.8z" />
+    </Svg>
+  );
+}

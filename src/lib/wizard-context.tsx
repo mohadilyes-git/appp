@@ -14,8 +14,13 @@ export type WizardState = {
   line: string;
   prices: Record<string, { min: string; max: string }>;
   keyword: { text: string; min: string; max: string };
-  radiusKm: number | null;
-  platforms: Record<string, boolean>;
+  // the picked place and its coordinates, straight from the geocoder
+  location: string;
+  lat: number | null;
+  lng: number | null;
+  // miles in the ui, converted to km when the search is saved
+  radiusMiles: number;
+  platform: string;
   includeWords: string[];
   excludeWords: string[];
 };
@@ -25,8 +30,11 @@ const INITIAL: WizardState = {
   line: 'S',
   prices: {},
   keyword: { text: '', min: '', max: '' },
-  radiusKm: 40,
-  platforms: { facebook: true, ebay: true, gumtree: true },
+  location: '',
+  lat: null,
+  lng: null,
+  radiusMiles: 25,
+  platform: 'facebook',
   includeWords: [],
   excludeWords: [],
 };
