@@ -69,8 +69,6 @@ export default function ModelsScreen() {
     patch({ models });
   };
 
-  // skipping prices means every model alerts at any price
-  const skipPrices = () => router.navigate('/new-search/filters');
 
   return (
     <View style={styles.screen}>
@@ -212,7 +210,6 @@ export default function ModelsScreen() {
         label="Set prices"
         onPress={() => router.navigate('/new-search/prices')}
         disabled={count === 0}
-        onSkip={skipPrices}
       />
     </View>
   );

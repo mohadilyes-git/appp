@@ -73,12 +73,11 @@ type BarProps = {
   label?: string;
   onPress: () => void;
   disabled?: boolean;
-  onSkip?: () => void;
   // the last step's button gets the hero gradient instead of the flat blue
   hero?: boolean;
 };
 
-export function WizardBar({ label = 'Continue', onPress, disabled, onSkip, hero }: BarProps) {
+export function WizardBar({ label = 'Continue', onPress, disabled, hero }: BarProps) {
   const { colors, shadows } = useTheme();
   const [keyboardUp, setKeyboardUp] = useState(false);
 
@@ -107,11 +106,6 @@ export function WizardBar({ label = 'Continue', onPress, disabled, onSkip, hero 
         pointerEvents="none"
       />
       <View style={styles.barRow}>
-        {onSkip ? (
-          <Pressable onPress={onSkip} hitSlop={8} style={({ pressed }) => [styles.skip, pressed && { opacity: 0.7 }]}>
-            <Text style={[styles.skipText, { color: colors.textTertiary }]}>Skip</Text>
-          </Pressable>
-        ) : null}
         <Pressable
           onPress={onPress}
           disabled={disabled}
@@ -169,9 +163,7 @@ const styles = StyleSheet.create({
   subtitle: { fontFamily: font.body, fontSize: 12.5, lineHeight: 18.75 },
 
   bar: { position: 'absolute', left: 0, right: 0, bottom: 0, paddingTop: 14, paddingBottom: 26 },
-  barRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 18 },
-  skip: { height: 52, paddingHorizontal: 15, alignItems: 'center', justifyContent: 'center' },
-  skipText: { fontFamily: font.heavy, fontSize: 14.5 },
+  barRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 18 },
   continue: {
     flex: 1,
     height: 52,

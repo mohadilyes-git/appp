@@ -118,11 +118,7 @@ export default function BrandScreen() {
         </ScrollView>
       </View>
 
-      <WizardBar
-        onPress={() => router.navigate('/new-search/models')}
-        disabled={!state.brandId}
-        onSkip={keywordInstead}
-      />
+      <WizardBar onPress={() => router.navigate('/new-search/models')} disabled={!state.brandId} />
     </View>
   );
 }

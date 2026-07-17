@@ -140,7 +140,7 @@ export default function PricesScreen() {
         </ScrollView>
       </View>
 
-      <WizardBar onPress={next} onSkip={next} />
+      <WizardBar onPress={next} />
     </View>
   );
 }
