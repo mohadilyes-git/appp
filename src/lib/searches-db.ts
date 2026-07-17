@@ -69,3 +69,31 @@ export async function setSearchesActive(ids: number[], active: boolean) {
   const { error } = await supabase.from('searches').update({ active }).in('id', ids);
   if (error) throw error;
 }
+
+// what the wizard hands over per model, already in the table's own shape
+export type NewSearchRow = {
+  keyword: string;
+  label: string;
+  group_id: string | null;
+  platforms: string[];
+  location: string | null;
+  lat: number | null;
+  lng: number | null;
+  radius_km: number;
+  include_shipping: boolean;
+  include_words: string | null;
+  exclude_words: string | null;
+  price_min: number | null;
+  price_max: number | null;
+};
+
+export async function createSearches(rows: NewSearchRow[]) {
+  const { data: auth } = await supabase.auth.getUser();
+  const userId = auth.user?.id;
+  if (!userId) throw new Error('You need to be signed in to start a search.');
+
+  const { error } = await supabase
+    .from('searches')
+    .insert(rows.map((row) => ({ ...row, user_id: userId })));
+  if (error) throw error;
+}

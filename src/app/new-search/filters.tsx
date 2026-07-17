@@ -18,6 +18,8 @@ import AppBackground from '@/components/app-background';
 import { ChevronRightIcon, CloseIcon } from '@/components/icons';
 import { WizardBar, WizardHeader } from '@/components/wizard-chrome';
 import { CheckIcon, PinIcon } from '@/components/wizard-icons';
+import { compileWizard } from '@/lib/search-compiler';
+import { createSearches } from '@/lib/searches-db';
 import { font, radius, tracking } from '@/lib/theme';
 import { useTheme } from '@/lib/theme-context';
 import { useWizard } from '@/lib/wizard-context';
@@ -69,6 +71,7 @@ export default function FiltersScreen() {
   // the slider redraws on its own while dragging, the draft only takes the final value
   const [miles, setMiles] = useState(state.radiusMiles);
   const [platformOpen, setPlatformOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     const query = state.location.trim();
@@ -109,9 +112,26 @@ export default function FiltersScreen() {
     setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 60);
   };
 
-  const notYet = () => {
-    // placeholder until the save step is built
-    Alert.alert('Not built yet', 'Saving the search is the next step.');
+  const startSearch = async () => {
+    // no coordinates means no radius filter, the search has to know where to look
+    if (state.lat == null) {
+      Alert.alert('Where should we look?', 'Search for your area and pick it from the list.');
+      return;
+    }
+    const rows = compileWizard(state);
+    if (!rows) {
+      Alert.alert('Nothing to save', 'Pick at least one model first.');
+      return;
+    }
+    setSaving(true);
+    try {
+      await createSearches(rows);
+      // home refetches on focus, the new card is already there
+      router.replace('/');
+    } catch (e) {
+      Alert.alert("Couldn't start the search", e instanceof Error ? e.message : 'Try again in a moment.');
+      setSaving(false);
+    }
   };
 
   const currentPlatform = PLATFORMS.find((p) => p.id === state.platform) ?? PLATFORMS[0];
@@ -283,7 +303,12 @@ export default function FiltersScreen() {
         </ScrollView>
       </View>
 
-      <WizardBar label="Start this search" onPress={notYet} hero />
+      <WizardBar
+        label={saving ? 'Starting…' : 'Start this search'}
+        onPress={startSearch}
+        disabled={saving}
+        hero
+      />
     </View>
   );
 }

@@ -12,6 +12,8 @@ export type GalaxyLine = {
   id: string;
   label: string;
   groupTitles: string[];
+  // a line can carry its own scrape keyword, tighter than the brand root
+  root?: string;
 };
 
 export type Brand = {
@@ -82,10 +84,10 @@ export const GALAXY: Brand = {
     { title: 'Note', prefix: '', chips: ['Note 9', 'Note 10', 'Note 10+', 'Note 20', 'Note 20 Ultra'] },
   ],
   lines: [
-    { id: 'S', label: 'Galaxy S', groupTitles: ['S10 series', 'S20 series', 'S21 series', 'S22 series', 'S23 series', 'S24 series', 'S25 series'] },
-    { id: 'Z', label: 'Galaxy Z', groupTitles: ['Z Flip', 'Z Fold'] },
-    { id: 'A', label: 'Galaxy A', groupTitles: ['A series'] },
-    { id: 'N', label: 'Note', groupTitles: ['Note'] },
+    { id: 'S', label: 'Galaxy S', root: 'samsung galaxy s', groupTitles: ['S10 series', 'S20 series', 'S21 series', 'S22 series', 'S23 series', 'S24 series', 'S25 series'] },
+    { id: 'Z', label: 'Galaxy Z', root: 'samsung galaxy z', groupTitles: ['Z Flip', 'Z Fold'] },
+    { id: 'A', label: 'Galaxy A', root: 'samsung galaxy a', groupTitles: ['A series'] },
+    { id: 'N', label: 'Note', root: 'samsung note', groupTitles: ['Note'] },
   ],
 };
 
@@ -322,6 +324,12 @@ export function displayName(brand: Brand, group: ModelGroup, chip: string) {
 // the matcher's keyword for a model row: the brand root, or the whole name when there is none
 export function rootKeyword(brand: Brand, name: string) {
   return (brand.root || name).toLowerCase();
+}
+
+// a row's scrape keyword: the line's own root wins over the brand's
+export function rowKeyword(brand: Brand, group: ModelGroup, name: string) {
+  const line = brand.lines?.find((l) => l.groupTitles.includes(group.title));
+  return line?.root ?? rootKeyword(brand, name);
 }
 
 // the words that pick this model out of the shared keyword pool
