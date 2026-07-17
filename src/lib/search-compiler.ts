@@ -1,4 +1,4 @@
-import { displayName, includeWords, modelKey, PHONE_BRANDS, rowKeyword, type ModelGroup } from './catalogue';
+import { brandById, displayName, includeWords, modelKey, rowKeyword, type ModelGroup } from './catalogue';
 import { type NewSearchRow } from './searches-db';
 import { type WizardState } from './wizard-context';
 
@@ -41,7 +41,7 @@ function siblingExcludes(group: ModelGroup, chip: string) {
 // one wizard run fans out to one searches row per picked model,
 // all stamped with the same group so home shows a single card
 export function compileWizard(state: WizardState): NewSearchRow[] | null {
-  const brand = PHONE_BRANDS.find((b) => b.id === state.brandId)?.brand;
+  const brand = brandById(state.brandId);
   if (!brand) return null;
 
   const picked = brand.groups.flatMap((group) =>

@@ -14,7 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AppBackground from '@/components/app-background';
 import { WizardBar, WizardHeader } from '@/components/wizard-chrome';
 import { CheckIcon, SearchIcon } from '@/components/wizard-icons';
-import { displayName, modelKey, PHONE_BRANDS, type ModelGroup } from '@/lib/catalogue';
+import { brandById, displayName, modelKey, type ModelGroup } from '@/lib/catalogue';
 import { font, radius, tracking } from '@/lib/theme';
 import { useTheme } from '@/lib/theme-context';
 import { useWizard } from '@/lib/wizard-context';
@@ -27,7 +27,7 @@ export default function ModelsScreen() {
   const { state, patch } = useWizard();
   const [query, setQuery] = useState('');
 
-  const brand = PHONE_BRANDS.find((b) => b.id === state.brandId)?.brand;
+  const brand = brandById(state.brandId);
   // landing here without a brand (deep link, web refresh) would be a blank screen
   if (!brand) return <Redirect href="/new-search/brand" />;
 

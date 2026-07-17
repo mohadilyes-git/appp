@@ -13,7 +13,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import AppBackground from '@/components/app-background';
 import { WizardBar, WizardHeader } from '@/components/wizard-chrome';
-import { displayName, modelKey, PHONE_BRANDS } from '@/lib/catalogue';
+import { brandById, displayName, modelKey } from '@/lib/catalogue';
 import { font, radius, tracking } from '@/lib/theme';
 import { useTheme } from '@/lib/theme-context';
 import { useWizard } from '@/lib/wizard-context';
@@ -33,7 +33,7 @@ export default function PricesScreen() {
   const [allMax, setAllMax] = useState('');
 
   // only the active brand's picks: switching brand parks the other one's models
-  const brand = PHONE_BRANDS.find((b) => b.id === state.brandId)?.brand;
+  const brand = brandById(state.brandId);
   const rows = brand
     ? brand.groups.flatMap((group) =>
         group.chips

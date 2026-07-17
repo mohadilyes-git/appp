@@ -311,6 +311,28 @@ export const FORD_MODELS = [
   'Mustang', 'Mustang Mach-E', 'Taurus', 'EcoSport',
 ];
 
+// ---- brand registry -----------------------------------------------------
+
+// every drawn brand on one shelf, so the shared screens can serve any category
+const ALL_BRANDS: Brand[] = [
+  ...PHONE_BRANDS.map((b) => b.brand),
+  PLAYSTATION,
+  XBOX,
+  NINTENDO,
+  STEAM_DECK,
+  IPAD,
+  MACBOOK,
+  AIRPODS,
+  APPLE_WATCH,
+  GOPRO,
+  DELL,
+  CANON,
+];
+
+export function brandById(id?: string) {
+  return ALL_BRANDS.find((b) => b.id === id);
+}
+
 // ---- name resolution ----------------------------------------------------
 
 // {prefix:'13', chip:'Base'} -> "iPhone 13", {prefix:'13', chip:'Pro Max'} -> "iPhone 13 Pro Max"
