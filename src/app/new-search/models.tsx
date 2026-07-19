@@ -19,6 +19,22 @@ import { font, radius, tracking } from '@/lib/theme';
 import { useTheme } from '@/lib/theme-context';
 import { useWizard } from '@/lib/wizard-context';
 
+// consoles introduce themselves by name, phones share one line
+const HEADERS: Record<string, { title: string; accent: string; subtitle: string }> = {
+  playstation: {
+    title: 'Which PlayStation',
+    accent: 'models?',
+    subtitle: 'Consoles and handhelds, grouped by generation.',
+  },
+  xbox: { title: 'Which Xbox', accent: 'models?', subtitle: 'Two generations, four current SKUs.' },
+  nintendo: {
+    title: 'Which Nintendo',
+    accent: 'models?',
+    subtitle: 'Switch first, then the retro handhelds that still move.',
+  },
+  steamdeck: { title: 'Which Steam Deck', accent: 'models?', subtitle: 'LCD and OLED, split by storage.' },
+};
+
 export default function ModelsScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -29,7 +45,15 @@ export default function ModelsScreen() {
 
   const brand = brandById(state.brandId);
   // landing here without a brand (deep link, web refresh) would be a blank screen
-  if (!brand) return <Redirect href="/new-search/brand" />;
+  if (!brand) return <Redirect href="/new-search" />;
+
+  const header = HEADERS[brand.id] ?? {
+    title: 'Pick the',
+    accent: 'models',
+    subtitle: brand.lines
+      ? 'Switch lines up top — your picks carry across all of them.'
+      : 'Tap the ones worth flipping. Series headers select the whole row.',
+  };
 
   // galaxy shows one line at a time, but a search looks across all of them
   const line = brand.lines?.find((l) => l.id === state.line) ?? brand.lines?.[0];
@@ -85,13 +109,9 @@ export default function ModelsScreen() {
             <WizardHeader
               eyebrow="Step 3 of 5"
               step={{ filled: 3, total: 5 }}
-              title="Pick the"
-              accent="models"
-              subtitle={
-                brand.lines
-                  ? 'Switch lines up top — your picks carry across all of them.'
-                  : 'Tap the ones worth flipping. Series headers select the whole row.'
-              }
+              title={header.title}
+              accent={header.accent}
+              subtitle={header.subtitle}
               onBack={() => router.back()}
             />
           </View>

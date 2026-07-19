@@ -45,7 +45,7 @@ export default function PricesScreen() {
       )
     : [];
 
-  if (rows.length === 0) return <Redirect href="/new-search/brand" />;
+  if (rows.length === 0) return <Redirect href="/new-search" />;
 
   const priceOf = (key: string) => state.prices[key] ?? { min: '', max: '' };
 

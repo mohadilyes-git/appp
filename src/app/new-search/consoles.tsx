@@ -3,24 +3,22 @@ import { Alert, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, Vi
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import AppBackground from '@/components/app-background';
-import { AppleLogo } from '@/components/brand-logos';
 import { WizardBar, WizardHeader } from '@/components/wizard-chrome';
 import { CheckIcon } from '@/components/wizard-icons';
-import { IPHONE, PHONE_BRANDS } from '@/lib/catalogue';
+import { CONSOLE_BRANDS } from '@/lib/catalogue';
 import { font, radius } from '@/lib/theme';
 import { useTheme } from '@/lib/theme-context';
 import { useWizard } from '@/lib/wizard-context';
 
-const IPHONE_COUNT = IPHONE.groups.reduce((sum, g) => sum + g.chips.length, 0);
-
-// the letter badges and sub lines are presentation only, so they live here not in the catalogue
+// this screen was never drawn, so it borrows the phone brand card layout
 const CARD_EXTRAS: Record<string, { letter: string; sub: string }> = {
-  iphone: { letter: '', sub: `${IPHONE_COUNT} models tracked` },
-  galaxy: { letter: 'S', sub: 'Galaxy S · Z · A series' },
-  pixel: { letter: 'G', sub: 'Pixel 4 through 10' },
+  playstation: { letter: 'P', sub: 'PS4 · PS5 · handhelds' },
+  xbox: { letter: 'X', sub: 'One and Series' },
+  nintendo: { letter: 'N', sub: 'Switch and older systems' },
+  steamdeck: { letter: 'S', sub: 'LCD and OLED' },
 };
 
-export default function BrandScreen() {
+export default function ConsolesScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { width, height } = useWindowDimensions();
@@ -38,11 +36,11 @@ export default function BrandScreen() {
 
       <View style={[styles.content, { paddingTop: insets.top + 8 }]}>
         <WizardHeader
-          eyebrow="Brand"
+          eyebrow="Console"
           step={{ filled: 2, total: 5 }}
           title="Which"
-          accent="brand?"
-          subtitle="Phones are matched by exact model, so pick the maker first."
+          accent="console?"
+          subtitle="Consoles are matched by exact model, so pick the family first."
           onBack={() => router.back()}
         />
 
@@ -50,7 +48,7 @@ export default function BrandScreen() {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.list}
           style={styles.scroll}>
-          {PHONE_BRANDS.map(({ id, card }) => {
+          {CONSOLE_BRANDS.map(({ id, card }) => {
             const selected = id === state.brandId;
             const extras = CARD_EXTRAS[id];
             return (
@@ -68,18 +66,13 @@ export default function BrandScreen() {
                 <View
                   style={[
                     styles.badge,
-                    // filled accents keep the brand blue in both themes, like the CTA
                     selected
                       ? { backgroundColor: colors.accentBrand }
                       : { backgroundColor: colors.surfaceWash },
                   ]}>
-                  {extras.letter ? (
-                    <Text style={[styles.badgeLetter, { color: selected ? '#fff' : colors.textSecondary }]}>
-                      {extras.letter}
-                    </Text>
-                  ) : (
-                    <AppleLogo color={selected ? '#fff' : colors.textSecondary} size={22} />
-                  )}
+                  <Text style={[styles.badgeLetter, { color: selected ? '#fff' : colors.textSecondary }]}>
+                    {extras.letter}
+                  </Text>
                 </View>
                 <View style={styles.cardText}>
                   <Text style={[styles.cardName, { color: colors.textPrimary }]}>{card}</Text>
@@ -100,7 +93,7 @@ export default function BrandScreen() {
 
           <View style={[styles.keywordCard, { backgroundColor: colors.accentFaint, borderColor: colors.accentChip }]}>
             <View style={styles.cardText}>
-              <Text style={[styles.keywordTitle, { color: colors.textPrimary }]}>Brand not listed?</Text>
+              <Text style={[styles.keywordTitle, { color: colors.textPrimary }]}>Console not listed?</Text>
               <Text style={[styles.cardSub, { color: colors.textTertiary }]}>
                 Search by your own keyword instead
               </Text>
@@ -118,10 +111,9 @@ export default function BrandScreen() {
         </ScrollView>
       </View>
 
-      {/* a console pick left in the draft shouldn't light this continue */}
       <WizardBar
         onPress={() => router.navigate('/new-search/models')}
-        disabled={!PHONE_BRANDS.some((b) => b.id === state.brandId)}
+        disabled={!CONSOLE_BRANDS.some((b) => b.id === state.brandId)}
       />
     </View>
   );

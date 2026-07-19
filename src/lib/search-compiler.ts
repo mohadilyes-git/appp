@@ -1,4 +1,4 @@
-import { brandById, displayName, includeWords, modelKey, rowKeyword, type ModelGroup } from './catalogue';
+import { brandById, displayName, includeWords, modelKey, rowKeyword, withAlias, type ModelGroup } from './catalogue';
 import { type NewSearchRow } from './searches-db';
 import { type WizardState } from './wizard-context';
 
@@ -33,7 +33,7 @@ function siblingExcludes(group: ModelGroup, chip: string) {
   for (const other of group.chips) {
     if (other === chip) continue;
     const token = suffixToken(group, other);
-    if (chip === 'Base' || token.includes(mine)) out.push(token);
+    if (chip === 'Base' || token.includes(mine)) out.push(withAlias(token));
   }
   return out;
 }
@@ -55,7 +55,7 @@ export function compileWizard(state: WizardState): NewSearchRow[] | null {
   const location = state.location.trim() || null;
 
   return picked.map(({ group, chip, name }) => {
-    const include = [...new Set([...includeWords(brand, name), ...state.includeWords])];
+    const include = [...new Set([...includeWords(brand, name).map(withAlias), ...state.includeWords])];
     // a word the user wants present beats the same word on the sibling fence
     const exclude = [...new Set([...siblingExcludes(group, chip), ...state.excludeWords])].filter(
       (word) => !include.includes(word),

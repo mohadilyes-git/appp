@@ -117,7 +117,7 @@ export const PLAYSTATION: Brand = {
   id: 'playstation',
   // chips already say PS5, a name here would render "PlayStation PS5"
   name: '',
-  root: '',
+  root: 'playstation',
   groups: [
     { title: 'PS4 family', prefix: '', chips: ['PS4', 'PS4 Slim', 'PS4 Pro'] },
     { title: 'PS5 family', prefix: '', chips: ['PS5', 'PS5 Digital', 'PS5 Slim', 'PS5 Pro'] },
@@ -138,7 +138,7 @@ export const XBOX: Brand = {
 export const NINTENDO: Brand = {
   id: 'nintendo',
   name: '',
-  root: '',
+  root: 'nintendo',
   groups: [
     { title: 'Switch family', prefix: '', chips: ['Switch', 'Switch Lite', 'Switch OLED'] },
     { title: 'Switch 2', prefix: '', chips: ['Switch 2'] },
@@ -331,6 +331,29 @@ const ALL_BRANDS: Brand[] = [
 
 export function brandById(id?: string) {
   return ALL_BRANDS.find((b) => b.id === id);
+}
+
+// spelled-out forms sellers also use. written as "short|long" so one row
+// matches either spelling, the matcher treats | as any-of
+const TOKEN_ALIASES: Record<string, string> = {
+  ps4: 'playstation 4',
+  ps5: 'playstation 5',
+  // covers the handhelds: "ps portal" -> "playstation portal"
+  ps: 'playstation',
+  // storage comes spaced or glued in titles: "512GB" and "512 GB"
+  '64gb': '64 gb',
+  '256gb': '256 gb',
+  '512gb': '512 gb',
+  '1tb': '1 tb',
+};
+
+export function withAlias(token: string) {
+  if (TOKEN_ALIASES[token]) return `${token}|${TOKEN_ALIASES[token]}`;
+  for (const short of Object.keys(TOKEN_ALIASES)) {
+    // "ps5 digital" borrows the ps5 alias: "ps5 digital|playstation 5 digital"
+    if (token.startsWith(`${short} `)) return `${token}|${token.replace(short, TOKEN_ALIASES[short])}`;
+  }
+  return token;
 }
 
 // ---- name resolution ----------------------------------------------------

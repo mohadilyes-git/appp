@@ -26,6 +26,10 @@ export default function CategoryScreen() {
       router.navigate('/new-search/brand');
       return;
     }
+    if (picked.id === 'consoles') {
+      router.navigate('/new-search/consoles');
+      return;
+    }
     // placeholder until the other category paths are built
     Alert.alert('Not built yet', `The ${picked.name} questions are a later step.`);
   };
