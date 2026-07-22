@@ -142,7 +142,7 @@ export const NINTENDO: Brand = {
   groups: [
     { title: 'Switch family', prefix: '', chips: ['Switch', 'Switch Lite', 'Switch OLED'] },
     { title: 'Switch 2', prefix: '', chips: ['Switch 2'] },
-    { title: 'Older systems', prefix: '', chips: ['3DS', 'New 3DS XL', '2DS XL', 'Wii U'] },
+    { title: 'Older systems', prefix: '', chips: ['3DS', 'New 3DS XL', '2DS XL', 'Wii', 'Wii U'] },
   ],
 };
 
@@ -170,10 +170,10 @@ export const IPAD: Brand = {
   name: 'iPad',
   root: 'ipad',
   groups: [
-    { title: 'iPad (base)', prefix: '', chips: ['9th gen', '10th gen', '11th gen'] },
+    { title: 'iPad (base)', prefix: '', chips: ['8th gen', '9th gen', '10th gen', '11th gen'] },
     { title: 'iPad Air', prefix: '', chips: ['Air 3', 'Air 4', 'Air 5', 'Air M2', 'Air M3'] },
-    { title: 'iPad Pro', prefix: '', chips: ['Pro 11 M1', 'Pro 11 M2', 'Pro 11 M4', 'Pro 12.9 M1', 'Pro 12.9 M2', 'Pro 13 M4'] },
-    { title: 'iPad mini', prefix: '', chips: ['mini 5', 'mini 6', 'mini 7'] },
+    { title: 'iPad Pro', prefix: '', chips: ['Pro 11 2018', 'Pro 11 2020', 'Pro 11 M1', 'Pro 11 M2', 'Pro 11 M4', 'Pro 12.9 2018', 'Pro 12.9 2020', 'Pro 12.9 M1', 'Pro 12.9 M2', 'Pro 13 M4'] },
+    { title: 'iPad mini', prefix: '', chips: ['mini 4', 'mini 5', 'mini 6', 'mini 7'] },
   ],
 };
 
@@ -182,9 +182,10 @@ export const MACBOOK: Brand = {
   name: 'MacBook',
   root: 'macbook',
   groups: [
-    { title: 'MacBook Air · Apple silicon', prefix: '', chips: ['Air 13 M1', 'Air 13 M2', 'Air 15 M3', 'Air 13 M4'] },
-    { title: 'MacBook Pro · Apple silicon', prefix: '', chips: ['Pro 13 M1', 'Pro 14 M1 Pro', 'Pro 14 M3', 'Pro 16 M2 Max', 'Pro 16 M4 Pro'] },
-    { title: 'Intel era', prefix: '', chips: ['Air 2017', 'Air 2019', 'Pro 2015', 'Pro 2019'] },
+    { title: 'MacBook Air · Apple silicon', prefix: '', chips: ['Air 13 M1', 'Air 13 M2', 'Air 15 M2', 'Air 13 M3', 'Air 15 M3', 'Air 13 M4', 'Air 15 M4'] },
+    { title: 'MacBook Pro 13–14', prefix: '', chips: ['Pro 13 M1', 'Pro 13 M2', 'Pro 14 M1 Pro', 'Pro 14 M1 Max', 'Pro 14 M2 Pro', 'Pro 14 M2 Max', 'Pro 14 M3', 'Pro 14 M3 Pro', 'Pro 14 M3 Max', 'Pro 14 M4', 'Pro 14 M4 Pro', 'Pro 14 M4 Max', 'Pro 14 M5'] },
+    { title: 'MacBook Pro 16', prefix: '', chips: ['Pro 16 M1 Pro', 'Pro 16 M1 Max', 'Pro 16 M2 Pro', 'Pro 16 M2 Max', 'Pro 16 M3 Pro', 'Pro 16 M3 Max', 'Pro 16 M4 Pro', 'Pro 16 M4 Max'] },
+    { title: 'Intel era', prefix: '', chips: ['Air 2017', 'Air 2019', 'Pro 2015', 'Pro 2019', 'Pro 2020'] },
   ],
 };
 
@@ -193,7 +194,7 @@ export const AIRPODS: Brand = {
   name: 'AirPods',
   root: 'airpods',
   groups: [
-    { title: 'Standard', prefix: '', chips: ['2nd gen', '3rd gen', '4th gen', '4th gen ANC'] },
+    { title: 'Standard', prefix: '', chips: ['1st gen', '2nd gen', '3rd gen', '4th gen', '4th gen ANC'] },
     { title: 'Pro', prefix: '', chips: ['Pro', 'Pro 2', 'Pro 2 USB-C', 'Pro 3'] },
     { title: 'Max', prefix: '', chips: ['Max', 'Max USB-C'] },
   ],
@@ -204,8 +205,8 @@ export const APPLE_WATCH: Brand = {
   name: 'Apple Watch',
   root: 'apple watch',
   groups: [
-    { title: 'Series 4–6 and SE', prefix: '', chips: ['Series 4', 'Series 5', 'Series 6', 'SE', 'SE 2'] },
-    { title: 'Series 7–10', prefix: '', chips: ['Series 7', 'Series 8', 'Series 9', 'Series 10'] },
+    { title: 'Series 4–6 and SE', prefix: '', chips: ['Series 4', 'Series 5', 'Series 6', 'SE', 'SE 2', 'SE 3'] },
+    { title: 'Series 7–11', prefix: '', chips: ['Series 7', 'Series 8', 'Series 9', 'Series 10', 'Series 11'] },
     { title: 'Ultra', prefix: '', chips: ['Ultra', 'Ultra 2', 'Ultra 3'] },
   ],
 };
@@ -215,9 +216,9 @@ export const GOPRO: Brand = {
   name: 'GoPro',
   root: 'gopro',
   groups: [
-    { title: 'Hero 8–11', prefix: '', chips: ['Hero 8', 'Hero 9', 'Hero 10', 'Hero 11'] },
+    { title: 'Hero 7–11', prefix: '', chips: ['Hero 7', 'Hero 8', 'Hero 9', 'Hero 10', 'Hero 11'] },
     { title: 'Hero 12–13', prefix: '', chips: ['Hero 12', 'Hero 13'] },
-    { title: '360 and compact', prefix: '', chips: ['Max', 'Hero 2024'] },
+    { title: '360 and compact', prefix: '', chips: ['Max', 'Max 2', 'Hero 2024'] },
   ],
 };
 
@@ -226,11 +227,12 @@ export const DELL: Brand = {
   name: 'Dell',
   root: 'dell',
   groups: [
-    { title: 'XPS', prefix: '', chips: ['XPS 13', 'XPS 14', 'XPS 15', 'XPS 17'] },
+    { title: 'XPS', prefix: '', chips: ['XPS 13', 'XPS 14', 'XPS 15', 'XPS 16', 'XPS 17'] },
     { title: 'Inspiron', prefix: '', chips: ['Inspiron 14', 'Inspiron 15', 'Inspiron 16'] },
     { title: 'Latitude', prefix: '', chips: ['Latitude 5000', 'Latitude 7000', 'Latitude 9000'] },
-    { title: 'Alienware', prefix: '', chips: ['Alienware m16', 'Alienware m18', 'Alienware x14'] },
-    { title: 'Precision', prefix: '', chips: ['Precision 3000', 'Precision 5000'] },
+    { title: 'G series', prefix: '', chips: ['G15', 'G16'] },
+    { title: 'Alienware', prefix: '', chips: ['Alienware m15', 'Alienware m16', 'Alienware m17', 'Alienware m18', 'Alienware x14', 'Alienware x16', 'Alienware x17'] },
+    { title: 'Precision', prefix: '', chips: ['Precision 3000', 'Precision 5000', 'Precision 7000'] },
   ],
 };
 
@@ -239,9 +241,9 @@ export const CANON: Brand = {
   name: 'Canon',
   root: 'canon',
   groups: [
-    { title: 'EOS R · mirrorless', prefix: '', chips: ['EOS R5', 'EOS R6', 'EOS R7', 'EOS R8', 'EOS R50', 'EOS R100'] },
-    { title: 'EOS · DSLR', prefix: '', chips: ['EOS 5D IV', 'EOS 6D II', 'EOS 90D', 'EOS 250D', 'Rebel T7'] },
-    { title: 'PowerShot · compact', prefix: '', chips: ['PowerShot G7X', 'PowerShot SX70', 'PowerShot V10'] },
+    { title: 'EOS R · mirrorless', prefix: '', chips: ['EOS R1', 'EOS R3', 'EOS R5', 'EOS R5 II', 'EOS R6', 'EOS R6 II', 'EOS R7', 'EOS R8', 'EOS R10', 'EOS R50', 'EOS R50 V', 'EOS R100'] },
+    { title: 'EOS M and DSLR', prefix: '', chips: ['EOS M50', 'EOS 5D IV', 'EOS 6D II', 'EOS 90D', 'EOS 250D', 'EOS 2000D'] },
+    { title: 'PowerShot · compact', prefix: '', chips: ['PowerShot G7X', 'PowerShot SX70', 'PowerShot V1', 'PowerShot V10'] },
   ],
 };
 
@@ -269,17 +271,12 @@ export const ELECTRONICS_PRODUCTS: ProductGroup[] = [
     title: 'Computing',
     products: [
       { id: 'laptop', name: 'Laptop', brandStep: true },
-      { id: 'monitor', name: 'Monitor', brandStep: true },
       { id: 'gpu', name: 'Graphics card', brandStep: true },
     ],
   },
   {
     title: 'TV and audio',
-    products: [
-      { id: 'tv', name: 'TV', brandStep: true },
-      { id: 'soundbar', name: 'Soundbar', brandStep: true },
-      { id: 'projector', name: 'Projector', brandStep: true },
-    ],
+    products: [{ id: 'tv', name: 'TV', brandStep: true }],
   },
   {
     title: 'Cameras and drones',
@@ -292,10 +289,177 @@ export const ELECTRONICS_PRODUCTS: ProductGroup[] = [
   },
 ];
 
-// only laptop and camera have model screens drawn, the rest reuse the pattern later
-export const LAPTOP_BRANDS = ['Dell', 'Apple', 'HP', 'Lenovo', 'Asus', 'Acer', 'MSI', 'Microsoft', 'Razer'];
-export const CAMERA_BRANDS = ['Canon', 'Nikon', 'Sony', 'Fujifilm', 'Panasonic', 'Olympus / OM', 'Leica'];
-export const DRAWN_PRODUCT_BRANDS: Record<string, Brand> = { Dell: DELL, Canon: CANON };
+export const HP: Brand = {
+  id: 'hp',
+  name: 'HP',
+  root: 'hp',
+  groups: [
+    { title: 'Spectre', prefix: '', chips: ['Spectre x360 13', 'Spectre x360 14', 'Spectre x360 16'] },
+    { title: 'Envy', prefix: '', chips: ['Envy 13', 'Envy 14', 'Envy 16', 'Envy x360'] },
+    { title: 'Pavilion', prefix: '', chips: ['Pavilion 14', 'Pavilion 15', 'Pavilion x360', 'Pavilion Aero 13'] },
+    { title: 'Omen and Victus', prefix: '', chips: ['Omen 15', 'Omen 16', 'Omen 17', 'Omen Transcend 14', 'Omen Transcend 16', 'Victus 15', 'Victus 16'] },
+    { title: 'EliteBook and ProBook', prefix: '', chips: ['EliteBook 830', 'EliteBook 840', 'EliteBook 850', 'EliteBook x360', 'ProBook 440', 'ProBook 450'] },
+  ],
+};
+
+export const LENOVO: Brand = {
+  id: 'lenovo',
+  name: 'Lenovo',
+  root: 'lenovo',
+  groups: [
+    { title: 'ThinkPad', prefix: '', chips: ['ThinkPad X1 Carbon', 'ThinkPad X13', 'ThinkPad T14', 'ThinkPad T14s', 'ThinkPad T480', 'ThinkPad E14', 'ThinkPad P1'] },
+    { title: 'IdeaPad', prefix: '', chips: ['IdeaPad 3', 'IdeaPad 5', 'IdeaPad Slim 5', 'IdeaPad Gaming 3'] },
+    { title: 'Legion', prefix: '', chips: ['Legion 5', 'Legion 5 Pro', 'Legion 7', 'Legion Slim 5'] },
+    { title: 'Yoga', prefix: '', chips: ['Yoga 7', 'Yoga 9', 'Yoga Slim 7'] },
+  ],
+};
+
+export const ASUS: Brand = {
+  id: 'asus',
+  name: 'Asus',
+  root: 'asus',
+  groups: [
+    { title: 'ZenBook', prefix: '', chips: ['ZenBook 14', 'ZenBook 14 OLED', 'ZenBook Pro'] },
+    { title: 'VivoBook', prefix: '', chips: ['VivoBook 15', 'VivoBook S 14'] },
+    { title: 'ROG', prefix: '', chips: ['ROG Zephyrus G14', 'ROG Zephyrus G16', 'ROG Strix G15', 'ROG Strix G16', 'ROG Strix Scar 15', 'ROG Strix Scar 16', 'ROG Strix Scar 17', 'ROG Flow'] },
+    { title: 'TUF', prefix: '', chips: ['TUF A15', 'TUF A16', 'TUF F15'] },
+  ],
+};
+
+export const ACER: Brand = {
+  id: 'acer',
+  name: 'Acer',
+  root: 'acer',
+  groups: [
+    { title: 'Swift', prefix: '', chips: ['Swift 3', 'Swift 5', 'Swift Go 14'] },
+    { title: 'Aspire', prefix: '', chips: ['Aspire 3', 'Aspire 5', 'Aspire 7'] },
+    { title: 'Predator', prefix: '', chips: ['Predator Helios 300', 'Predator Helios 16', 'Predator Helios 18'] },
+    { title: 'Nitro', prefix: '', chips: ['Nitro 5', 'Nitro V 15', 'Nitro 16'] },
+  ],
+};
+
+export const MSI: Brand = {
+  id: 'msi',
+  name: 'MSI',
+  root: 'msi',
+  groups: [
+    { title: 'Gaming', prefix: '', chips: ['Katana 15', 'Sword 16', 'Cyborg 15', 'Raider GE68', 'Raider GE78', 'Titan 18'] },
+    { title: 'Stealth', prefix: '', chips: ['Stealth 14', 'Stealth 16'] },
+    { title: 'Creator and thin', prefix: '', chips: ['Prestige 14', 'Prestige 16', 'Modern 14', 'Modern 15'] },
+  ],
+};
+
+export const SURFACE: Brand = {
+  id: 'surface',
+  // microsoft's laptops all sell under the surface name
+  name: 'Surface',
+  root: 'surface',
+  groups: [
+    { title: 'Surface Laptop', prefix: '', chips: ['Laptop 3', 'Laptop 4', 'Laptop 5', 'Laptop 6', 'Laptop 7'] },
+    { title: 'Surface Pro', prefix: '', chips: ['Pro 7', 'Pro 8', 'Pro 9', 'Pro 10', 'Pro 11'] },
+    { title: 'Studio and Go', prefix: '', chips: ['Laptop Studio', 'Laptop Studio 2', 'Laptop Go 2', 'Laptop Go 3', 'Book 3'] },
+  ],
+};
+
+export const RAZER: Brand = {
+  id: 'razer',
+  name: 'Razer',
+  root: 'razer',
+  groups: [
+    { title: 'Blade', prefix: '', chips: ['Blade 14', 'Blade 15', 'Blade 16', 'Blade 17', 'Blade 18'] },
+  ],
+};
+
+export const NIKON: Brand = {
+  id: 'nikon',
+  name: 'Nikon',
+  root: 'nikon',
+  groups: [
+    { title: 'Z · mirrorless', prefix: '', chips: ['Z5', 'Z6', 'Z6 II', 'Z6 III', 'Z7', 'Z7 II', 'Z8', 'Z9', 'Z50', 'Z50 II', 'Zf', 'Zfc'] },
+    { title: 'D · DSLR', prefix: '', chips: ['D3500', 'D5600', 'D7500', 'D750', 'D780', 'D850'] },
+    { title: 'Coolpix', prefix: '', chips: ['Coolpix P950', 'Coolpix P1000'] },
+  ],
+};
+
+export const SONY_CAMERA: Brand = {
+  id: 'sonycamera',
+  name: 'Sony',
+  root: 'sony',
+  groups: [
+    { title: 'A7 and full frame', prefix: '', chips: ['A7 III', 'A7 IV', 'A7C', 'A7C II', 'A7R IV', 'A7R V', 'A7S III', 'A9 II', 'A1'] },
+    { title: 'A6000 series', prefix: '', chips: ['A6000', 'A6100', 'A6400', 'A6600', 'A6700'] },
+    { title: 'ZV · vlog', prefix: '', chips: ['ZV-1', 'ZV-E10', 'ZV-E10 II', 'ZV-E1'] },
+    { title: 'RX · compact', prefix: '', chips: ['RX100 VII'] },
+  ],
+};
+
+export const FUJIFILM: Brand = {
+  id: 'fujifilm',
+  name: 'Fujifilm',
+  // fuji is a substring of fujifilm, so the short root catches both spellings
+  root: 'fuji',
+  groups: [
+    { title: 'X-T', prefix: '', chips: ['X-T3', 'X-T4', 'X-T5', 'X-T30', 'X-T30 II', 'X-T50'] },
+    { title: 'X-S and X-E', prefix: '', chips: ['X-S10', 'X-S20', 'X-E4'] },
+    { title: 'X100', prefix: '', chips: ['X100V', 'X100VI'] },
+    { title: 'GFX · medium format', prefix: '', chips: ['GFX 50S II', 'GFX 100S'] },
+  ],
+};
+
+export const PANASONIC: Brand = {
+  id: 'panasonic',
+  // sellers nearly always write lumix, panasonic alone is tvs and phones
+  name: 'Lumix',
+  root: 'lumix',
+  groups: [
+    { title: 'S · full frame', prefix: '', chips: ['S1', 'S5', 'S5 II', 'S5 IIX', 'S9'] },
+    { title: 'G and GH', prefix: '', chips: ['G9', 'G9 II', 'GH5', 'GH5 II', 'GH6', 'GH7', 'G100'] },
+    { title: 'Compact', prefix: '', chips: ['LX100 II', 'TZ200'] },
+  ],
+};
+
+export const OLYMPUS: Brand = {
+  id: 'olympus',
+  name: 'Olympus',
+  root: 'olympus',
+  groups: [
+    { title: 'OM-D and OM', prefix: '', chips: ['E-M10 III', 'E-M10 IV', 'E-M5 III', 'E-M1 III', 'OM-5', 'OM-1', 'OM-1 II'] },
+    { title: 'PEN', prefix: '', chips: ['PEN E-P7', 'PEN E-PL9', 'PEN E-PL10'] },
+    { title: 'Tough', prefix: '', chips: ['Tough TG-6', 'Tough TG-7'] },
+  ],
+};
+
+export const LEICA: Brand = {
+  id: 'leica',
+  name: 'Leica',
+  root: 'leica',
+  groups: [
+    { title: 'Q', prefix: '', chips: ['Q2', 'Q3', 'Q3 43'] },
+    { title: 'M', prefix: '', chips: ['M10', 'M10-R', 'M11'] },
+    { title: 'SL and compact', prefix: '', chips: ['SL2', 'SL3', 'D-Lux 7', 'D-Lux 8'] },
+  ],
+};
+
+export const LAPTOP_BRANDS = [
+  { name: 'Dell', brand: DELL },
+  { name: 'HP', brand: HP },
+  { name: 'Lenovo', brand: LENOVO },
+  { name: 'Asus', brand: ASUS },
+  { name: 'Acer', brand: ACER },
+  { name: 'MSI', brand: MSI },
+  { name: 'Microsoft', brand: SURFACE },
+  { name: 'Razer', brand: RAZER },
+];
+
+export const CAMERA_BRANDS = [
+  { name: 'Canon', brand: CANON },
+  { name: 'Nikon', brand: NIKON },
+  { name: 'Sony', brand: SONY_CAMERA },
+  { name: 'Fujifilm', brand: FUJIFILM },
+  { name: 'Panasonic', brand: PANASONIC },
+  { name: 'Olympus / OM', brand: OLYMPUS },
+  { name: 'Leica', brand: LEICA },
+];
 
 // ---- cars ---------------------------------------------------------------
 
@@ -325,12 +489,16 @@ const ALL_BRANDS: Brand[] = [
   AIRPODS,
   APPLE_WATCH,
   GOPRO,
-  DELL,
-  CANON,
+  ...LAPTOP_BRANDS.map((b) => b.brand),
+  ...CAMERA_BRANDS.map((b) => b.brand),
 ];
 
 export function brandById(id?: string) {
   return ALL_BRANDS.find((b) => b.id === id);
+}
+
+export function productById(id?: string) {
+  return ELECTRONICS_PRODUCTS.flatMap((g) => g.products).find((p) => p.id === id);
 }
 
 // spelled-out forms sellers also use. written as "short|long" so one row
@@ -345,6 +513,8 @@ const TOKEN_ALIASES: Record<string, string> = {
   '256gb': '256 gb',
   '512gb': '512 gb',
   '1tb': '1 tb',
+  // same camera, US name — uk listings say 2000D, imports say Rebel T7
+  '2000d': 'rebel t7',
 };
 
 export function withAlias(token: string) {

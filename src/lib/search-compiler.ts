@@ -27,13 +27,18 @@ function suffixToken(group: ModelGroup, chip: string) {
 // a row's keyword catches the whole brand, these words keep siblings out.
 // Base excludes every variant, others exclude the ones their own token hides in:
 // 'pro' is inside 'pro max', 'x' is inside 'xr', 'se' is inside 'se 2'.
+// the word check catches near-twins string containment misses, like
+// 'pro 14 m1 pro' vs 'pro 14 m1 max' — every word of mine is in the sibling
 function siblingExcludes(group: ModelGroup, chip: string) {
   const mine = suffixToken(group, chip);
+  const mineWords = mine.split(' ');
   const out: string[] = [];
   for (const other of group.chips) {
     if (other === chip) continue;
     const token = suffixToken(group, other);
-    if (chip === 'Base' || token.includes(mine)) out.push(withAlias(token));
+    const otherWords = token.split(' ');
+    const swallowsMine = mineWords.every((word) => otherWords.includes(word));
+    if (chip === 'Base' || token.includes(mine) || swallowsMine) out.push(withAlias(token));
   }
   return out;
 }
