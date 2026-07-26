@@ -14,7 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AppBackground from '@/components/app-background';
 import { WizardBar, WizardHeader } from '@/components/wizard-chrome';
 import { CheckIcon, SearchIcon } from '@/components/wizard-icons';
-import { brandById, displayName, modelKey, type ModelGroup } from '@/lib/catalogue';
+import { brandById, displayName, modelKey, productById, type ModelGroup } from '@/lib/catalogue';
 import { font, radius, tracking } from '@/lib/theme';
 import { useTheme } from '@/lib/theme-context';
 import { useWizard } from '@/lib/wizard-context';
@@ -33,6 +33,17 @@ const HEADERS: Record<string, { title: string; accent: string; subtitle: string 
     subtitle: 'Switch first, then the retro handhelds that still move.',
   },
   steamdeck: { title: 'Which Steam Deck', accent: 'models?', subtitle: 'LCD and OLED, split by storage.' },
+  ipad: { title: 'Which iPad', accent: 'models?', subtitle: 'No brand step — iPad is already one maker.' },
+  macbook: {
+    title: 'Which MacBook',
+    accent: 'models?',
+    subtitle: 'Apple silicon first, older Intel bodies at the bottom.',
+  },
+  airpods: { title: 'Which AirPods', accent: 'models?', subtitle: 'Standard, Pro and Max — grouped by family.' },
+  applewatch: { title: 'Which Watch', accent: 'models?', subtitle: 'Older bodies, current Series, and Ultra.' },
+  gopro: { title: 'Which GoPro', accent: 'models?', subtitle: 'Hero generations plus the 360 bodies.' },
+  dell: { title: 'Which Dell', accent: 'models?', subtitle: 'Grouped by line — pick the ones that actually resell.' },
+  canon: { title: 'Which Canon', accent: 'models?', subtitle: 'Mirrorless, DSLR and compacts kept apart.' },
 };
 
 export default function ModelsScreen() {
@@ -47,6 +58,8 @@ export default function ModelsScreen() {
   // landing here without a brand (deep link, web refresh) would be a blank screen
   if (!brand) return <Redirect href="/new-search" />;
 
+  // the laptop and camera detours add a brand step, stretching the trail to six
+  const detour = Boolean(productById(state.productId)?.brandStep);
   const header = HEADERS[brand.id] ?? {
     title: 'Pick the',
     accent: 'models',
@@ -107,8 +120,8 @@ export default function ModelsScreen() {
           contentContainerStyle={[styles.listContent, { paddingTop: insets.top + 8 }]}>
           <View style={styles.headerWrap}>
             <WizardHeader
-              eyebrow="Step 3 of 5"
-              step={{ filled: 3, total: 5 }}
+              eyebrow={detour ? 'Step 4 of 6' : 'Step 3 of 5'}
+              step={detour ? { filled: 4, total: 6 } : { filled: 3, total: 5 }}
               title={header.title}
               accent={header.accent}
               subtitle={header.subtitle}

@@ -13,7 +13,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import AppBackground from '@/components/app-background';
 import { WizardBar, WizardHeader } from '@/components/wizard-chrome';
-import { brandById, displayName, modelKey } from '@/lib/catalogue';
+import { brandById, displayName, modelKey, productById } from '@/lib/catalogue';
 import { font, radius, tracking } from '@/lib/theme';
 import { useTheme } from '@/lib/theme-context';
 import { useWizard } from '@/lib/wizard-context';
@@ -81,7 +81,11 @@ export default function PricesScreen() {
           <View style={styles.headerWrap}>
             <WizardHeader
               eyebrow="Prices"
-              step={{ filled: 4, total: 5 }}
+              step={
+                productById(state.productId)?.brandStep
+                  ? { filled: 5, total: 6 }
+                  : { filled: 4, total: 5 }
+              }
               title="Price"
               accent="per model"
               subtitle="A cheap iPhone 13 is not a cheap 15 Pro Max — set the ceiling that makes each one a deal."

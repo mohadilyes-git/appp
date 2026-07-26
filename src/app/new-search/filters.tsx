@@ -18,6 +18,7 @@ import AppBackground from '@/components/app-background';
 import { ChevronRightIcon, CloseIcon } from '@/components/icons';
 import { WizardBar, WizardHeader } from '@/components/wizard-chrome';
 import { CheckIcon, PinIcon } from '@/components/wizard-icons';
+import { productById } from '@/lib/catalogue';
 import { compileWizard } from '@/lib/search-compiler';
 import { createSearches } from '@/lib/searches-db';
 import { font, radius, tracking } from '@/lib/theme';
@@ -151,7 +152,11 @@ export default function FiltersScreen() {
           <View style={styles.headerWrap}>
             <WizardHeader
               eyebrow="Last step"
-              step={{ filled: 5, total: 5 }}
+              step={
+                productById(state.productId)?.brandStep
+                  ? { filled: 6, total: 6 }
+                  : { filled: 5, total: 5 }
+              }
               title="Where and"
               accent="what to skip"
               subtitle="Last step — this part is the same for every category."

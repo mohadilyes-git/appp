@@ -22,12 +22,14 @@ export default function CategoryScreen() {
 
   const next = () => {
     if (!picked) return;
-    if (picked.id === 'phones') {
-      router.navigate('/new-search/brand');
+    if (picked.id === 'phones' || picked.id === 'consoles') {
+      // a leftover electronics pick would stretch the step trail to six
+      patch({ productId: undefined });
+      router.navigate(picked.id === 'phones' ? '/new-search/brand' : '/new-search/consoles');
       return;
     }
-    if (picked.id === 'consoles') {
-      router.navigate('/new-search/consoles');
+    if (picked.id === 'electronics') {
+      router.navigate('/new-search/products');
       return;
     }
     // placeholder until the other category paths are built
