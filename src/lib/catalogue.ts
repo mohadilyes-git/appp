@@ -1,5 +1,20 @@
 // every list the new-search wizard picks from, mined from the design files.
 // data lives here so the fourteen model screens can be one component.
+// the long tail (tvs, drones, lenses, cameras, gpus) sits in catalogue-electronics.
+
+import {
+  CAMERA_BRANDS,
+  DRONE_BRANDS,
+  ELECTRONICS_ALIASES,
+  GOPRO,
+  GPU_BRANDS,
+  INSTA360,
+  LENS_BRANDS,
+  OSMO,
+  TV_BRANDS,
+} from './catalogue-electronics';
+
+export * from './catalogue-electronics';
 
 export type ModelGroup = {
   title: string;
@@ -211,16 +226,6 @@ export const APPLE_WATCH: Brand = {
   ],
 };
 
-export const GOPRO: Brand = {
-  id: 'gopro',
-  name: 'GoPro',
-  root: 'gopro',
-  groups: [
-    { title: 'Hero 7–11', prefix: '', chips: ['Hero 7', 'Hero 8', 'Hero 9', 'Hero 10', 'Hero 11'] },
-    { title: 'Hero 12–13', prefix: '', chips: ['Hero 12', 'Hero 13'] },
-    { title: '360 and compact', prefix: '', chips: ['Max', 'Max 2', 'Hero 2024'] },
-  ],
-};
 
 export const DELL: Brand = {
   id: 'dell',
@@ -236,16 +241,6 @@ export const DELL: Brand = {
   ],
 };
 
-export const CANON: Brand = {
-  id: 'canon',
-  name: 'Canon',
-  root: 'canon',
-  groups: [
-    { title: 'EOS R · mirrorless', prefix: '', chips: ['EOS R1', 'EOS R3', 'EOS R5', 'EOS R5 II', 'EOS R6', 'EOS R6 II', 'EOS R7', 'EOS R8', 'EOS R10', 'EOS R50', 'EOS R50 V', 'EOS R100'] },
-    { title: 'EOS M and DSLR', prefix: '', chips: ['EOS M50', 'EOS 5D IV', 'EOS 6D II', 'EOS 90D', 'EOS 250D', 'EOS 2000D'] },
-    { title: 'PowerShot · compact', prefix: '', chips: ['PowerShot G7X', 'PowerShot SX70', 'PowerShot V1', 'PowerShot V10'] },
-  ],
-};
 
 export type Product = {
   id: string;
@@ -284,6 +279,8 @@ export const ELECTRONICS_PRODUCTS: ProductGroup[] = [
       { id: 'camera', name: 'Camera', brandStep: true },
       { id: 'drone', name: 'Drone', brandStep: true },
       { id: 'gopro', name: 'GoPro', brandStep: false, brand: GOPRO },
+      { id: 'insta360', name: 'Insta360', brandStep: false, brand: INSTA360 },
+      { id: 'osmo', name: 'DJI Osmo', brandStep: false, brand: OSMO },
       { id: 'lens', name: 'Lens', brandStep: true },
     ],
   },
@@ -370,75 +367,11 @@ export const RAZER: Brand = {
   ],
 };
 
-export const NIKON: Brand = {
-  id: 'nikon',
-  name: 'Nikon',
-  root: 'nikon',
-  groups: [
-    { title: 'Z · mirrorless', prefix: '', chips: ['Z5', 'Z6', 'Z6 II', 'Z6 III', 'Z7', 'Z7 II', 'Z8', 'Z9', 'Z50', 'Z50 II', 'Zf', 'Zfc'] },
-    { title: 'D · DSLR', prefix: '', chips: ['D3500', 'D5600', 'D7500', 'D750', 'D780', 'D850'] },
-    { title: 'Coolpix', prefix: '', chips: ['Coolpix P950', 'Coolpix P1000'] },
-  ],
-};
 
-export const SONY_CAMERA: Brand = {
-  id: 'sonycamera',
-  name: 'Sony',
-  root: 'sony',
-  groups: [
-    { title: 'A7 and full frame', prefix: '', chips: ['A7 III', 'A7 IV', 'A7C', 'A7C II', 'A7R IV', 'A7R V', 'A7S III', 'A9 II', 'A1'] },
-    { title: 'A6000 series', prefix: '', chips: ['A6000', 'A6100', 'A6400', 'A6600', 'A6700'] },
-    { title: 'ZV · vlog', prefix: '', chips: ['ZV-1', 'ZV-E10', 'ZV-E10 II', 'ZV-E1'] },
-    { title: 'RX · compact', prefix: '', chips: ['RX100 VII'] },
-  ],
-};
 
-export const FUJIFILM: Brand = {
-  id: 'fujifilm',
-  name: 'Fujifilm',
-  // fuji is a substring of fujifilm, so the short root catches both spellings
-  root: 'fuji',
-  groups: [
-    { title: 'X-T', prefix: '', chips: ['X-T3', 'X-T4', 'X-T5', 'X-T30', 'X-T30 II', 'X-T50'] },
-    { title: 'X-S and X-E', prefix: '', chips: ['X-S10', 'X-S20', 'X-E4'] },
-    { title: 'X100', prefix: '', chips: ['X100V', 'X100VI'] },
-    { title: 'GFX · medium format', prefix: '', chips: ['GFX 50S II', 'GFX 100S'] },
-  ],
-};
 
-export const PANASONIC: Brand = {
-  id: 'panasonic',
-  // sellers nearly always write lumix, panasonic alone is tvs and phones
-  name: 'Lumix',
-  root: 'lumix',
-  groups: [
-    { title: 'S · full frame', prefix: '', chips: ['S1', 'S5', 'S5 II', 'S5 IIX', 'S9'] },
-    { title: 'G and GH', prefix: '', chips: ['G9', 'G9 II', 'GH5', 'GH5 II', 'GH6', 'GH7', 'G100'] },
-    { title: 'Compact', prefix: '', chips: ['LX100 II', 'TZ200'] },
-  ],
-};
 
-export const OLYMPUS: Brand = {
-  id: 'olympus',
-  name: 'Olympus',
-  root: 'olympus',
-  groups: [
-    { title: 'OM-D and OM', prefix: '', chips: ['E-M10 III', 'E-M10 IV', 'E-M5 III', 'E-M1 III', 'OM-5', 'OM-1', 'OM-1 II'] },
-    { title: 'PEN', prefix: '', chips: ['PEN E-P7', 'PEN E-PL9', 'PEN E-PL10'] },
-    { title: 'Tough', prefix: '', chips: ['Tough TG-6', 'Tough TG-7'] },
-  ],
-};
 
-export const LEICA: Brand = {
-  id: 'leica',
-  name: 'Leica',
-  root: 'leica',
-  groups: [
-    { title: 'Q', prefix: '', chips: ['Q2', 'Q3', 'Q3 43'] },
-    { title: 'M', prefix: '', chips: ['M10', 'M10-R', 'M11'] },
-    { title: 'SL and compact', prefix: '', chips: ['SL2', 'SL3', 'D-Lux 7', 'D-Lux 8'] },
-  ],
-};
 
 export const LAPTOP_BRANDS = [
   { name: 'Dell', brand: DELL },
@@ -451,15 +384,6 @@ export const LAPTOP_BRANDS = [
   { name: 'Razer', brand: RAZER },
 ];
 
-export const CAMERA_BRANDS = [
-  { name: 'Canon', brand: CANON },
-  { name: 'Nikon', brand: NIKON },
-  { name: 'Sony', brand: SONY_CAMERA },
-  { name: 'Fujifilm', brand: FUJIFILM },
-  { name: 'Panasonic', brand: PANASONIC },
-  { name: 'Olympus / OM', brand: OLYMPUS },
-  { name: 'Leica', brand: LEICA },
-];
 
 // ---- cars ---------------------------------------------------------------
 
@@ -489,8 +413,14 @@ const ALL_BRANDS: Brand[] = [
   AIRPODS,
   APPLE_WATCH,
   GOPRO,
+  INSTA360,
+  OSMO,
   ...LAPTOP_BRANDS.map((b) => b.brand),
   ...CAMERA_BRANDS.map((b) => b.brand),
+  ...GPU_BRANDS.map((b) => b.brand),
+  ...TV_BRANDS.map((b) => b.brand),
+  ...DRONE_BRANDS.map((b) => b.brand),
+  ...LENS_BRANDS.map((b) => b.brand),
 ];
 
 export function brandById(id?: string) {
@@ -513,8 +443,7 @@ const TOKEN_ALIASES: Record<string, string> = {
   '256gb': '256 gb',
   '512gb': '512 gb',
   '1tb': '1 tb',
-  // same camera, US name — uk listings say 2000D, imports say Rebel T7
-  '2000d': 'rebel t7',
+  ...ELECTRONICS_ALIASES,
 };
 
 export function withAlias(token: string) {
