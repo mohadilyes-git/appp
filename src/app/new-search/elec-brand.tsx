@@ -14,7 +14,16 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AppBackground from '@/components/app-background';
 import { WizardBar, WizardHeader } from '@/components/wizard-chrome';
 import { CheckIcon, SearchIcon } from '@/components/wizard-icons';
-import { CAMERA_BRANDS, LAPTOP_BRANDS, type Brand } from '@/lib/catalogue';
+import {
+  BRAND_SUBLINES,
+  CAMERA_BRANDS,
+  DRONE_BRANDS,
+  GPU_BRANDS,
+  LAPTOP_BRANDS,
+  LENS_BRANDS,
+  TV_BRANDS,
+  type Brand,
+} from '@/lib/catalogue';
 import { font, radius } from '@/lib/theme';
 import { useTheme } from '@/lib/theme-context';
 import { useWizard } from '@/lib/wizard-context';
@@ -22,36 +31,47 @@ import { useWizard } from '@/lib/wizard-context';
 // per-product copy, every maker has a model screen behind it
 const PRODUCTS: Record<
   string,
-  { title: string; subtitle: string; brands: { name: string; brand: Brand }[]; subs: Record<string, string> }
+  { title: string; subtitle: string; brands: { name: string; brand: Brand }[]; subs?: Record<string, string> }
 > = {
   laptop: {
     title: 'Which laptop',
     subtitle: 'Laptops price wildly by maker, so models come next per brand.',
     brands: LAPTOP_BRANDS,
     subs: {
-      Dell: 'XPS, Inspiron, Latitude, Alienware',
-      HP: 'Spectre, Envy, Pavilion, Omen',
-      Lenovo: 'ThinkPad, IdeaPad, Legion, Yoga',
-      Asus: 'ZenBook, VivoBook, ROG, TUF',
-      Acer: 'Swift, Aspire, Predator, Nitro',
-      MSI: 'Katana, Stealth, Raider, Prestige',
-      Microsoft: 'Surface Laptop, Pro and Go',
-      Razer: 'Blade 14 through 18',
+      dell: 'XPS, Inspiron, Latitude, Alienware',
+      hp: 'Spectre, Envy, Pavilion, Omen',
+      lenovo: 'ThinkPad, IdeaPad, Legion, Yoga',
+      asus: 'ZenBook, VivoBook, ROG, TUF',
+      acer: 'Swift, Aspire, Predator, Nitro',
+      msi: 'Katana, Stealth, Raider, Prestige',
+      surface: 'Surface Laptop, Pro and Go',
+      razer: 'Blade 14 through 18',
     },
   },
   camera: {
     title: 'Which camera',
-    subtitle: 'Bodies and lenses price per maker, so models come next.',
+    subtitle: 'Bodies price per maker, so models come next.',
     brands: CAMERA_BRANDS,
-    subs: {
-      Canon: 'EOS R, EOS DSLR, PowerShot',
-      Nikon: 'Z series, D series, Coolpix',
-      Sony: 'Alpha A7, A6000, ZV',
-      Fujifilm: 'X-T, X-S, X100, GFX',
-      Panasonic: 'Lumix S, GH, G',
-      'Olympus / OM': 'OM-D, PEN, Tough',
-      Leica: 'Q, M, SL',
-    },
+  },
+  lens: {
+    title: 'Which lens',
+    subtitle: 'Mount matters more than anything, so pick the maker first.',
+    brands: LENS_BRANDS,
+  },
+  gpu: {
+    title: 'Which card',
+    subtitle: 'Nvidia, AMD and Intel price on their own curves.',
+    brands: GPU_BRANDS,
+  },
+  tv: {
+    title: 'Which TV',
+    subtitle: 'Sellers title by series code, so pick the maker first.',
+    brands: TV_BRANDS,
+  },
+  drone: {
+    title: 'Which drone',
+    subtitle: 'DJI resells hardest, but the rest hold value too.',
+    brands: DRONE_BRANDS,
   },
 };
 
@@ -111,8 +131,9 @@ export default function ElecBrandScreen() {
             />
           </View>
 
-          {shown.map(({ name }) => {
+          {shown.map(({ name, brand }) => {
             const selected = name === picked;
+            const sub = product.subs?.[brand.id] ?? BRAND_SUBLINES[brand.id];
             return (
               <Pressable
                 key={name}
@@ -139,7 +160,7 @@ export default function ElecBrandScreen() {
                 <View style={styles.cardText}>
                   <Text style={[styles.cardName, { color: colors.textPrimary }]}>{name}</Text>
                   <Text style={[styles.cardSub, { color: colors.textTertiary }]} numberOfLines={1}>
-                    {product.subs[name]}
+                    {sub}
                   </Text>
                 </View>
                 <View

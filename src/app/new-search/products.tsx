@@ -31,13 +31,14 @@ const SUBLINES: Record<string, string> = {
   gpu: 'Nvidia, AMD, Intel',
   tv: 'Samsung, LG, Sony, TCL…',
   camera: 'Canon, Nikon, Sony, Fujifilm…',
-  drone: 'DJI, Autel, Parrot',
-  gopro: 'Hero 8 through Hero 13',
+  drone: 'DJI, Autel, Parrot, HoverAir…',
+  gopro: 'Hero 5 through Hero 13, Max',
+  insta360: 'X series, GO, Ace Pro',
+  osmo: 'Action, Pocket, gimbals',
   lens: 'Canon, Nikon, Sigma, Tamron…',
 };
 
-// only these two brand lists are drawn, the rest wait for the keyword path
-const BRAND_LISTS = ['laptop', 'camera'];
+const BRAND_LISTS = ['laptop', 'camera', 'lens', 'gpu', 'tv', 'drone'];
 
 export default function ProductsScreen() {
   const router = useRouter();

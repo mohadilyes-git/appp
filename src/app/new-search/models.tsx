@@ -14,13 +14,15 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AppBackground from '@/components/app-background';
 import { WizardBar, WizardHeader } from '@/components/wizard-chrome';
 import { CheckIcon, SearchIcon } from '@/components/wizard-icons';
-import { brandById, displayName, modelKey, productById, type ModelGroup } from '@/lib/catalogue';
+import { BRAND_HEADERS, brandById, displayName, modelKey, productById, type ModelGroup } from '@/lib/catalogue';
 import { font, radius, tracking } from '@/lib/theme';
 import { useTheme } from '@/lib/theme-context';
 import { useWizard } from '@/lib/wizard-context';
 
-// consoles introduce themselves by name, phones share one line
+// consoles introduce themselves by name, phones share one line.
+// the electronics brands bring their own headers from the catalogue
 const HEADERS: Record<string, { title: string; accent: string; subtitle: string }> = {
+  ...BRAND_HEADERS,
   playstation: {
     title: 'Which PlayStation',
     accent: 'models?',
