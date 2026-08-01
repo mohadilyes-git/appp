@@ -23,19 +23,18 @@ export type ModelGroup = {
   chips: string[];
 };
 
+// a line splits one brand's groups across switcher pills, it never changes the keyword
 export type GalaxyLine = {
   id: string;
   label: string;
   groupTitles: string[];
-  // a line can carry its own scrape keyword, tighter than the brand root
-  root?: string;
 };
 
 export type Brand = {
   id: string;
   // display prefix for model names, '' when the chips already carry it
   name: string;
-  // the matcher's keyword root, '' means use the whole model name as the keyword
+  // the one keyword a whole wizard run searches with: the product word plus the maker
   root: string;
   groups: ModelGroup[];
   lines?: GalaxyLine[];
@@ -83,7 +82,7 @@ export const IPHONE: Brand = {
 export const GALAXY: Brand = {
   id: 'galaxy',
   name: 'Galaxy',
-  root: 'galaxy',
+  root: 'samsung galaxy',
   groups: [
     { title: 'S10 series', prefix: 'S10', chips: ['Base', 'Plus', 'e', '5G'] },
     { title: 'S20 series', prefix: 'S20', chips: ['Base', 'Plus', 'Ultra', 'FE'] },
@@ -99,10 +98,10 @@ export const GALAXY: Brand = {
     { title: 'Note', prefix: '', chips: ['Note 9', 'Note 10', 'Note 10+', 'Note 20', 'Note 20 Ultra'] },
   ],
   lines: [
-    { id: 'S', label: 'Galaxy S', root: 'samsung galaxy s', groupTitles: ['S10 series', 'S20 series', 'S21 series', 'S22 series', 'S23 series', 'S24 series', 'S25 series'] },
-    { id: 'Z', label: 'Galaxy Z', root: 'samsung galaxy z', groupTitles: ['Z Flip', 'Z Fold'] },
-    { id: 'A', label: 'Galaxy A', root: 'samsung galaxy a', groupTitles: ['A series'] },
-    { id: 'N', label: 'Note', root: 'samsung note', groupTitles: ['Note'] },
+    { id: 'S', label: 'Galaxy S', groupTitles: ['S10 series', 'S20 series', 'S21 series', 'S22 series', 'S23 series', 'S24 series', 'S25 series'] },
+    { id: 'Z', label: 'Galaxy Z', groupTitles: ['Z Flip', 'Z Fold'] },
+    { id: 'A', label: 'Galaxy A', groupTitles: ['A series'] },
+    { id: 'N', label: 'Note', groupTitles: ['Note'] },
   ],
 };
 
@@ -230,14 +229,26 @@ export const APPLE_WATCH: Brand = {
 export const DELL: Brand = {
   id: 'dell',
   name: 'Dell',
-  root: 'dell',
+  root: 'laptop dell',
   groups: [
     { title: 'XPS', prefix: '', chips: ['XPS 13', 'XPS 14', 'XPS 15', 'XPS 16', 'XPS 17'] },
     { title: 'Inspiron', prefix: '', chips: ['Inspiron 14', 'Inspiron 15', 'Inspiron 16'] },
-    { title: 'Latitude', prefix: '', chips: ['Latitude 5000', 'Latitude 7000', 'Latitude 9000'] },
+    // sellers type the four digit model, never the series number
+    { title: 'Latitude', prefix: '', chips: ['Latitude 5420', 'Latitude 5430', 'Latitude 5440', 'Latitude 7420', 'Latitude 7430', 'Latitude 7440', 'Latitude 9430', 'Latitude 9440'] },
     { title: 'G series', prefix: '', chips: ['G15', 'G16'] },
-    { title: 'Alienware', prefix: '', chips: ['Alienware m15', 'Alienware m16', 'Alienware m17', 'Alienware m18', 'Alienware x14', 'Alienware x16', 'Alienware x17'] },
-    { title: 'Precision', prefix: '', chips: ['Precision 3000', 'Precision 5000', 'Precision 7000'] },
+    { title: 'Precision', prefix: '', chips: ['Precision 3571', 'Precision 5560', 'Precision 5570', 'Precision 5680', 'Precision 7670', 'Precision 7770'] },
+  ],
+};
+
+export const ALIENWARE: Brand = {
+  id: 'alienware',
+  name: 'Alienware',
+  // dell owns it but almost no listing title says dell
+  root: 'laptop alienware',
+  groups: [
+    { title: 'M series', prefix: '', chips: ['m15', 'm16', 'm17', 'm18'] },
+    { title: 'X series', prefix: '', chips: ['x14', 'x15', 'x16', 'x17'] },
+    { title: 'Area 51 and older', prefix: '', chips: ['Area-51m', '13 R3', '15 R4', '17 R5'] },
   ],
 };
 
@@ -289,7 +300,7 @@ export const ELECTRONICS_PRODUCTS: ProductGroup[] = [
 export const HP: Brand = {
   id: 'hp',
   name: 'HP',
-  root: 'hp',
+  root: 'laptop hp',
   groups: [
     { title: 'Spectre', prefix: '', chips: ['Spectre x360 13', 'Spectre x360 14', 'Spectre x360 16'] },
     { title: 'Envy', prefix: '', chips: ['Envy 13', 'Envy 14', 'Envy 16', 'Envy x360'] },
@@ -302,7 +313,7 @@ export const HP: Brand = {
 export const LENOVO: Brand = {
   id: 'lenovo',
   name: 'Lenovo',
-  root: 'lenovo',
+  root: 'laptop lenovo',
   groups: [
     { title: 'ThinkPad', prefix: '', chips: ['ThinkPad X1 Carbon', 'ThinkPad X13', 'ThinkPad T14', 'ThinkPad T14s', 'ThinkPad T480', 'ThinkPad E14', 'ThinkPad P1'] },
     { title: 'IdeaPad', prefix: '', chips: ['IdeaPad 3', 'IdeaPad 5', 'IdeaPad Slim 5', 'IdeaPad Gaming 3'] },
@@ -314,7 +325,7 @@ export const LENOVO: Brand = {
 export const ASUS: Brand = {
   id: 'asus',
   name: 'Asus',
-  root: 'asus',
+  root: 'laptop asus',
   groups: [
     { title: 'ZenBook', prefix: '', chips: ['ZenBook 14', 'ZenBook 14 OLED', 'ZenBook Pro'] },
     { title: 'VivoBook', prefix: '', chips: ['VivoBook 15', 'VivoBook S 14'] },
@@ -326,7 +337,7 @@ export const ASUS: Brand = {
 export const ACER: Brand = {
   id: 'acer',
   name: 'Acer',
-  root: 'acer',
+  root: 'laptop acer',
   groups: [
     { title: 'Swift', prefix: '', chips: ['Swift 3', 'Swift 5', 'Swift Go 14'] },
     { title: 'Aspire', prefix: '', chips: ['Aspire 3', 'Aspire 5', 'Aspire 7'] },
@@ -338,7 +349,7 @@ export const ACER: Brand = {
 export const MSI: Brand = {
   id: 'msi',
   name: 'MSI',
-  root: 'msi',
+  root: 'laptop msi',
   groups: [
     { title: 'Gaming', prefix: '', chips: ['Katana 15', 'Sword 16', 'Cyborg 15', 'Raider GE68', 'Raider GE78', 'Titan 18'] },
     { title: 'Stealth', prefix: '', chips: ['Stealth 14', 'Stealth 16'] },
@@ -350,7 +361,8 @@ export const SURFACE: Brand = {
   id: 'surface',
   // microsoft's laptops all sell under the surface name
   name: 'Surface',
-  root: 'surface',
+  // "laptop surface" appears in no real listing, "microsoft surface" is in most
+  root: 'microsoft surface',
   groups: [
     { title: 'Surface Laptop', prefix: '', chips: ['Laptop 3', 'Laptop 4', 'Laptop 5', 'Laptop 6', 'Laptop 7'] },
     { title: 'Surface Pro', prefix: '', chips: ['Pro 7', 'Pro 8', 'Pro 9', 'Pro 10', 'Pro 11'] },
@@ -361,7 +373,7 @@ export const SURFACE: Brand = {
 export const RAZER: Brand = {
   id: 'razer',
   name: 'Razer',
-  root: 'razer',
+  root: 'laptop razer',
   groups: [
     { title: 'Blade', prefix: '', chips: ['Blade 14', 'Blade 15', 'Blade 16', 'Blade 17', 'Blade 18'] },
   ],
@@ -375,6 +387,7 @@ export const RAZER: Brand = {
 
 export const LAPTOP_BRANDS = [
   { name: 'Dell', brand: DELL },
+  { name: 'Alienware', brand: ALIENWARE },
   { name: 'HP', brand: HP },
   { name: 'Lenovo', brand: LENOVO },
   { name: 'Asus', brand: ASUS },
@@ -468,12 +481,6 @@ export function displayName(brand: Brand, group: ModelGroup, chip: string) {
 // the matcher's keyword for a model row: the brand root, or the whole name when there is none
 export function rootKeyword(brand: Brand, name: string) {
   return (brand.root || name).toLowerCase();
-}
-
-// a row's scrape keyword: the line's own root wins over the brand's
-export function rowKeyword(brand: Brand, group: ModelGroup, name: string) {
-  const line = brand.lines?.find((l) => l.groupTitles.includes(group.title));
-  return line?.root ?? rootKeyword(brand, name);
 }
 
 // the words that pick this model out of the shared keyword pool

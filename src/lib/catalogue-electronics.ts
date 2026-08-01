@@ -9,7 +9,7 @@ import type { Brand } from './catalogue';
 export const NVIDIA: Brand = {
   id: 'nvidia',
   name: 'Nvidia',
-  root: 'geforce',
+  root: 'graphics card nvidia',
   groups: [
     { title: 'RTX 50 series', prefix: '', chips: ['RTX 5090', 'RTX 5080', 'RTX 5070 Ti', 'RTX 5070', 'RTX 5060 Ti', 'RTX 5060', 'RTX 5050'] },
     { title: 'RTX 40 series', prefix: '', chips: ['RTX 4090', 'RTX 4080 Super', 'RTX 4080', 'RTX 4070 Ti Super', 'RTX 4070 Ti', 'RTX 4070 Super', 'RTX 4070', 'RTX 4060 Ti', 'RTX 4060'] },
@@ -25,19 +25,19 @@ export const NVIDIA: Brand = {
     { title: 'RTX A series', prefix: '', chips: ['RTX A2000', 'RTX A4000', 'RTX A5000'] },
   ],
   lines: [
-    { id: 'rtx', label: 'GeForce RTX', root: 'rtx', groupTitles: ['RTX 50 series', 'RTX 40 series', 'RTX 30 series', 'RTX 20 series'] },
-    { id: 'gtx', label: 'GeForce GTX', root: 'gtx', groupTitles: ['GTX 16 series', 'GTX 10 series', 'GTX 900 series', 'GTX 700 series'] },
-    { id: 'gt', label: 'GeForce GT', root: 'geforce gt', groupTitles: ['GT series'] },
-    { id: 'titan', label: 'Titan', root: 'nvidia titan', groupTitles: ['Titan'] },
-    { id: 'quadro', label: 'Quadro', root: 'quadro', groupTitles: ['Quadro'] },
-    { id: 'rtxa', label: 'RTX A', root: 'rtx a', groupTitles: ['RTX A series'] },
+    { id: 'rtx', label: 'GeForce RTX', groupTitles: ['RTX 50 series', 'RTX 40 series', 'RTX 30 series', 'RTX 20 series'] },
+    { id: 'gtx', label: 'GeForce GTX', groupTitles: ['GTX 16 series', 'GTX 10 series', 'GTX 900 series', 'GTX 700 series'] },
+    { id: 'gt', label: 'GeForce GT', groupTitles: ['GT series'] },
+    { id: 'titan', label: 'Titan', groupTitles: ['Titan'] },
+    { id: 'quadro', label: 'Quadro', groupTitles: ['Quadro'] },
+    { id: 'rtxa', label: 'RTX A', groupTitles: ['RTX A series'] },
   ],
 };
 
 export const RADEON: Brand = {
   id: 'radeon',
   name: 'Radeon',
-  root: 'rx',
+  root: 'graphics card radeon',
   groups: [
     { title: 'RX 9000 series', prefix: '', chips: ['RX 9070 XT', 'RX 9070', 'RX 9060 XT', 'RX 9060', 'RX 9070 GRE'] },
     { title: 'RX 7000 series', prefix: '', chips: ['RX 7900 XTX', 'RX 7900 XT', 'RX 7900 GRE', 'RX 7800 XT', 'RX 7700 XT', 'RX 7600 XT', 'RX 7600'] },
@@ -46,18 +46,18 @@ export const RADEON: Brand = {
     { title: 'RX 500 series', prefix: '', chips: ['RX 590', 'RX 580', 'RX 570', 'RX 560', 'RX 550'] },
     { title: 'Vega and Radeon VII', prefix: '', chips: ['RX Vega 56', 'RX Vega 64', 'VII'] },
     { title: 'RX 400 series', prefix: '', chips: ['RX 480', 'RX 470', 'RX 460'] },
-    { title: 'R9 and R7 series', prefix: '', chips: ['R9 390', 'R9 380', 'R9 290X', 'R9 290', 'R9 280X', 'R7 370', 'R7 260X'] },
+    { title: 'R9 and R7 series', prefix: '', chips: ['R9 390X', 'R9 390', 'R9 380X', 'R9 380', 'R9 290X', 'R9 290', 'R9 280X', 'R7 370', 'R7 260X'] },
   ],
   lines: [
-    { id: 'rx', label: 'Radeon RX', root: 'rx', groupTitles: ['RX 9000 series', 'RX 7000 series', 'RX 6000 series', 'RX 5000 series', 'RX 500 series', 'RX 400 series'] },
-    { id: 'legacy', label: 'Vega and R9', root: 'radeon', groupTitles: ['Vega and Radeon VII', 'R9 and R7 series'] },
+    { id: 'rx', label: 'Radeon RX', groupTitles: ['RX 9000 series', 'RX 7000 series', 'RX 6000 series', 'RX 5000 series', 'RX 500 series', 'RX 400 series'] },
+    { id: 'legacy', label: 'Vega and R9', groupTitles: ['Vega and Radeon VII', 'R9 and R7 series'] },
   ],
 };
 
 export const INTEL_ARC: Brand = {
   id: 'intelarc',
   name: 'Intel',
-  root: 'intel arc',
+  root: 'graphics card intel',
   groups: [
     { title: 'Arc B · Battlemage', prefix: '', chips: ['Arc B580', 'Arc B570'] },
     { title: 'Arc A · Alchemist', prefix: '', chips: ['Arc A770', 'Arc A750', 'Arc A580', 'Arc A380', 'Arc A310'] },
@@ -69,7 +69,7 @@ export const INTEL_ARC: Brand = {
 export const SAMSUNG_TV: Brand = {
   id: 'samsungtv',
   name: 'Samsung',
-  root: 'samsung tv',
+  root: 'tv samsung',
   groups: [
     { title: 'QLED Q60 and Q6', prefix: '', chips: ['Q60R', 'Q60T', 'Q60A', 'Q60B', 'Q60C', 'Q60D', 'Q6F', 'Q6FN'] },
     { title: 'QLED Q70 and Q7', prefix: '', chips: ['Q70R', 'Q70T', 'Q70A', 'Q70B', 'Q70C', 'Q70D', 'Q7F', 'Q7FN'] },
@@ -89,7 +89,7 @@ export const SAMSUNG_TV: Brand = {
 export const LG_TV: Brand = {
   id: 'lgtv',
   name: 'LG',
-  root: 'lg tv',
+  root: 'tv lg',
   groups: [
     { title: 'OLED C series', prefix: '', chips: ['C7', 'C8', 'C9', 'CX', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6'] },
     { title: 'OLED B series', prefix: '', chips: ['B7', 'B8', 'B9', 'BX', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6'] },
@@ -105,7 +105,7 @@ export const LG_TV: Brand = {
 export const SONY_TV: Brand = {
   id: 'sonytv',
   name: 'Sony',
-  root: 'sony tv',
+  root: 'tv sony',
   groups: [
     { title: 'OLED A series', prefix: '', chips: ['A1', 'AF8', 'AG8', 'AG9', 'A8', 'A80J', 'A90J', 'A80K', 'A83K', 'A90K', 'A95K', 'AF9'] },
     { title: 'OLED 2023 on', prefix: '', chips: ['A80L', 'A95L', 'Bravia 8', 'Bravia 8 II'] },
@@ -119,7 +119,7 @@ export const SONY_TV: Brand = {
 export const TCL_TV: Brand = {
   id: 'tcltv',
   name: 'TCL',
-  root: 'tcl tv',
+  root: 'tv tcl',
   groups: [
     { title: 'C series 2021-2023', prefix: '', chips: ['C715', 'C725', 'C728', 'C735', 'C745', 'C805', 'C825', 'C835', 'C845'] },
     { title: 'C series 2024-2026', prefix: '', chips: ['C655', 'C755', 'C855', 'C6K', 'C6KS', 'C7K', 'C8K', 'C7L', 'C8L'] },
@@ -131,7 +131,7 @@ export const TCL_TV: Brand = {
 export const HISENSE_TV: Brand = {
   id: 'hisensetv',
   name: 'Hisense',
-  root: 'hisense tv',
+  root: 'tv hisense',
   groups: [
     { title: 'U7 and U8 mini LED', prefix: '', chips: ['U7QF', 'U8QF', 'U7G', 'U8G', 'U7H', 'U8H', 'U7K', 'U8K', 'U7N', 'U8N', 'U7Q', 'U8Q', 'U8Q Pro'] },
     { title: 'U6 and RGB mini LED', prefix: '', chips: ['U6K', 'U6N', 'U6Q', 'U7Q Pro', 'UR8', 'UR9'] },
@@ -145,7 +145,7 @@ export const HISENSE_TV: Brand = {
 export const PANASONIC_TV: Brand = {
   id: 'panasonictv',
   name: 'Panasonic',
-  root: 'panasonic tv',
+  root: 'tv panasonic',
   groups: [
     { title: 'OLED GZ to JZ', prefix: '', chips: ['GZ950', 'GZ1000', 'GZ2000', 'HZ980', 'HZ1000', 'HZ1500', 'HZ2000', 'JZ980', 'JZ1000', 'JZ1500', 'JZ2000'] },
     { title: 'OLED LZ and MZ', prefix: '', chips: ['LZ980', 'LZ1000', 'LZ1500', 'LZ2000', 'MZ980', 'MZ1500', 'MZ2000'] },
@@ -160,7 +160,7 @@ export const PANASONIC_TV: Brand = {
 export const PHILIPS_TV: Brand = {
   id: 'philipstv',
   name: 'Philips',
-  root: 'philips tv',
+  root: 'tv philips',
   groups: [
     { title: 'OLED 700 and 800', prefix: '', chips: ['OLED754', 'OLED784', 'OLED805', 'OLED806', 'OLED807', 'OLED808', 'OLED809', 'OLED810', 'OLED818', 'OLED819', 'OLED803', 'OLED804', 'OLED706', 'OLED707', 'OLED718', 'OLED759', 'OLED769'] },
     { title: 'OLED+ flagship', prefix: '', chips: ['OLED873', 'OLED903', 'OLED907', 'OLED908', 'OLED909', 'OLED910', 'OLED935', 'OLED936', 'OLED937', 'OLED934'] },
@@ -172,7 +172,7 @@ export const PHILIPS_TV: Brand = {
 export const TOSHIBA_TV: Brand = {
   id: 'toshibatv',
   name: 'Toshiba',
-  root: 'toshiba tv',
+  root: 'tv toshiba',
   groups: [
     { title: '4K UHD (UK and UL)', prefix: '', chips: ['UK3163', 'UK4063', 'UK4D63', 'UL2063', 'UL2163', 'UL5A63', 'UA2063', 'UA3D63'] },
     { title: 'QLED and Fire TV', prefix: '', chips: ['QA4C63', 'QA5D63', 'QA7D63', 'UF3D53', 'QF5D53'] },
@@ -183,7 +183,7 @@ export const TOSHIBA_TV: Brand = {
 export const SHARP_TV: Brand = {
   id: 'sharptv',
   name: 'Sharp',
-  root: 'sharp tv',
+  root: 'tv sharp',
   groups: [
     { title: 'Aquos 4K', prefix: '', chips: ['Aquos 4K', 'Aquos QLED', 'Aquos XLED'] },
     { title: 'Roku, Android and HD', prefix: '', chips: ['Aquos Roku TV', 'Aquos Android TV', 'Aquos Full HD'] },
@@ -213,7 +213,7 @@ export const SKY_GLASS: Brand = {
 export const DJI: Brand = {
   id: 'dji',
   name: 'DJI',
-  root: 'dji',
+  root: 'drone dji',
   groups: [
     { title: 'Mini 2019-2022', prefix: '', chips: ['Mavic Mini', 'Mini 2', 'Mini SE', 'Mini 2 SE'] },
     { title: 'Mini 2023-2026', prefix: '', chips: ['Mini 3', 'Mini 3 Pro', 'Mini 4K', 'Mini 4 Pro', 'Mini 5 Pro'] },
@@ -228,20 +228,20 @@ export const DJI: Brand = {
     { title: 'Matrice enterprise', prefix: '', chips: ['Matrice 100', 'Matrice 200', 'Matrice 300 RTK', 'Matrice 350 RTK', 'Matrice 30T'] },
   ],
   lines: [
-    { id: 'mini', label: 'Mini', root: 'dji mini', groupTitles: ['Mini 2019-2022', 'Mini 2023-2026'] },
-    { id: 'mavic', label: 'Mavic', root: 'dji mavic', groupTitles: ['Mavic Pro & Mavic 2', 'Mavic 3 & 4'] },
-    { id: 'air', label: 'Air', root: 'dji air', groupTitles: ['Air series'] },
-    { id: 'fpv', label: 'Avata, FPV & Neo', root: 'dji', groupTitles: ['Avata & FPV', 'Neo & Flip'] },
-    { id: 'phantom', label: 'Phantom', root: 'dji phantom', groupTitles: ['Phantom series'] },
-    { id: 'inspire', label: 'Inspire', root: 'dji inspire', groupTitles: ['Inspire series'] },
-    { id: 'other', label: 'Other DJI', root: 'dji', groupTitles: ['Spark', 'Matrice enterprise'] },
+    { id: 'mini', label: 'Mini', groupTitles: ['Mini 2019-2022', 'Mini 2023-2026'] },
+    { id: 'mavic', label: 'Mavic', groupTitles: ['Mavic Pro & Mavic 2', 'Mavic 3 & 4'] },
+    { id: 'air', label: 'Air', groupTitles: ['Air series'] },
+    { id: 'fpv', label: 'Avata, FPV & Neo', groupTitles: ['Avata & FPV', 'Neo & Flip'] },
+    { id: 'phantom', label: 'Phantom', groupTitles: ['Phantom series'] },
+    { id: 'inspire', label: 'Inspire', groupTitles: ['Inspire series'] },
+    { id: 'other', label: 'Other DJI', groupTitles: ['Spark', 'Matrice enterprise'] },
   ],
 };
 
 export const AUTEL: Brand = {
   id: 'autel',
   name: 'Autel',
-  root: 'autel',
+  root: 'drone autel',
   groups: [
     { title: 'EVO Nano & Lite', prefix: '', chips: ['EVO Nano', 'EVO Nano+', 'EVO Lite', 'EVO Lite+'] },
     { title: 'EVO II series', prefix: '', chips: ['EVO II', 'EVO II Pro', 'EVO II Pro V3', 'EVO II Dual 640T', 'EVO II RTK', 'EVO II Pro V2', 'EVO II Dual 320'] },
@@ -252,7 +252,7 @@ export const AUTEL: Brand = {
 export const PARROT: Brand = {
   id: 'parrot',
   name: 'Parrot',
-  root: 'parrot',
+  root: 'drone parrot',
   groups: [
     { title: 'Anafi series', prefix: '', chips: ['Anafi', 'Anafi FPV', 'Anafi Thermal', 'Anafi USA', 'Anafi Ai'] },
     { title: 'Bebop & older', prefix: '', chips: ['Bebop', 'Bebop 2', 'Bebop 2 Power', 'AR.Drone 2.0', 'Disco', 'AR.Drone'] },
@@ -263,7 +263,7 @@ export const PARROT: Brand = {
 export const HOVERAIR: Brand = {
   id: 'hoverair',
   name: 'HoverAir',
-  root: 'hoverair',
+  root: 'drone hoverair',
   groups: [
     { title: 'X1 family', prefix: '', chips: ['X1', 'X1 Smart', 'X1 Pro', 'X1 Pro Max'] },
     { title: 'Aqua', prefix: '', chips: ['Aqua'] },
@@ -273,7 +273,7 @@ export const HOVERAIR: Brand = {
 export const SKYDIO: Brand = {
   id: 'skydio',
   name: 'Skydio',
-  root: 'skydio',
+  root: 'drone skydio',
   groups: [
     { title: 'Consumer drones', prefix: '', chips: ['R1', '2', '2+'] },
     { title: 'Enterprise', prefix: '', chips: ['X2', 'X2D', 'X10'] },
@@ -283,7 +283,7 @@ export const SKYDIO: Brand = {
 export const RYZE: Brand = {
   id: 'ryze',
   name: 'Ryze',
-  root: 'tello',
+  root: 'drone tello',
   groups: [
     { title: 'Tello family', prefix: '', chips: ['Tello', 'Tello EDU', 'Tello Iron Man', 'Tello Talent'] },
   ],
@@ -292,7 +292,7 @@ export const RYZE: Brand = {
 export const HOLY_STONE: Brand = {
   id: 'holystone',
   name: 'Holy Stone',
-  root: 'holy stone',
+  root: 'drone holy stone',
   groups: [
     { title: 'Toy & beginner', prefix: '', chips: ['HS110D', 'HS170', 'HS190', 'HS210', 'HS340', 'HS160', 'HS165', 'HS110G'] },
     { title: 'GPS camera drones', prefix: '', chips: ['HS100', 'HS120D', 'HS175D', 'HS360S', 'HS440', 'HS600', 'HS175'] },
@@ -303,7 +303,7 @@ export const HOLY_STONE: Brand = {
 export const POTENSIC: Brand = {
   id: 'potensic',
   name: 'Potensic',
-  root: 'potensic',
+  root: 'drone potensic',
   groups: [
     { title: 'Atom series', prefix: '', chips: ['Atom', 'Atom 2', 'Atom SE', 'Atom 3'] },
     { title: 'Dreamer series', prefix: '', chips: ['Dreamer', 'Dreamer Pro', 'Dreamer 4K'] },
@@ -314,7 +314,7 @@ export const POTENSIC: Brand = {
 export const HUBSAN: Brand = {
   id: 'hubsan',
   name: 'Hubsan',
-  root: 'hubsan',
+  root: 'drone hubsan',
   groups: [
     { title: 'Zino series', prefix: '', chips: ['Zino', 'Zino Pro', 'Zino 2', 'Zino 2+', 'Zino Mini Pro', 'Zino Mini SE', 'Zino Pro+'] },
     { title: 'ACE series', prefix: '', chips: ['ACE', 'ACE Pro', 'ACE SE'] },
@@ -327,7 +327,7 @@ export const HUBSAN: Brand = {
 export const CANON: Brand = {
   id: 'canon',
   name: 'Canon',
-  root: 'canon',
+  root: 'camera canon',
   groups: [
     { title: 'EOS R · full frame', prefix: '', chips: ['EOS R', 'EOS RP', 'EOS R5', 'EOS R5 II', 'EOS R6', 'EOS R6 II', 'EOS R6 III', 'EOS R6 V', 'EOS R8', 'EOS R3', 'EOS R1', 'EOS R5 C'] },
     { title: 'EOS R · APS-C', prefix: '', chips: ['EOS R7', 'EOS R10', 'EOS R50', 'EOS R50 V', 'EOS R100'] },
@@ -342,7 +342,7 @@ export const CANON: Brand = {
 export const NIKON: Brand = {
   id: 'nikon',
   name: 'Nikon',
-  root: 'nikon',
+  root: 'camera nikon',
   groups: [
     { title: 'Z · full frame', prefix: '', chips: ['Z5', 'Z5 II', 'Z6', 'Z6 II', 'Z6 III', 'Z7', 'Z7 II', 'Z8', 'Z9', 'Zf', 'ZR'] },
     { title: 'Z · APS-C', prefix: '', chips: ['Z30', 'Z50', 'Z50 II', 'Zfc'] },
@@ -356,7 +356,7 @@ export const NIKON: Brand = {
 export const SONY_CAMERA: Brand = {
   id: 'sonycamera',
   name: 'Sony',
-  root: 'sony',
+  root: 'camera sony',
   groups: [
     { title: 'A7 · full frame', prefix: '', chips: ['A7 II', 'A7 III', 'A7 IV', 'A7 V', 'A7C', 'A7C II', 'A7C R', 'A7'] },
     { title: 'A7R and A7S', prefix: '', chips: ['A7R II', 'A7R III', 'A7R IV', 'A7R V', 'A7R VI', 'A7S II', 'A7S III', 'A7R', 'A7S'] },
@@ -371,7 +371,7 @@ export const SONY_CAMERA: Brand = {
 export const FUJIFILM: Brand = {
   id: 'fujifilm',
   name: 'Fujifilm',
-  root: 'fuji',
+  root: 'camera fujifilm',
   groups: [
     { title: 'X-T · flagship', prefix: '', chips: ['X-T1', 'X-T2', 'X-T3', 'X-T4', 'X-T5'] },
     { title: 'X-T · compact', prefix: '', chips: ['X-T10', 'X-T20', 'X-T30', 'X-T30 II', 'X-T50', 'X-T100', 'X-T200'] },
@@ -383,15 +383,15 @@ export const FUJIFILM: Brand = {
     { title: 'Instax', prefix: '', chips: ['Instax Mini 9', 'Instax Mini 11', 'Instax Mini 12', 'Instax Mini 40', 'Instax Mini 90', 'Instax Wide 300', 'Instax Square SQ1', 'Instax Mini Evo', 'Instax Mini 8', 'Instax Mini 41', 'Instax Mini LiPlay', 'Instax Wide 400', 'Instax Wide Evo', 'Instax Square SQ6'] },
   ],
   lines: [
-    { id: 'x', label: 'X and GFX', root: 'fuji', groupTitles: ['X-T · flagship', 'X-T · compact', 'X-S and X-H', 'X-E and X-Pro', 'X100 and compacts', 'X-A and X-M', 'GFX · medium format'] },
-    { id: 'instax', label: 'Instax', root: 'instax', groupTitles: ['Instax'] },
+    { id: 'x', label: 'X and GFX', groupTitles: ['X-T · flagship', 'X-T · compact', 'X-S and X-H', 'X-E and X-Pro', 'X100 and compacts', 'X-A and X-M', 'GFX · medium format'] },
+    { id: 'instax', label: 'Instax', groupTitles: ['Instax'] },
   ],
 };
 
 export const PANASONIC: Brand = {
   id: 'panasonic',
   name: 'Lumix',
-  root: 'lumix',
+  root: 'camera lumix',
   groups: [
     { title: 'S · full frame', prefix: '', chips: ['S1', 'S1 II', 'S1R', 'S1R II', 'S1H', 'S5', 'S5 II', 'S5 IIX', 'S9', 'S1 IIE'] },
     { title: 'GH · video', prefix: '', chips: ['GH4', 'GH5', 'GH5 II', 'GH5S', 'GH6', 'GH7', 'GH3'] },
@@ -403,7 +403,7 @@ export const PANASONIC: Brand = {
 export const OLYMPUS: Brand = {
   id: 'olympus',
   name: 'Olympus',
-  root: 'olympus',
+  root: 'camera olympus',
   groups: [
     { title: 'OM-D E-M10', prefix: '', chips: ['E-M10', 'E-M10 II', 'E-M10 III', 'E-M10 IV'] },
     { title: 'OM-D E-M5 and E-M1', prefix: '', chips: ['E-M5', 'E-M5 II', 'E-M5 III', 'E-M1', 'E-M1 II', 'E-M1 III', 'E-M1X'] },
@@ -412,15 +412,15 @@ export const OLYMPUS: Brand = {
     { title: 'OM System', prefix: '', chips: ['OM-1', 'OM-1 II', 'OM-3', 'OM-5', 'OM-5 II'] },
   ],
   lines: [
-    { id: 'olympus', label: 'Olympus', root: 'olympus', groupTitles: ['OM-D E-M10', 'OM-D E-M5 and E-M1', 'PEN', 'Tough'] },
-    { id: 'omsystem', label: 'OM System', root: 'om system', groupTitles: ['OM System'] },
+    { id: 'olympus', label: 'Olympus', groupTitles: ['OM-D E-M10', 'OM-D E-M5 and E-M1', 'PEN', 'Tough'] },
+    { id: 'omsystem', label: 'OM System', groupTitles: ['OM System'] },
   ],
 };
 
 export const LEICA: Brand = {
   id: 'leica',
   name: 'Leica',
-  root: 'leica',
+  root: 'camera leica',
   groups: [
     { title: 'M · digital', prefix: '', chips: ['M240', 'M10', 'M10-P', 'M10-R', 'M10 Monochrom', 'M11', 'M11-P', 'M11-D', 'M11 Monochrom', 'M EV1', 'M9', 'M8', 'M262'] },
     { title: 'M · film', prefix: '', chips: ['M3', 'M4-P', 'M6', 'M7', 'MP', 'M2', 'M4', 'M5'] },
@@ -432,7 +432,7 @@ export const LEICA: Brand = {
 export const PENTAX: Brand = {
   id: 'pentax',
   name: '',
-  root: 'pentax',
+  root: 'camera pentax',
   groups: [
     { title: 'Pentax K · entry', prefix: '', chips: ['Pentax K-30', 'Pentax K-50', 'Pentax K-70', 'Pentax K-500', 'Pentax K-S2', 'Pentax KF', 'Pentax K-S1', 'Pentax K-r', 'Pentax K-x'] },
     { title: 'Pentax K · enthusiast', prefix: '', chips: ['Pentax K-3', 'Pentax K-3 II', 'Pentax K-3 III', 'Pentax K-5', 'Pentax K-5 II', 'Pentax KP', 'Pentax K-1', 'Pentax K-1 II', 'Pentax K-7', 'Pentax K-5 IIs'] },
@@ -440,8 +440,8 @@ export const PENTAX: Brand = {
     { title: 'Ricoh GR', prefix: '', chips: ['Ricoh GR', 'Ricoh GR II', 'Ricoh GR III', 'Ricoh GR IIIx', 'Ricoh GR III HDF', 'Ricoh GR IV', 'Ricoh GR IIIx HDF'] },
   ],
   lines: [
-    { id: 'pentax', label: 'Pentax', root: 'pentax', groupTitles: ['Pentax K · entry', 'Pentax K · enthusiast', 'Pentax film'] },
-    { id: 'ricoh', label: 'Ricoh GR', root: 'ricoh', groupTitles: ['Ricoh GR'] },
+    { id: 'pentax', label: 'Pentax', groupTitles: ['Pentax K · entry', 'Pentax K · enthusiast', 'Pentax film'] },
+    { id: 'ricoh', label: 'Ricoh GR', groupTitles: ['Ricoh GR'] },
   ],
 };
 
@@ -457,9 +457,9 @@ export const FILM_CAMERA: Brand = {
     { title: 'Toy and reloadable', prefix: '', chips: ['Kodak Ektar H35', 'Kodak Ektar H35N', 'Kodak M35', 'Ilford Sprite 35-II', 'Lomo LC-A+', 'Lomo Diana F+', 'Holga 120N'] },
   ],
   lines: [
-    { id: 'film', label: '35mm', root: 'film camera', groupTitles: ['35mm SLRs', 'Point and shoot', 'Toy and reloadable'] },
-    { id: 'medium', label: 'Medium format', root: 'medium format', groupTitles: ['Medium format'] },
-    { id: 'instant', label: 'Instant', root: 'polaroid', groupTitles: ['Instant'] },
+    { id: 'film', label: '35mm', groupTitles: ['35mm SLRs', 'Point and shoot', 'Toy and reloadable'] },
+    { id: 'medium', label: 'Medium format', groupTitles: ['Medium format'] },
+    { id: 'instant', label: 'Instant', groupTitles: ['Instant'] },
   ],
 };
 
@@ -468,7 +468,7 @@ export const FILM_CAMERA: Brand = {
 export const CANON_LENS: Brand = {
   id: 'canonlens',
   name: 'Canon',
-  root: 'canon lens',
+  root: 'lens canon',
   groups: [
     { title: 'RF primes', prefix: '', chips: ['RF 50mm f/1.8', 'RF 50mm f/1.2L', 'RF 35mm f/1.8 Macro', 'RF 85mm f/2', 'RF 85mm f/1.2L', 'RF 16mm f/2.8', 'RF 24mm f/1.8', 'RF 28mm f/2.8', 'RF 100mm f/2.8 Macro', 'RF 135mm f/1.8L', 'RF 35mm f/1.4L VCM', 'RF 50mm f/1.4L VCM', 'RF 24mm f/1.4L VCM', 'RF 20mm f/1.4L VCM', 'RF 85mm f/1.4L VCM', 'RF 45mm f/1.2 STM'] },
     { title: 'RF zooms', prefix: '', chips: ['RF 24-105mm f/4L', 'RF 24-105mm STM', 'RF 24-70mm f/2.8L', 'RF 28-70mm f/2L', 'RF 24-240mm', 'RF 15-30mm f/4.5-6.3', 'RF 14-35mm f/4L', 'RF 15-35mm f/2.8L', 'RF 24-105mm f/2.8L', 'RF 10-20mm f/4L', 'RF 28-70mm f/2.8 STM', 'RF 16-28mm f/2.8 STM'] },
@@ -481,15 +481,15 @@ export const CANON_LENS: Brand = {
     { title: 'EF-M · EOS M', prefix: '', chips: ['EF-M 15-45mm', 'EF-M 18-150mm', 'EF-M 55-200mm', 'EF-M 11-22mm', 'EF-M 22mm f/2', 'EF-M 32mm f/1.4', 'EF-M 28mm Macro'] },
   ],
   lines: [
-    { id: 'RF', label: 'RF · mirrorless', root: 'canon rf', groupTitles: ['RF primes', 'RF zooms', 'RF telephoto', 'RF-S · APS-C'] },
-    { id: 'EF', label: 'EF · DSLR and EOS M', root: 'canon ef', groupTitles: ['EF primes', 'EF zooms', 'EF telephoto', 'EF-S · APS-C', 'EF-M · EOS M'] },
+    { id: 'RF', label: 'RF · mirrorless', groupTitles: ['RF primes', 'RF zooms', 'RF telephoto', 'RF-S · APS-C'] },
+    { id: 'EF', label: 'EF · DSLR and EOS M', groupTitles: ['EF primes', 'EF zooms', 'EF telephoto', 'EF-S · APS-C', 'EF-M · EOS M'] },
   ],
 };
 
 export const NIKON_LENS: Brand = {
   id: 'nikonlens',
   name: 'Nikon',
-  root: 'nikkor',
+  root: 'lens nikon',
   groups: [
     { title: 'Z primes', prefix: '', chips: ['Z 50mm f/1.8 S', 'Z 50mm f/1.2 S', 'Z 40mm f/2', 'Z 28mm f/2.8', 'Z 26mm f/2.8', 'Z 35mm f/1.8 S', 'Z 85mm f/1.8 S', 'Z 20mm f/1.8 S', 'Z MC 50mm Macro', 'Z MC 105mm Macro', 'Z 24mm f/1.8 S', 'Z 35mm f/1.4', 'Z 50mm f/1.4', 'Z 85mm f/1.2 S', 'Z 135mm f/1.8 Plena', 'Z 35mm f/1.2 S'] },
     { title: 'Z zooms', prefix: '', chips: ['Z 24-70mm f/4 S', 'Z 24-70mm f/2.8 S', 'Z 24-120mm f/4 S', 'Z 24-50mm', 'Z 28-75mm f/2.8', 'Z 14-30mm f/4 S', 'Z 14-24mm f/2.8 S', 'Z 17-28mm f/2.8', 'Z 24-70mm f/2.8 S II'] },
@@ -501,15 +501,15 @@ export const NIKON_LENS: Brand = {
     { title: 'DX · APS-C DSLR', prefix: '', chips: ['AF-P DX 18-55mm', 'AF-S DX 18-55mm VR', 'AF-S DX 18-105mm', 'AF-S DX 18-140mm', 'AF-S DX 55-200mm', 'AF-S DX 55-300mm', 'AF-P DX 70-300mm', 'AF-S DX 35mm f/1.8', 'AF-S DX 10-24mm', 'AF-S DX 16-85mm', 'AF-S DX 17-55mm f/2.8', 'AF-S DX 18-200mm VR', 'AF-S DX 18-300mm', 'AF-P DX 10-20mm', 'AF-S DX 40mm Micro', 'AF-S DX 12-24mm'] },
   ],
   lines: [
-    { id: 'Z', label: 'Z · mirrorless', root: 'nikon z', groupTitles: ['Z primes', 'Z zooms', 'Z telephoto', 'Z DX · APS-C'] },
-    { id: 'F', label: 'F · DSLR', root: 'nikkor', groupTitles: ['F-mount primes', 'F-mount zooms', 'F-mount telephoto', 'DX · APS-C DSLR'] },
+    { id: 'Z', label: 'Z · mirrorless', groupTitles: ['Z primes', 'Z zooms', 'Z telephoto', 'Z DX · APS-C'] },
+    { id: 'F', label: 'F · DSLR', groupTitles: ['F-mount primes', 'F-mount zooms', 'F-mount telephoto', 'DX · APS-C DSLR'] },
   ],
 };
 
 export const SONY_LENS: Brand = {
   id: 'sonylens',
   name: 'Sony',
-  root: 'sony lens',
+  root: 'lens sony',
   groups: [
     { title: 'FE primes', prefix: '', chips: ['FE 50mm f/1.8', 'FE 50mm f/1.2 GM', 'FE 55mm f/1.8 ZA', 'FE 35mm f/1.8', 'FE 85mm f/1.8', 'FE 85mm f/1.4 GM', 'FE 28mm f/2', 'FE 24mm f/1.4 GM', 'FE 20mm f/1.8 G', 'FE 40mm f/2.5 G', 'FE 90mm Macro', 'FE 24mm f/2.8 G', 'FE 50mm f/2.5 G', 'FE 35mm f/2.8 ZA', 'FE 35mm f/1.4 ZA', 'FE 50mm f/1.4 ZA', 'FE 14mm f/1.8 GM', 'FE 16mm f/1.8 G', 'FE 85mm f/1.4 GM II', 'FE 100mm f/2.8 Macro GM', 'FE 100mm STF GM', 'FE 50mm f/2.8 Macro'] },
     { title: 'FE zooms', prefix: '', chips: ['FE 28-70mm OSS', 'FE 28-60mm', 'FE 24-70mm f/2.8 GM', 'FE 24-70mm GM II', 'FE 24-105mm f/4 G', 'FE 16-35mm f/2.8 GM', 'FE 16-35mm f/4 ZA', 'FE 20-70mm f/4 G', 'FE 24-50mm f/2.8 G', 'FE 24-70mm f/4 ZA', 'FE 16-35mm GM II', 'FE PZ 16-35mm f/4 G', 'FE 12-24mm f/4 G', 'FE 12-24mm f/2.8 GM'] },
@@ -519,15 +519,15 @@ export const SONY_LENS: Brand = {
     { title: 'E primes · APS-C', prefix: '', chips: ['E 35mm f/1.8 OSS', 'E 50mm f/1.8 OSS', 'E 30mm Macro', 'E 20mm f/2.8', 'E 16mm f/2.8', 'E 15mm f/1.4 G', 'E 11mm f/1.8', 'E 24mm f/1.8 ZA'] },
   ],
   lines: [
-    { id: 'FE', label: 'FE · full frame', root: 'sony fe', groupTitles: ['FE primes', 'FE zooms', 'FE telephoto', 'Fast G Master glass'] },
-    { id: 'E', label: 'E · APS-C', root: 'sony e', groupTitles: ['E zooms · APS-C', 'E primes · APS-C'] },
+    { id: 'FE', label: 'FE · full frame', groupTitles: ['FE primes', 'FE zooms', 'FE telephoto', 'Fast G Master glass'] },
+    { id: 'E', label: 'E · APS-C', groupTitles: ['E zooms · APS-C', 'E primes · APS-C'] },
   ],
 };
 
 export const SIGMA_LENS: Brand = {
   id: 'sigmalens',
   name: 'Sigma',
-  root: 'sigma',
+  root: 'lens sigma',
   groups: [
     { title: 'Art primes (DSLR)', prefix: '', chips: ['Art 20mm f/1.4', 'Art 24mm f/1.4', 'Art 30mm f/1.4 DC', 'Art 35mm f/1.4', 'Art 40mm f/1.4', 'Art 50mm f/1.4', 'Art 85mm f/1.4', 'Art 105mm f/1.4', 'Art 135mm f/1.8', 'Art 14mm f/1.8', 'Art 28mm f/1.4', 'Art 70mm f/2.8 Macro'] },
     { title: 'Art zooms (DSLR)', prefix: '', chips: ['Art 12-24mm f/4', 'Art 14-24mm f/2.8', 'Art 18-35mm f/1.8', 'Art 24-70mm f/2.8', 'Art 24-105mm f/4', 'Art 50-100mm f/1.8', 'Art 24-35mm f/2'] },
@@ -543,7 +543,7 @@ export const SIGMA_LENS: Brand = {
 export const TAMRON_LENS: Brand = {
   id: 'tamronlens',
   name: 'Tamron',
-  root: 'tamron',
+  root: 'lens tamron',
   groups: [
     { title: 'Mirrorless standard zooms', prefix: '', chips: ['17-28mm f/2.8 Di III', '20-40mm f/2.8 Di III', '28-75mm f/2.8 Di III', '28-75mm f/2.8 G2', '16-30mm f/2.8 G2', '35-150mm f/2-2.8', '35-100mm f/2.8', '25-200mm f/2.8-5.6', '28-300mm f/4-7.1'] },
     { title: 'Mirrorless telephoto', prefix: '', chips: ['70-180mm f/2.8 Di III', '70-180mm f/2.8 G2', '50-400mm f/4.5-6.3', '70-300mm f/4.5-6.3', '150-500mm f/5-6.7', '50-300mm f/4.5-6.3'] },
@@ -558,7 +558,7 @@ export const TAMRON_LENS: Brand = {
 export const FUJI_LENS: Brand = {
   id: 'fujilens',
   name: 'Fujifilm',
-  root: 'fuji',
+  root: 'lens fujifilm',
   groups: [
     { title: 'Fast XF primes', prefix: '', chips: ['XF 16mm f/1.4 R', 'XF 18mm f/1.4 R LM', 'XF 23mm f/1.4 R', 'XF 23mm f/1.4 R LM', 'XF 33mm f/1.4 R LM', 'XF 35mm f/1.4 R', 'XF 50mm f/1.0 R WR', 'XF 56mm f/1.2 R', 'XF 56mm f/1.2 R WR', 'XF 56mm f/1.2 R APD'] },
     { title: 'XF f/2 primes', prefix: '', chips: ['XF 14mm f/2.8 R', 'XF 16mm f/2.8 R WR', 'XF 18mm f/2 R', 'XF 23mm f/2 R WR', 'XF 23mm f/2.8 R WR', 'XF 27mm f/2.8', 'XF 27mm f/2.8 R WR', 'XF 35mm f/2 R WR', 'XF 50mm f/2 R WR', 'XF 90mm f/2 R LM WR'] },
@@ -572,7 +572,7 @@ export const FUJI_LENS: Brand = {
 export const PANASONIC_LENS: Brand = {
   id: 'panasoniclens',
   name: 'Lumix',
-  root: 'lumix',
+  root: 'lens lumix',
   groups: [
     { title: 'S primes (L mount)', prefix: '', chips: ['S 18mm f/1.8', 'S 24mm f/1.8', 'S 26mm f/8 Pancake', 'S 35mm f/1.8', 'S 50mm f/1.8', 'S 85mm f/1.8', 'S 100mm f/2.8 Macro', 'S Pro 50mm f/1.4', 'S 40mm f/2'] },
     { title: 'S zooms (L mount)', prefix: '', chips: ['S 14-28mm f/4-5.6', 'S 18-40mm f/4.5-6.3', 'S 20-60mm f/3.5-5.6', 'S 24-60mm f/2.8', 'S 24-105mm f/4 Macro', 'S 28-200mm f/4-7.1', 'S 70-300mm f/4.5-5.6', 'S 100-400mm f/4-6.3', 'S Pro 16-35mm f/4', 'S Pro 24-70mm f/2.8', 'S Pro 70-200mm f/2.8', 'S Pro 70-200mm f/4', 'S 100-500mm f/5-7.1'] },
@@ -581,16 +581,16 @@ export const PANASONIC_LENS: Brand = {
     { title: 'Leica DG (Micro Four Thirds)', prefix: '', chips: ['Leica DG 9mm f/1.7', 'Leica DG 12mm f/1.4', 'Leica DG 15mm f/1.7', 'Leica DG 25mm f/1.4', 'Leica DG 42.5mm f/1.2', 'Leica DG 45mm f/2.8', 'Leica DG 8-18mm f/2.8', 'Leica DG 10-25mm f/1.7', 'Leica DG 12-60mm f/2.8', 'Leica DG 25-50mm f/1.7', 'Leica DG 50-200mm f/2.8', 'Leica DG 100-400mm', 'Leica DG 200mm f/2.8'] },
   ],
   lines: [
-    { id: 'S', label: 'Lumix S (L mount)', root: 'lumix s', groupTitles: ['S primes (L mount)', 'S zooms (L mount)'] },
-    { id: 'G', label: 'Lumix G (Micro Four Thirds)', root: 'lumix g', groupTitles: ['G primes (Micro Four Thirds)', 'G zooms (Micro Four Thirds)'] },
-    { id: 'DG', label: 'Leica DG (Micro Four Thirds)', root: 'leica dg', groupTitles: ['Leica DG (Micro Four Thirds)'] },
+    { id: 'S', label: 'Lumix S (L mount)', groupTitles: ['S primes (L mount)', 'S zooms (L mount)'] },
+    { id: 'G', label: 'Lumix G (Micro Four Thirds)', groupTitles: ['G primes (Micro Four Thirds)', 'G zooms (Micro Four Thirds)'] },
+    { id: 'DG', label: 'Leica DG (Micro Four Thirds)', groupTitles: ['Leica DG (Micro Four Thirds)'] },
   ],
 };
 
 export const OM_LENS: Brand = {
   id: 'omlens',
   name: 'M.Zuiko',
-  root: 'zuiko',
+  root: 'lens olympus',
   groups: [
     { title: 'Pro zooms', prefix: '', chips: ['7-14mm f/2.8 Pro', '8-25mm f/4 Pro', '12-40mm f/2.8 Pro', '12-40mm f/2.8 Pro II', '12-45mm f/4 Pro', '12-100mm f/4 Pro', '40-150mm f/2.8 Pro', '40-150mm f/4 Pro', '50-200mm f/2.8 Pro', '150-400mm f/4.5 Pro'] },
     { title: 'Pro primes', prefix: '', chips: ['8mm f/1.8 Fisheye Pro', '17mm f/1.2 Pro', '20mm f/1.4 Pro', '25mm f/1.2 Pro', '45mm f/1.2 Pro', '90mm f/3.5 Macro Pro', '300mm f/4 Pro'] },
@@ -603,7 +603,7 @@ export const OM_LENS: Brand = {
 export const SAMYANG_LENS: Brand = {
   id: 'samyanglens',
   name: 'Samyang',
-  root: 'samyang',
+  root: 'lens samyang',
   groups: [
     { title: 'AF full frame primes', prefix: '', chips: ['AF 14mm f/2.8 FE', 'AF 18mm f/2.8 FE', 'AF 24mm f/1.8 FE', 'AF 24mm f/2.8 FE', 'AF 35mm f/1.4 FE', 'AF 35mm f/1.8 FE', 'AF 45mm f/1.8 FE', 'AF 50mm f/1.4 FE', 'AF 50mm f/1.4 II FE', 'AF 75mm f/1.8 FE', 'AF 85mm f/1.4 FE', 'AF 135mm f/1.8 FE', 'AF 85mm f/1.4 II FE'] },
     { title: 'AF zooms, macro and APS-C', prefix: '', chips: ['AF 24-70mm f/2.8 FE', 'AF 35-150mm f/2-2.8', 'AF 12mm f/2 APS-C'] },
@@ -616,7 +616,7 @@ export const SAMYANG_LENS: Brand = {
 export const VILTROX_LENS: Brand = {
   id: 'viltroxlens',
   name: 'Viltrox',
-  root: 'viltrox',
+  root: 'lens viltrox',
   groups: [
     { title: 'APS-C AF primes', prefix: '', chips: ['9mm f/2.8 Air', '13mm f/1.4', '23mm f/1.4', '25mm f/1.7 Air', '27mm f/1.2 Pro', '33mm f/1.4', '35mm f/1.7 Air', '56mm f/1.4', '56mm f/1.7 Air', '75mm f/1.2 Pro', '15mm f/1.7 Air', '75mm f/1.8 EVO'] },
     { title: 'Full frame AF lenses', prefix: '', chips: ['14mm f/4.0 Air', '16mm f/1.8 FE', '20mm f/2.8 FE', '24mm f/1.8 FE', '35mm f/1.8 FE', '40mm f/2.5 Air', '50mm f/1.8 FE', '50mm f/2.0 Air', '85mm f/1.8 II', '85mm f/2.0 EVO', '85mm f/1.4 Pro', '28-75mm f/2.8 FE', '35mm f/1.8 EVO', '55mm f/1.8 EVO', '28mm f/4.5 FE'] },
@@ -627,7 +627,7 @@ export const VILTROX_LENS: Brand = {
 export const LAOWA_LENS: Brand = {
   id: 'laowalens',
   name: 'Laowa',
-  root: 'laowa',
+  root: 'lens laowa',
   groups: [
     { title: 'Macro', prefix: '', chips: ['15mm f/4 Wide Macro', '25mm f/2.8 2.5-5x', '58mm f/2.8 2x Macro', '60mm f/2.8 2x Macro', '65mm f/2.8 2x Macro', '85mm f/5.6 2x Macro', '90mm f/2.8 2x APO', '100mm f/2.8 2x Macro', '50mm f/2.8 2x Macro'] },
     { title: 'Ultra wide', prefix: '', chips: ['9mm f/2.8 Zero-D', '9mm f/5.6 W-Dreamer', '10mm f/4 Cookie', '11mm f/4.5 FF RL', '12mm f/2.8 Zero-D', '14mm f/4 Zero-D', '15mm f/2 Zero-D', '10-18mm f/4.5-5.6', '7.5mm f/2 MFT', '10mm f/2.8 Zero-D FF', '6mm f/2 Zero-D MFT', '12-24mm f/5.6 Zoom'] },
@@ -640,7 +640,7 @@ export const LAOWA_LENS: Brand = {
 export const TOKINA_LENS: Brand = {
   id: 'tokinalens',
   name: 'Tokina',
-  root: 'tokina',
+  root: 'lens tokina',
   groups: [
     { title: 'DSLR wide zooms', prefix: '', chips: ['10-17mm Fisheye', '11-16mm f/2.8 DX', '11-16mm f/2.8 DX II', '11-20mm f/2.8 DX', '12-24mm f/4 DX', '14-20mm f/2 DX', '16-28mm f/2.8 FX', '17-35mm f/4 FX', '12-28mm f/4 DX'] },
     { title: 'DSLR standard and tele', prefix: '', chips: ['28-70mm f/2.6-2.8', '24-70mm f/2.8 FX', '50-135mm f/2.8 DX', '70-200mm f/4 FX', '80-400mm f/4.5-5.6', '16-50mm f/2.8 DX'] },
@@ -691,10 +691,10 @@ export const OSMO: Brand = {
     { title: 'OM gimbals', prefix: '', chips: ['OM 4', 'OM 4 SE', 'OM 5'] },
   ],
   lines: [
-    { id: 'action', label: 'Osmo Action', root: 'dji action', groupTitles: ['Osmo Action'] },
-    { id: 'pocket', label: 'Osmo Pocket', root: 'osmo pocket', groupTitles: ['Osmo Pocket'] },
-    { id: 'osmo', label: '360 and gimbals', root: 'osmo', groupTitles: ['360, Nano and gimbals'] },
-    { id: 'om', label: 'DJI OM', root: 'dji om', groupTitles: ['OM gimbals'] },
+    { id: 'action', label: 'Osmo Action', groupTitles: ['Osmo Action'] },
+    { id: 'pocket', label: 'Osmo Pocket', groupTitles: ['Osmo Pocket'] },
+    { id: 'osmo', label: '360 and gimbals', groupTitles: ['360, Nano and gimbals'] },
+    { id: 'om', label: 'DJI OM', groupTitles: ['OM gimbals'] },
   ],
 };
 
@@ -860,6 +860,7 @@ export const BRAND_SUBLINES: Record<string, string> = {
 
 // spellings sellers use for the same thing, merged into the shared alias table
 export const ELECTRONICS_ALIASES: Record<string, string> = {
+  'ar.drone': 'ar drone',
   'frame': 'ls03',
   'serif': 'ls01',
   'sero': 'ls05',

@@ -38,7 +38,8 @@ const PRODUCTS: Record<
     subtitle: 'Laptops price wildly by maker, so models come next per brand.',
     brands: LAPTOP_BRANDS,
     subs: {
-      dell: 'XPS, Inspiron, Latitude, Alienware',
+      dell: 'XPS, Inspiron, Latitude, Precision',
+      alienware: 'm15, m16, m18, x14, x16',
       hp: 'Spectre, Envy, Pavilion, Omen',
       lenovo: 'ThinkPad, IdeaPad, Legion, Yoga',
       asus: 'ZenBook, VivoBook, ROG, TUF',

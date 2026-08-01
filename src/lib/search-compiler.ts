@@ -1,4 +1,13 @@
-import { brandById, displayName, includeWords, modelKey, rowKeyword, withAlias, type ModelGroup } from './catalogue';
+import {
+  brandById,
+  displayName,
+  includeWords,
+  modelKey,
+  rootKeyword,
+  withAlias,
+  type Brand,
+  type ModelGroup,
+} from './catalogue';
 import { type NewSearchRow } from './searches-db';
 import { type WizardState } from './wizard-context';
 
@@ -24,21 +33,28 @@ function suffixToken(group: ModelGroup, chip: string) {
   return chip.toLowerCase();
 }
 
-// a row's keyword catches the whole brand, these words keep siblings out.
-// Base excludes every variant, others exclude the ones their own token hides in:
-// 'pro' is inside 'pro max', 'x' is inside 'xr', 'se' is inside 'se 2'.
-// the word check catches near-twins string containment misses, like
-// 'pro 14 m1 pro' vs 'pro 14 m1 max' — every word of mine is in the sibling
-function siblingExcludes(group: ModelGroup, chip: string) {
+// a row's keyword catches the whole brand, these words keep every other model out.
+// four ways a sibling can steal this row's listings:
+//   'pro' hides inside 'pro max', 'evo' inside 'evo nano'
+//   every word of mine appears in it: 'laptop 3' inside 'laptop go 3'
+//   it is the same family, one model along: 'swift 3' against 'swift 5'
+//   and Base means the plain one, so it fences off its whole series
+// siblings from other groups count too, a Mavic 3 Pro would fire the Mavic Pro row
+function siblingExcludes(brand: Brand, group: ModelGroup, chip: string) {
   const mine = suffixToken(group, chip);
   const mineWords = mine.split(' ');
   const out: string[] = [];
-  for (const other of group.chips) {
-    if (other === chip) continue;
-    const token = suffixToken(group, other);
-    const otherWords = token.split(' ');
-    const swallowsMine = mineWords.every((word) => otherWords.includes(word));
-    if (chip === 'Base' || token.includes(mine) || swallowsMine) out.push(withAlias(token));
+  for (const other of brand.groups) {
+    for (const otherChip of other.chips) {
+      const token = suffixToken(other, otherChip);
+      // never fence off a piece of my own name, 'pro max' must not exclude 'pro'
+      if (token === mine || mine.includes(token)) continue;
+      const otherWords = token.split(' ');
+      const swallowsMine = mineWords.every((word) => otherWords.includes(word));
+      const sameFamily = other === group && mineWords.length > 1 && otherWords[0] === mineWords[0];
+      const baseTakesTheSeries = other === group && chip === 'Base';
+      if (baseTakesTheSeries || token.includes(mine) || swallowsMine || sameFamily) out.push(withAlias(token));
+    }
   }
   return out;
 }
@@ -62,7 +78,7 @@ export function compileWizard(state: WizardState): NewSearchRow[] | null {
   return picked.map(({ group, chip, name }) => {
     const include = [...new Set([...includeWords(brand, name).map(withAlias), ...state.includeWords])];
     // a word the user wants present beats the same word on the sibling fence
-    const exclude = [...new Set([...siblingExcludes(group, chip), ...state.excludeWords])].filter(
+    const exclude = [...new Set([...siblingExcludes(brand, group, chip), ...state.excludeWords])].filter(
       (word) => !include.includes(word),
     );
     const price = state.prices[modelKey(brand, group, chip)];
@@ -74,7 +90,7 @@ export function compileWizard(state: WizardState): NewSearchRow[] | null {
     }
 
     return {
-      keyword: rowKeyword(brand, group, name),
+      keyword: rootKeyword(brand, name),
       label: name,
       group_id: groupId,
       platforms: [state.platform],
