@@ -460,10 +460,12 @@ const TOKEN_ALIASES: Record<string, string> = {
 };
 
 export function withAlias(token: string) {
-  if (TOKEN_ALIASES[token]) return `${token}|${TOKEN_ALIASES[token]}`;
-  for (const short of Object.keys(TOKEN_ALIASES)) {
-    // "ps5 digital" borrows the ps5 alias: "ps5 digital|playstation 5 digital"
-    if (token.startsWith(`${short} `)) return `${token}|${token.replace(short, TOKEN_ALIASES[short])}`;
+  for (const [short, long] of Object.entries(TOKEN_ALIASES)) {
+    // whole words only, or 'ps' would turn "gps mount" into "gplaystation mount".
+    // the alias can sit anywhere: "ps5 digital", "x1 promax", "hero 12 black"
+    const escaped = short.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const spot = new RegExp(`(^| )${escaped}( |$)`);
+    if (spot.test(token)) return `${token}|${token.replace(spot, (_m, before, after) => `${before}${long}${after}`)}`;
   }
   return token;
 }
