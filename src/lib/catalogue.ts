@@ -2,6 +2,7 @@
 // data lives here so the fourteen model screens can be one component.
 // the long tail (tvs, drones, lenses, cameras, gpus) sits in catalogue-electronics.
 
+import { CAR_MAKES } from './catalogue-cars';
 import {
   CAMERA_BRANDS,
   DRONE_BRANDS,
@@ -15,6 +16,7 @@ import {
 } from './catalogue-electronics';
 
 export * from './catalogue-electronics';
+export * from './catalogue-cars';
 
 export type ModelGroup = {
   title: string;
@@ -398,19 +400,6 @@ export const LAPTOP_BRANDS = [
 ];
 
 
-// ---- cars ---------------------------------------------------------------
-
-export const CAR_MAKES = [
-  'Acura', 'Alfa Romeo', 'Audi', 'BMW', 'Buick', 'Cadillac', 'Chevrolet',
-  'Chrysler', 'Dodge', 'Ford', 'GMC', 'Honda', 'Hyundai', 'Jeep',
-];
-
-// only ford's model list is drawn
-export const FORD_MODELS = [
-  'F-150', 'F-250', 'Ranger', 'Maverick', 'Transit', 'Bronco', 'Bronco Sport',
-  'Escape', 'Edge', 'Explorer', 'Expedition', 'Focus', 'Fiesta', 'Fusion',
-  'Mustang', 'Mustang Mach-E', 'Taurus', 'EcoSport',
-];
 
 // ---- brand registry -----------------------------------------------------
 
@@ -434,6 +423,7 @@ const ALL_BRANDS: Brand[] = [
   ...TV_BRANDS.map((b) => b.brand),
   ...DRONE_BRANDS.map((b) => b.brand),
   ...LENS_BRANDS.map((b) => b.brand),
+  ...CAR_MAKES.map((m) => m.brand),
 ];
 
 export function brandById(id?: string) {
