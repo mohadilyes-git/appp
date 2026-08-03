@@ -32,6 +32,11 @@ export default function CategoryScreen() {
       router.navigate('/new-search/products');
       return;
     }
+    if (picked.id === 'cars') {
+      patch({ productId: undefined });
+      router.navigate('/new-search/car-make');
+      return;
+    }
     // placeholder until the other category paths are built
     Alert.alert('Not built yet', `The ${picked.name} questions are a later step.`);
   };

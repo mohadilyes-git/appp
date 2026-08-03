@@ -14,15 +14,24 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AppBackground from '@/components/app-background';
 import { WizardBar, WizardHeader } from '@/components/wizard-chrome';
 import { CheckIcon, SearchIcon } from '@/components/wizard-icons';
-import { BRAND_HEADERS, brandById, displayName, modelKey, productById, type ModelGroup } from '@/lib/catalogue';
+import {
+  BRAND_HEADERS,
+  brandById,
+  CAR_HEADERS,
+  displayName,
+  modelKey,
+  productById,
+  type ModelGroup,
+} from '@/lib/catalogue';
 import { font, radius, tracking } from '@/lib/theme';
 import { useTheme } from '@/lib/theme-context';
-import { useWizard } from '@/lib/wizard-context';
+import { stepTotal, useWizard } from '@/lib/wizard-context';
 
 // consoles introduce themselves by name, phones share one line.
 // the electronics brands bring their own headers from the catalogue
 const HEADERS: Record<string, { title: string; accent: string; subtitle: string }> = {
   ...BRAND_HEADERS,
+  ...CAR_HEADERS,
   playstation: {
     title: 'Which PlayStation',
     accent: 'models?',
@@ -62,6 +71,7 @@ export default function ModelsScreen() {
 
   // the laptop and camera detours add a brand step, stretching the trail to six
   const detour = Boolean(productById(state.productId)?.brandStep);
+  const total = stepTotal(state);
   const header = HEADERS[brand.id] ?? {
     title: 'Pick the',
     accent: 'models',
@@ -122,8 +132,8 @@ export default function ModelsScreen() {
           contentContainerStyle={[styles.listContent, { paddingTop: insets.top + 8 }]}>
           <View style={styles.headerWrap}>
             <WizardHeader
-              eyebrow={detour ? 'Step 4 of 6' : 'Step 3 of 5'}
-              step={detour ? { filled: 4, total: 6 } : { filled: 3, total: 5 }}
+              eyebrow={`Step ${detour ? 4 : 3} of ${total}`}
+              step={{ filled: detour ? 4 : 3, total }}
               title={header.title}
               accent={header.accent}
               subtitle={header.subtitle}
@@ -202,7 +212,7 @@ export default function ModelsScreen() {
             const rowChecked = chips.every((c) => picked(group, c));
             return (
               <View key={group.title} style={styles.group}>
-                {group.title === 'No series' ? (
+                {brand.groups.length === 1 ? null : group.title === 'No series' ? (
                   <Text style={[styles.groupTitle, { color: colors.textTag }]}>{group.title}</Text>
                 ) : (
                   <Pressable
@@ -243,7 +253,9 @@ export default function ModelsScreen() {
 
       <WizardBar
         label="Set prices"
-        onPress={() => router.navigate('/new-search/prices')}
+        onPress={() =>
+          router.navigate(state.category === 'cars' ? '/new-search/car-details' : '/new-search/prices')
+        }
         disabled={count === 0}
       />
     </View>

@@ -1,5 +1,7 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
 
+import { productById } from './catalogue';
+
 // one object built up across the steps, so going back never loses input.
 // number-ish fields stay strings while they live in text inputs.
 export type WizardState = {
@@ -23,6 +25,14 @@ export type WizardState = {
   platform: string;
   includeWords: string[];
   excludeWords: string[];
+  // cars get their own step: year, mileage and the three condition rows
+  yearFrom: string;
+  yearTo: string;
+  mileageMin: string;
+  mileageMax: string;
+  transmission: string;
+  fuel: string;
+  body: string;
 };
 
 const INITIAL: WizardState = {
@@ -37,7 +47,21 @@ const INITIAL: WizardState = {
   platform: 'facebook',
   includeWords: [],
   excludeWords: [],
+  yearFrom: '',
+  yearTo: '',
+  mileageMin: '',
+  mileageMax: '',
+  transmission: 'Any',
+  fuel: 'Any',
+  body: 'Any',
 };
+
+// the car path asks one extra question, so does an electronics product
+// that needs a brand picked before its models
+export function stepTotal(state: WizardState) {
+  if (state.category === 'cars') return 6;
+  return productById(state.productId)?.brandStep ? 6 : 5;
+}
 
 type Patch = Partial<WizardState> | ((current: WizardState) => Partial<WizardState>);
 

@@ -13,10 +13,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import AppBackground from '@/components/app-background';
 import { WizardBar, WizardHeader } from '@/components/wizard-chrome';
-import { brandById, displayName, modelKey, productById } from '@/lib/catalogue';
+import { brandById, displayName, modelKey } from '@/lib/catalogue';
 import { font, radius, tracking } from '@/lib/theme';
 import { useTheme } from '@/lib/theme-context';
-import { useWizard } from '@/lib/wizard-context';
+import { stepTotal, useWizard } from '@/lib/wizard-context';
 
 // whole pounds only, commas and stray paste garbage stripped at the door
 function cleanPrice(value: string) {
@@ -81,11 +81,7 @@ export default function PricesScreen() {
           <View style={styles.headerWrap}>
             <WizardHeader
               eyebrow="Prices"
-              step={
-                productById(state.productId)?.brandStep
-                  ? { filled: 5, total: 6 }
-                  : { filled: 4, total: 5 }
-              }
+              step={{ filled: stepTotal(state) - 1, total: stepTotal(state) }}
               title="Price"
               accent="per model"
               subtitle="A cheap iPhone 13 is not a cheap 15 Pro Max — set the ceiling that makes each one a deal."
