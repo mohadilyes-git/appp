@@ -85,6 +85,14 @@ export type NewSearchRow = {
   exclude_words: string | null;
   price_min: number | null;
   price_max: number | null;
+  // cars only, null on every other search
+  year_min: number | null;
+  year_max: number | null;
+  mileage_min: number | null;
+  mileage_max: number | null;
+  transmission: string | null;
+  fuel: string | null;
+  body: string | null;
 };
 
 export async function createSearches(rows: NewSearchRow[]) {

@@ -21,6 +21,12 @@ function uuid() {
   });
 }
 
+// 'Any' means the user did not narrow it down, so the column stays empty
+function pickOrNull(category: string | undefined, pick: string) {
+  if (category !== 'cars' || !pick || pick === 'Any') return null;
+  return pick.toLowerCase();
+}
+
 function parsePrice(value: string | undefined) {
   if (!value) return null;
   const n = Number.parseInt(value, 10);
@@ -75,6 +81,25 @@ export function compileWizard(state: WizardState): NewSearchRow[] | null {
   const groupId = picked.length > 1 ? uuid() : null;
   const location = state.location.trim() || null;
 
+  // a car's year and condition are columns, not title words: plenty of real
+  // listings never write "diesel" or "manual" even when that is what they are
+  const car = {
+    year_min: state.category === 'cars' ? parsePrice(state.yearFrom) : null,
+    year_max: state.category === 'cars' ? parsePrice(state.yearTo) : null,
+    mileage_min: state.category === 'cars' ? parsePrice(state.mileageMin) : null,
+    mileage_max: state.category === 'cars' ? parsePrice(state.mileageMax) : null,
+    transmission: pickOrNull(state.category, state.transmission),
+    fuel: pickOrNull(state.category, state.fuel),
+    body: pickOrNull(state.category, state.body),
+  };
+  // a year the wrong way round would match nothing, assume they were swapped
+  if (car.year_min != null && car.year_max != null && car.year_min > car.year_max) {
+    [car.year_min, car.year_max] = [car.year_max, car.year_min];
+  }
+  if (car.mileage_min != null && car.mileage_max != null && car.mileage_min > car.mileage_max) {
+    [car.mileage_min, car.mileage_max] = [car.mileage_max, car.mileage_min];
+  }
+
   return picked.map(({ group, chip, name }) => {
     const include = [...new Set([...includeWords(brand, name).map(withAlias), ...state.includeWords])];
     // a word the user wants present beats the same word on the sibling fence
@@ -103,6 +128,7 @@ export function compileWizard(state: WizardState): NewSearchRow[] | null {
       exclude_words: exclude.join(',') || null,
       price_min: priceMin,
       price_max: priceMax,
+      ...car,
     };
   });
 }
