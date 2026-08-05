@@ -118,14 +118,20 @@ export default function FiltersScreen() {
       Alert.alert('Where should we look?', 'Search for your area and pick it from the list.');
       return;
     }
-    const rows = compileWizard(state);
-    if (!rows) {
-      Alert.alert('Nothing to save', 'Pick at least one model first.');
+    const built = compileWizard(state);
+    if (!built) {
+      Alert.alert('Nothing to save', 'None of those models were made in the years you picked.');
       return;
     }
     setSaving(true);
     try {
-      await createSearches(rows);
+      await createSearches(built.rows);
+      if (built.skipped.length) {
+        Alert.alert(
+          'Some models were left out',
+          `${built.skipped.join(', ')} was never made in the years you picked, so it was skipped.`,
+        );
+      }
       // home refetches on focus, the new card is already there
       router.replace('/');
     } catch (e) {

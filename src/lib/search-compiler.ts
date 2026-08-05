@@ -8,6 +8,7 @@ import {
   type Brand,
   type ModelGroup,
 } from './catalogue';
+import { clampYears } from './car-specs';
 import { type NewSearchRow } from './searches-db';
 import { type WizardState } from './wizard-context';
 
@@ -67,7 +68,7 @@ function siblingExcludes(brand: Brand, group: ModelGroup, chip: string) {
 
 // one wizard run fans out to one searches row per picked model,
 // all stamped with the same group so home shows a single card
-export function compileWizard(state: WizardState): NewSearchRow[] | null {
+export function compileWizard(state: WizardState): { rows: NewSearchRow[]; skipped: string[] } | null {
   const brand = brandById(state.brandId);
   if (!brand) return null;
 
@@ -100,7 +101,8 @@ export function compileWizard(state: WizardState): NewSearchRow[] | null {
     [car.mileage_min, car.mileage_max] = [car.mileage_max, car.mileage_min];
   }
 
-  return picked.map(({ group, chip, name }) => {
+  const skipped: string[] = [];
+  const rows = picked.map(({ group, chip, name }) => {
     const include = [...new Set([...includeWords(brand, name).map(withAlias), ...state.includeWords])];
     // a word the user wants present beats the same word on the sibling fence
     const exclude = [...new Set([...siblingExcludes(brand, group, chip), ...state.excludeWords])].filter(
@@ -129,6 +131,17 @@ export function compileWizard(state: WizardState): NewSearchRow[] | null {
       price_min: priceMin,
       price_max: priceMax,
       ...car,
+      // a 2015-2024 search on a Puma saves as 2019-2024, its own life
+      ...(state.category === 'cars' ? clampYears(brand.id, chip, car.year_min, car.year_max) : {}),
     };
   });
+
+  // a Sierra asked for in 2015-2024 can never exist, so it is not worth a row
+  const live = rows.filter((row) => {
+    const dead = row.year_min != null && row.year_max != null && row.year_min > row.year_max;
+    if (dead) skipped.push(row.label);
+    return !dead;
+  });
+  if (live.length === 0) return null;
+  return { rows: live, skipped };
 }

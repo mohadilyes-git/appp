@@ -1,5 +1,5 @@
 import { Redirect, useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Pressable,
   ScrollView,
@@ -14,19 +14,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AppBackground from '@/components/app-background';
 import { ChevronRightIcon } from '@/components/icons';
 import { WizardBar, WizardHeader } from '@/components/wizard-chrome';
+import { allowedFor } from '@/lib/car-specs';
+import { brandById } from '@/lib/catalogue';
 import { font, radius, tracking } from '@/lib/theme';
 import { useTheme } from '@/lib/theme-context';
 import { useWizard } from '@/lib/wizard-context';
 
-// a car older than this barely trades outside the classic market
-const OLDEST_YEAR = 2000;
-const THIS_YEAR = 2026;
-const YEARS = Array.from({ length: THIS_YEAR - OLDEST_YEAR + 1 }, (_, i) => String(THIS_YEAR - i));
-
-const TRANSMISSION = ['Any', 'Automatic', 'Manual'];
-const FUEL = ['Any', 'Petrol', 'Diesel', 'Hybrid', 'Electric'];
-// uk body names, an american mock said sedan and wagon
-const BODY = ['Any', 'Hatchback', 'Saloon', 'Estate', 'SUV', 'Coupe', 'Convertible', 'MPV', 'Van'];
 
 export default function CarDetailsScreen() {
   const router = useRouter();
@@ -36,10 +29,35 @@ export default function CarDetailsScreen() {
   const { state, patch } = useWizard();
   const [openYear, setOpenYear] = useState<'' | 'from' | 'to'>('');
 
-  if (state.category !== 'cars') return <Redirect href="/new-search" />;
+  const brand = brandById(state.brandId);
+  // only the models actually ticked decide what this screen may offer
+  const picked = brand ? brand.groups[0].chips.filter((c) => state.models[`${brand.id}:Models:${c}`]) : [];
+  const allowed = allowedFor(brand?.id, picked);
+
+  // going back and changing models can strip a spec this search still holds
+  useEffect(() => {
+    const drop: Record<string, string> = {};
+    if (state.transmission !== 'Any' && !allowed.transmissions.includes(state.transmission)) drop.transmission = 'Any';
+    if (state.fuel !== 'Any' && !allowed.fuels.includes(state.fuel)) drop.fuel = 'Any';
+    if (state.body !== 'Any' && !allowed.bodies.includes(state.body)) drop.body = 'Any';
+    const from = Number(state.yearFrom);
+    const to = Number(state.yearTo);
+    if (from && (from < allowed.yearMin || from > allowed.yearMax)) drop.yearFrom = String(allowed.yearMin);
+    if (to && (to > allowed.yearMax || to < allowed.yearMin)) drop.yearTo = String(allowed.yearMax);
+    if (Object.keys(drop).length) patch(drop);
+  }, [allowed, state.transmission, state.fuel, state.body, state.yearFrom, state.yearTo, patch]);
+
+  if (state.category !== 'cars' || !brand) return <Redirect href="/new-search" />;
+  const YEARS = Array.from(
+    { length: allowed.yearMax - allowed.yearMin + 1 },
+    (_, i) => String(allowed.yearMax - i),
+  );
+  const THIS_YEAR = allowed.yearMax;
 
   const yearPreset = (from: string, to: string) => {
-    patch({ yearFrom: from, yearTo: to });
+    const clamp = (y: string) =>
+      y ? String(Math.min(Math.max(Number(y), allowed.yearMin), allowed.yearMax)) : '';
+    patch({ yearFrom: clamp(from), yearTo: clamp(to) });
     setOpenYear('');
   };
 
@@ -145,14 +163,15 @@ export default function CarDetailsScreen() {
             </View>
           </View>
 
-          <Choice label="Transmission" options={TRANSMISSION} value={state.transmission} onPick={(v) => patch({ transmission: v })} />
-          <Choice label="Fuel" options={FUEL} value={state.fuel} onPick={(v) => patch({ fuel: v })} />
-          <Choice label="Body" options={BODY} value={state.body} onPick={(v) => patch({ body: v })} />
+          <Choice label="Transmission" options={['Any', ...allowed.transmissions]} value={state.transmission} onPick={(v) => patch({ transmission: v })} />
+          <Choice label="Fuel" options={['Any', ...allowed.fuels]} value={state.fuel} onPick={(v) => patch({ fuel: v })} />
+          <Choice label="Body" options={['Any', ...allowed.bodies]} value={state.body} onPick={(v) => patch({ body: v })} />
 
           <View style={[styles.note, { backgroundColor: colors.accentFaint, borderColor: colors.accentChip }]}>
             <Text style={[styles.noteTitle, { color: colors.textPrimary }]}>Sellers leave fields blank</Text>
             <Text style={[styles.noteBody, { color: colors.textTertiary }]}>
-              Anything you pick here has to show up in the listing title, so leave a row on Any to keep the net wide.
+              Only the years and specs your picked models were actually sold with are offered, and each
+              model saves clamped to its own life.
             </Text>
           </View>
         </ScrollView>
