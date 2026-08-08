@@ -59,7 +59,7 @@ export default function FiltersScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { width, height } = useWindowDimensions();
-  const { colors, shadows } = useTheme();
+  const { colors, shadows, resolved } = useTheme();
   const { state, patch } = useWizard();
   const scrollRef = useRef<ScrollView>(null);
 
@@ -102,7 +102,16 @@ export default function FiltersScreen() {
     Keyboard.dismiss();
   };
 
+  const closePlatforms = () => setPlatformOpen(false);
+  // a tap on nothing means "I'm done here": shut the list and drop the keyboard
+  const dismissAll = () => {
+    setPlatformOpen(false);
+    setSuggestions([]);
+    Keyboard.dismiss();
+  };
+
   const setRadius = (value: number) => {
+    closePlatforms();
     setMiles(value);
     patch({ radiusMiles: value });
   };
@@ -141,6 +150,11 @@ export default function FiltersScreen() {
   };
 
   const currentPlatform = PLATFORMS.find((p) => p.id === state.platform) ?? PLATFORMS[0];
+  // a list has to lift off whatever it covers or it reads as part of it
+  const listSkin = {
+    backgroundColor: resolved === 'dark' ? colors.surfaceRaised : colors.surfaceCard,
+    borderColor: colors.accentFill,
+  };
 
   return (
     <View style={styles.screen}>
@@ -153,7 +167,8 @@ export default function FiltersScreen() {
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="on-drag"
           automaticallyAdjustKeyboardInsets
-          contentContainerStyle={[styles.listContent, { paddingTop: insets.top + 8 }]}>
+          contentContainerStyle={[styles.scrollPad, { paddingTop: insets.top + 8 }]}>
+          <Pressable onPress={dismissAll} accessible={false} style={styles.listContent}>
           <View style={styles.headerWrap}>
             <WizardHeader
               eyebrow="Last step"
@@ -167,12 +182,14 @@ export default function FiltersScreen() {
 
           <View style={styles.section}>
             <Text style={[styles.label, { color: colors.textLabel }]}>Location</Text>
+            <View style={styles.anchor}>
             <View
               style={[styles.locationField, { backgroundColor: colors.surfaceField, borderColor: colors.borderField }]}>
               <PinIcon color={colors.accentText} />
               <TextInput
                 value={state.location}
                 onChangeText={(v) => patch({ location: v, lat: null, lng: null })}
+                onFocus={closePlatforms}
                 placeholder="Search any city or area"
                 placeholderTextColor={colors.textPlaceholder}
                 autoCorrect={false}
@@ -181,7 +198,7 @@ export default function FiltersScreen() {
               {state.lat != null ? <CheckIcon color={colors.accentText} size={13} /> : null}
             </View>
             {suggestions.length > 0 ? (
-              <View style={[styles.suggestCard, { backgroundColor: colors.surfaceCard, borderColor: colors.borderCard }, shadows.card]}>
+              <View style={[styles.suggestCard, styles.floatingPlace, listSkin, shadows.panel]}>
                 {suggestions.map((s, i) => (
                   <Pressable
                     key={s.label}
@@ -199,6 +216,7 @@ export default function FiltersScreen() {
                 ))}
               </View>
             ) : null}
+            </View>
           </View>
 
           <View style={styles.section}>
@@ -244,8 +262,13 @@ export default function FiltersScreen() {
 
           <View style={styles.section}>
             <Text style={[styles.label, { color: colors.textLabel }]}>Platform</Text>
+            <View style={styles.anchor}>
             <Pressable
-              onPress={() => setPlatformOpen((open) => !open)}
+              onPress={() => {
+                Keyboard.dismiss();
+                setSuggestions([]);
+                setPlatformOpen((open) => !open);
+              }}
               accessibilityRole="button"
               accessibilityState={{ expanded: platformOpen }}
               style={[styles.platformTrigger, { backgroundColor: colors.surfaceField, borderColor: colors.borderField }]}>
@@ -257,7 +280,7 @@ export default function FiltersScreen() {
               </View>
             </Pressable>
             {platformOpen ? (
-              <View style={[styles.platformCard, { backgroundColor: colors.surfaceCard, borderColor: colors.borderCard }, shadows.card]}>
+              <View style={[styles.platformCard, styles.floating, listSkin, shadows.panel]}>
                 {PLATFORMS.map((p, i) => {
                   const on = state.platform === p.id;
                   return (
@@ -288,6 +311,7 @@ export default function FiltersScreen() {
                 })}
               </View>
             ) : null}
+            </View>
           </View>
 
           <WordSection
@@ -306,6 +330,7 @@ export default function FiltersScreen() {
             onAdded={keepInputVisible}
             tone="exclude"
           />
+          </Pressable>
         </ScrollView>
       </View>
 
@@ -395,7 +420,11 @@ function WordSection({ label, words, onChange, onAdded, helper, tone }: WordSect
 const styles = StyleSheet.create({
   screen: { flex: 1 },
   content: { flex: 1, paddingHorizontal: 18 },
-  listContent: { gap: 16, paddingBottom: 110 },
+  scrollPad: { paddingBottom: 110 },
+  anchor: { position: 'relative', zIndex: 30 },
+  floating: { position: 'absolute', top: 56, left: 0, right: 0, zIndex: 30, elevation: 8, borderWidth: 1.5 },
+  floatingPlace: { position: 'absolute', top: 56, left: 0, right: 0, zIndex: 30, elevation: 8, borderWidth: 1.5 },
+  listContent: { gap: 16 },
   headerWrap: { marginBottom: 0 },
 
   section: { gap: 8 },
