@@ -33,6 +33,21 @@ export type WizardState = {
   transmission: string;
   fuel: string;
   body: string;
+  // a model can override the shared year and mileage, keyed by its chip
+  // one set of answers for every model, or a set each
+  carScope: 'all' | 'model';
+  carRows: Record<
+    string,
+    {
+      yearFrom: string;
+      yearTo: string;
+      mileageMin: string;
+      mileageMax: string;
+      transmission: string;
+      fuel: string;
+      body: string;
+    }
+  >;
 };
 
 const INITIAL: WizardState = {
@@ -54,6 +69,8 @@ const INITIAL: WizardState = {
   transmission: 'Any',
   fuel: 'Any',
   body: 'Any',
+  carScope: 'all',
+  carRows: {},
 };
 
 // the car path asks one extra question, so does an electronics product

@@ -108,6 +108,24 @@ export function compileWizard(state: WizardState): { rows: NewSearchRow[]; skipp
     const exclude = [...new Set([...siblingExcludes(brand, group, chip), ...state.excludeWords])].filter(
       (word) => !include.includes(word),
     );
+    // on 'all' every row takes the shared answers, on 'per model' only its own
+    const own = state.carRows[chip];
+    const perModel = state.carScope === 'model';
+    const carRow: { year_min: number | null; year_max: number | null } | Record<string, never> =
+      state.category === 'cars'
+        ? perModel
+          ? {
+              year_min: parsePrice(own?.yearFrom),
+              year_max: parsePrice(own?.yearTo),
+              mileage_min: parsePrice(own?.mileageMin),
+              mileage_max: parsePrice(own?.mileageMax),
+              transmission: pickOrNull('cars', own?.transmission ?? ''),
+              fuel: pickOrNull('cars', own?.fuel ?? ''),
+              body: pickOrNull('cars', own?.body ?? ''),
+            }
+          : car
+        : {};
+
     const price = state.prices[modelKey(brand, group, chip)];
     let priceMin = parsePrice(price?.min);
     let priceMax = parsePrice(price?.max);
@@ -131,8 +149,11 @@ export function compileWizard(state: WizardState): { rows: NewSearchRow[]; skipp
       price_min: priceMin,
       price_max: priceMax,
       ...car,
+      ...carRow,
       // a 2015-2024 search on a Puma saves as 2019-2024, its own life
-      ...(state.category === 'cars' ? clampYears(brand.id, chip, car.year_min, car.year_max) : {}),
+      ...(state.category === 'cars'
+        ? clampYears(brand.id, chip, carRow.year_min ?? null, carRow.year_max ?? null)
+        : {}),
     };
   });
 

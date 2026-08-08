@@ -74,6 +74,23 @@ export function allowedFor(brandId: string | undefined, models: string[]) {
   };
 }
 
+// one model on its own, unlike allowedFor which narrows to what every pick shares
+export function allowedForModel(brandId: string | undefined, model: string) {
+  const spec = specFor(brandId, model);
+  if (!spec) {
+    return {
+      fuels: Object.values(FUEL_LABELS),
+      transmissions: Object.values(TRANSMISSION_LABELS),
+      bodies: Object.values(BODY_LABELS),
+    };
+  }
+  return {
+    fuels: labelled([...spec.f], FUEL_LABELS),
+    transmissions: labelled([...spec.t], TRANSMISSION_LABELS),
+    bodies: labelled([...spec.b], BODY_LABELS),
+  };
+}
+
 // each saved row is pinned to its own model's life, so a 2015-2024 search
 // on a Puma saves 2019-2024 and never alerts on a year it cannot be
 export function clampYears(
