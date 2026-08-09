@@ -1,6 +1,7 @@
 import { Redirect, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
+  Keyboard,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -63,6 +64,11 @@ export default function CarDetailsScreen() {
   };
 
   const closeYear = () => setOpenYear('');
+  // the keyboard would sit over a list that opens below its field
+  const openList = (id: string) => {
+    Keyboard.dismiss();
+    setOpenYear((current) => (current === id ? '' : id));
+  };
   // one model means the shared rows already are per model
   const showAll = state.carScope === 'all' || picked.length < 2;
   const milesPreset = (max: string) => {
@@ -131,14 +137,14 @@ export default function CarDetailsScreen() {
                 value={state.yearFrom}
                 placeholder="From"
                 open={openYear === 'all:from'}
-                onPress={() => setOpenYear(openYear === 'all:from' ? '' : 'all:from')}
+                onPress={() => openList('all:from')}
               />
               <Text style={[styles.to, { color: colors.textMuted }]}>to</Text>
               <YearField
                 value={state.yearTo}
                 placeholder="To"
                 open={openYear === 'all:to'}
-                onPress={() => setOpenYear(openYear === 'all:to' ? '' : 'all:to')}
+                onPress={() => openList('all:to')}
               />
             </View>
 
@@ -456,7 +462,11 @@ function ModelRow({
   const { colors, shadows } = useTheme();
   const years = Array.from({ length: span.to - span.from + 1 }, (_, i) => String(span.to - i));
   const close = () => setOpenYear('');
-  const toggle = (id: string) => setOpenYear(openYear === id ? '' : id);
+  const toggle = (id: string) => {
+    // same reason: never open a list into the space the keyboard is holding
+    Keyboard.dismiss();
+    setOpenYear(openYear === id ? '' : id);
+  };
 
   return (
     <View
