@@ -188,7 +188,11 @@ export default function FiltersScreen() {
               <PinIcon color={colors.accentText} />
               <TextInput
                 value={state.location}
-                onChangeText={(v) => patch({ location: v, lat: null, lng: null })}
+                onChangeText={(v) => {
+                  // editing means the pick is stale, so the geocoder may run again
+                  pickedRef.current = '';
+                  patch({ location: v, lat: null, lng: null });
+                }}
                 onFocus={closePlatforms}
                 placeholder="Search any city or area"
                 placeholderTextColor={colors.textPlaceholder}

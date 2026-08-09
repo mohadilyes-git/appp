@@ -28,6 +28,11 @@ function pickOrNull(category: string | undefined, pick: string) {
   return pick.toLowerCase();
 }
 
+// a range entered back to front matches nothing, so read it the way it was meant
+function ordered(min: number | null, max: number | null) {
+  return min != null && max != null && min > max ? [max, min] : [min, max];
+}
+
 function parsePrice(value: string | undefined) {
   if (!value) return null;
   const n = Number.parseInt(value, 10);
@@ -47,7 +52,7 @@ function suffixToken(group: ModelGroup, chip: string) {
 //   it is the same family, one model along: 'swift 3' against 'swift 5'
 //   and Base means the plain one, so it fences off its whole series
 // siblings from other groups count too, a Mavic 3 Pro would fire the Mavic Pro row
-function siblingExcludes(brand: Brand, group: ModelGroup, chip: string) {
+function siblingExcludes(brand: Brand, group: ModelGroup, chip: string, alias: (t: string) => string) {
   const mine = suffixToken(group, chip);
   const mineWords = mine.split(' ');
   const out: string[] = [];
@@ -60,7 +65,7 @@ function siblingExcludes(brand: Brand, group: ModelGroup, chip: string) {
       const swallowsMine = mineWords.every((word) => otherWords.includes(word));
       const sameFamily = other === group && mineWords.length > 1 && otherWords[0] === mineWords[0];
       const baseTakesTheSeries = other === group && chip === 'Base';
-      if (baseTakesTheSeries || token.includes(mine) || swallowsMine || sameFamily) out.push(withAlias(token));
+      if (baseTakesTheSeries || token.includes(mine) || swallowsMine || sameFamily) out.push(alias(token));
     }
   }
   return out;
@@ -79,11 +84,11 @@ export function compileWizard(state: WizardState): { rows: NewSearchRow[]; skipp
   );
   if (picked.length === 0) return null;
 
-  const groupId = picked.length > 1 ? uuid() : null;
   const location = state.location.trim() || null;
 
   // a car's year and condition are columns, not title words: plenty of real
   // listings never write "diesel" or "manual" even when that is what they are
+  const cars = state.category === 'cars';
   const car = {
     year_min: state.category === 'cars' ? parsePrice(state.yearFrom) : null,
     year_max: state.category === 'cars' ? parsePrice(state.yearTo) : null,
@@ -93,32 +98,30 @@ export function compileWizard(state: WizardState): { rows: NewSearchRow[]; skipp
     fuel: pickOrNull(state.category, state.fuel),
     body: pickOrNull(state.category, state.body),
   };
-  // a year the wrong way round would match nothing, assume they were swapped
-  if (car.year_min != null && car.year_max != null && car.year_min > car.year_max) {
-    [car.year_min, car.year_max] = [car.year_max, car.year_min];
-  }
-  if (car.mileage_min != null && car.mileage_max != null && car.mileage_min > car.mileage_max) {
-    [car.mileage_min, car.mileage_max] = [car.mileage_max, car.mileage_min];
-  }
+  [car.year_min, car.year_max] = ordered(car.year_min, car.year_max);
+  [car.mileage_min, car.mileage_max] = ordered(car.mileage_min, car.mileage_max);
+
+  // the alias table is electronics spellings, cars must not borrow them
+  const alias = cars ? (t: string) => t : withAlias;
 
   const skipped: string[] = [];
   const rows = picked.map(({ group, chip, name }) => {
-    const include = [...new Set([...includeWords(brand, name).map(withAlias), ...state.includeWords])];
+    const include = [...new Set([...includeWords(brand, name).map(alias), ...state.includeWords])];
     // a word the user wants present beats the same word on the sibling fence
-    const exclude = [...new Set([...siblingExcludes(brand, group, chip), ...state.excludeWords])].filter(
+    const exclude = [...new Set([...siblingExcludes(brand, group, chip, alias), ...state.excludeWords])].filter(
       (word) => !include.includes(word),
     );
     // on 'all' every row takes the shared answers, on 'per model' only its own
-    const own = state.carRows[chip];
-    const perModel = state.carScope === 'model';
+    const own = state.carRows[`${brand.id}:${chip}`];
+    const perModel = state.carScope === 'model' && picked.length > 1;
     const carRow: { year_min: number | null; year_max: number | null } | Record<string, never> =
       state.category === 'cars'
         ? perModel
           ? {
-              year_min: parsePrice(own?.yearFrom),
-              year_max: parsePrice(own?.yearTo),
-              mileage_min: parsePrice(own?.mileageMin),
-              mileage_max: parsePrice(own?.mileageMax),
+              year_min: ordered(parsePrice(own?.yearFrom), parsePrice(own?.yearTo))[0],
+              year_max: ordered(parsePrice(own?.yearFrom), parsePrice(own?.yearTo))[1],
+              mileage_min: ordered(parsePrice(own?.mileageMin), parsePrice(own?.mileageMax))[0],
+              mileage_max: ordered(parsePrice(own?.mileageMin), parsePrice(own?.mileageMax))[1],
               transmission: pickOrNull('cars', own?.transmission ?? ''),
               fuel: pickOrNull('cars', own?.fuel ?? ''),
               body: pickOrNull('cars', own?.body ?? ''),
@@ -137,7 +140,7 @@ export function compileWizard(state: WizardState): { rows: NewSearchRow[]; skipp
     return {
       keyword: rootKeyword(brand, name),
       label: name,
-      group_id: groupId,
+      group_id: null as string | null,
       platforms: [state.platform],
       location,
       lat: state.lat,
@@ -164,5 +167,10 @@ export function compileWizard(state: WizardState): { rows: NewSearchRow[]; skipp
     return !dead;
   });
   if (live.length === 0) return null;
+  // stamped after the impossible ones are dropped, so one survivor stays solo
+  if (live.length > 1) {
+    const groupId = uuid();
+    for (const row of live) row.group_id = groupId;
+  }
   return { rows: live, skipped };
 }

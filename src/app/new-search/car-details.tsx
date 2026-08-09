@@ -210,14 +210,18 @@ export default function CarDetailsScreen() {
                   key={model}
                   model={model}
                   depth={picked.length - i}
-                  row={state.carRows[model] ?? BLANK_ROW}
+                  row={state.carRows[`${brand.id}:${model}`] ?? BLANK_ROW}
                   mine={allowedForModel(brand.id, model)}
                   span={spanOf(brand.id, model, allowed)}
                   openYear={openYear}
                   setOpenYear={setOpenYear}
                   onSet={(part) =>
                     patch((s) => ({
-                      carRows: { ...s.carRows, [model]: { ...(s.carRows[model] ?? BLANK_ROW), ...part } },
+                      carRows: {
+                        ...s.carRows,
+                        // keyed by make too, or a SEAT Leon's answers show up on a Cupra Leon
+                        [`${brand.id}:${model}`]: { ...(s.carRows[`${brand.id}:${model}`] ?? BLANK_ROW), ...part },
+                      },
                     }))
                   }
                 />
