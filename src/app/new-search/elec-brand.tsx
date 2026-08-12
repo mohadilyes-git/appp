@@ -95,7 +95,7 @@ export default function ElecBrandScreen() {
   const next = () => {
     const entry = product.brands.find((b) => b.name === picked);
     if (!entry) return;
-    patch({ brandId: entry.brand.id });
+    patch({ brandId: entry.brand.id, mode: 'models' });
     router.navigate('/new-search/models');
   };
 

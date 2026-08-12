@@ -74,6 +74,40 @@ function siblingExcludes(brand: Brand, group: ModelGroup, chip: string, alias: (
 // one wizard run fans out to one searches row per picked model,
 // all stamped with the same group so home shows a single card
 export function compileWizard(state: WizardState): { rows: NewSearchRow[]; skipped: string[] } | null {
+  // the keyword path has no models to fan out, it is one row in the user's own words
+  if (state.mode === 'keyword') {
+    const text = state.keyword.text.trim().toLowerCase();
+    if (!text) return null;
+    const [priceMin, priceMax] = ordered(parsePrice(state.keyword.min), parsePrice(state.keyword.max));
+    return {
+      rows: [
+        {
+          keyword: text,
+          label: state.keyword.text.trim(),
+          group_id: null,
+          platforms: [state.platform],
+          location: state.location.trim() || null,
+          lat: state.lat,
+          lng: state.lng,
+          radius_km: Math.round(state.radiusMiles * KM_PER_MILE),
+          include_shipping: false,
+          include_words: state.includeWords.join(',') || null,
+          exclude_words: state.excludeWords.join(',') || null,
+          price_min: priceMin,
+          price_max: priceMax,
+          year_min: null,
+          year_max: null,
+          mileage_min: null,
+          mileage_max: null,
+          transmission: null,
+          fuel: null,
+          body: null,
+        },
+      ],
+      skipped: [],
+    };
+  }
+
   const brand = brandById(state.brandId);
   if (!brand) return null;
 

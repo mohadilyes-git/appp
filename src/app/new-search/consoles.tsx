@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { Alert, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import AppBackground from '@/components/app-background';
@@ -26,8 +26,8 @@ export default function ConsolesScreen() {
   const { state, patch } = useWizard();
 
   const keywordInstead = () => {
-    // placeholder until the keyword path is built
-    Alert.alert('Not built yet', 'The keyword screen is a later step.');
+    patch({ mode: 'keyword' });
+    router.navigate('/new-search/keyword');
   };
 
   return (
@@ -54,7 +54,7 @@ export default function ConsolesScreen() {
             return (
               <Pressable
                 key={id}
-                onPress={() => patch({ brandId: id })}
+                onPress={() => patch({ brandId: id, mode: 'models' })}
                 accessibilityRole="button"
                 accessibilityState={{ selected }}
                 style={[

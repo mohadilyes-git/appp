@@ -1,7 +1,6 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
-  Alert,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -32,8 +31,8 @@ export default function CarMakeScreen() {
   const shown = q ? CAR_MAKES.filter((m) => m.name.toLowerCase().includes(q)) : CAR_MAKES;
 
   const keywordInstead = () => {
-    // placeholder until the keyword path is built
-    Alert.alert('Not built yet', 'The keyword screen is a later step.');
+    patch({ mode: 'keyword' });
+    router.navigate('/new-search/keyword');
   };
 
   return (
@@ -74,7 +73,7 @@ export default function CarMakeScreen() {
             return (
               <Pressable
                 key={brand.id}
-                onPress={() => patch({ brandId: brand.id })}
+                onPress={() => patch({ brandId: brand.id, mode: 'models' })}
                 accessibilityRole="button"
                 accessibilityState={{ selected }}
                 style={[

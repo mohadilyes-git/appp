@@ -1,7 +1,6 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
-  Alert,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -56,17 +55,18 @@ export default function ProductsScreen() {
 
   const pick = (product: Product) => {
     if (product.brand) {
-      patch({ productId: product.id, brandId: product.brand.id });
+      patch({ productId: product.id, brandId: product.brand.id, mode: 'models' });
       router.navigate('/new-search/models');
       return;
     }
     if (BRAND_LISTS.includes(product.id)) {
-      patch({ productId: product.id, brandId: undefined });
+      patch({ productId: product.id, brandId: undefined, mode: 'models' });
       router.navigate('/new-search/elec-brand');
       return;
     }
-    // placeholder until the undrawn brand lists are built
-    Alert.alert('Not built yet', `The ${product.name} brands are a later step.`);
+    // gpu, tv and the rest of the undrawn lists fall through to words
+    patch({ mode: 'keyword' });
+    router.navigate('/new-search/keyword');
   };
 
   return (

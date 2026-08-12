@@ -1,11 +1,13 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
 
-import { productById } from './catalogue';
+import { CATEGORIES, productById } from './catalogue';
 
 // one object built up across the steps, so going back never loses input.
 // number-ish fields stay strings while they live in text inputs.
 export type WizardState = {
   category?: string;
+  // the keyword path skips models entirely, so the save has to know which one you took
+  mode: 'models' | 'keyword';
   brandId?: string;
   productId?: string;
   // selection keys are brand-scoped: 'iphone:13 series:Pro'
@@ -51,6 +53,7 @@ export type WizardState = {
 };
 
 const INITIAL: WizardState = {
+  mode: 'models',
   models: {},
   line: 'S',
   prices: {},
@@ -76,6 +79,11 @@ const INITIAL: WizardState = {
 // the car path asks one extra question, so does an electronics product
 // that needs a brand picked before its models
 export function stepTotal(state: WizardState) {
+  // keyword reached through a list screen is one step longer than keyword
+  // reached straight off the category screen, which has no list to show
+  if (state.mode === 'keyword') {
+    return CATEGORIES.find((c) => c.id === state.category)?.wired ? 4 : 3;
+  }
   if (state.category === 'cars') return 6;
   return productById(state.productId)?.brandStep ? 6 : 5;
 }

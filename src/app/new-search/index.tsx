@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { Alert, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import AppBackground from '@/components/app-background';
@@ -37,8 +37,9 @@ export default function CategoryScreen() {
       router.navigate('/new-search/car-make');
       return;
     }
-    // placeholder until the other category paths are built
-    Alert.alert('Not built yet', `The ${picked.name} questions are a later step.`);
+    // couches, trailers and the rest have no lists of their own, they search by words
+    patch({ mode: 'keyword' });
+    router.navigate('/new-search/keyword');
   };
 
   return (

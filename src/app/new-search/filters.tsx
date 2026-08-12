@@ -93,7 +93,9 @@ export default function FiltersScreen() {
   }, [state.location]);
 
   // landing here cold (deep link, web refresh) means the wizard never started
-  if (!state.brandId) return <Redirect href="/new-search" />;
+  if (state.mode === 'models' ? !state.brandId : !state.keyword.text.trim()) {
+    return <Redirect href="/new-search" />;
+  }
 
   const pickPlace = (s: Suggestion) => {
     pickedRef.current = s.label;
