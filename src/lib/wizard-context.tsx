@@ -12,6 +12,8 @@ export type WizardState = {
   productId?: string;
   // selection keys are brand-scoped: 'iphone:13 series:Pro'
   models: Record<string, boolean>;
+  // models the user typed in because the list did not have them, per brand
+  customModels: Record<string, string[]>;
   // which brand's models are on screen right now
   activeBrandId?: string;
   // galaxy's line switcher
@@ -55,6 +57,7 @@ export type WizardState = {
 const INITIAL: WizardState = {
   mode: 'models',
   models: {},
+  customModels: {},
   line: 'S',
   prices: {},
   keyword: { text: '', min: '', max: '' },

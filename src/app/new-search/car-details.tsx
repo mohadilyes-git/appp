@@ -16,7 +16,7 @@ import AppBackground from '@/components/app-background';
 import { ChevronRightIcon } from '@/components/icons';
 import { WizardBar, WizardHeader } from '@/components/wizard-chrome';
 import { allowedFor, allowedForModel, lastYear, specFor, THIS_YEAR as NOW } from '@/lib/car-specs';
-import { brandById } from '@/lib/catalogue';
+import { brandById, modelKey, withCustom } from '@/lib/catalogue';
 import { font, radius, tracking } from '@/lib/theme';
 import { useTheme } from '@/lib/theme-context';
 import { useWizard } from '@/lib/wizard-context';
@@ -31,9 +31,12 @@ export default function CarDetailsScreen() {
   // '' when shut, otherwise 'all:from' or '<model>:to'
   const [openYear, setOpenYear] = useState('');
 
-  const brand = brandById(state.brandId);
+  const found = brandById(state.brandId);
+  const brand = found ? withCustom(found, state.customModels[found.id]) : undefined;
   // only the models actually ticked decide what this screen may offer
-  const picked = brand ? brand.groups[0].chips.filter((c) => state.models[`${brand.id}:Models:${c}`]) : [];
+  const picked = brand
+    ? brand.groups.flatMap((g) => g.chips.filter((c) => state.models[modelKey(brand, g, c)]))
+    : [];
   const allowed = allowedFor(brand?.id, picked);
 
   // going back and changing models can strip a spec this search still holds

@@ -430,6 +430,41 @@ export function brandById(id?: string) {
   return ALL_BRANDS.find((b) => b.id === id);
 }
 
+// the user's own models ride along as one more group, so every screen that
+// walks brand.groups picks them up without knowing they were typed in
+export const CUSTOM_GROUP = 'Yours';
+export const CUSTOM_LINE = 'custom';
+
+export function withCustom(brand: Brand, names: string[] | undefined): Brand {
+  if (!names || names.length === 0) return brand;
+  const groups = [...brand.groups, { title: CUSTOM_GROUP, prefix: '', chips: names }];
+  // a brand with a line switcher only draws the active line's groups, so the
+  // typed-in ones need a pill of their own or they are invisible.
+  // it goes last: first place is the fallback when the saved line is unknown.
+  const lines = brand.lines
+    ? [...brand.lines, { id: CUSTOM_LINE, label: CUSTOM_GROUP, groupTitles: [CUSTOM_GROUP] }]
+    : undefined;
+  return { ...brand, groups, ...(lines ? { lines } : {}) };
+}
+
+// people type "Ford Focus RS" as often as "Focus RS", and the screen adds the
+// brand back itself, so a leading brand name would render twice and land in
+// the include words on top of the keyword that already covers it
+export function trimTypedModel(brand: Brand, typed: string) {
+  const cleaned = typed.trim().replace(/\s+/g, ' ');
+  // brands whose chips already carry the full name (PlayStation, Nintendo) keep it
+  if (!brand.name) return cleaned;
+  let out = cleaned;
+  for (const lead of [brand.root, brand.name]) {
+    if (!lead) continue;
+    const escaped = lead.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const at = new RegExp(`^${escaped}\\s+`, 'i');
+    if (at.test(out)) out = out.replace(at, '');
+  }
+  // typing nothing but the brand leaves us with the brand
+  return out || cleaned;
+}
+
 export function productById(id?: string) {
   return ELECTRONICS_PRODUCTS.flatMap((g) => g.products).find((p) => p.id === id);
 }

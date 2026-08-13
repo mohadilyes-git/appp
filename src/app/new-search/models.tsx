@@ -12,15 +12,20 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import AppBackground from '@/components/app-background';
+import { CloseIcon } from '@/components/icons';
 import { WizardBar, WizardHeader } from '@/components/wizard-chrome';
 import { CheckIcon, SearchIcon } from '@/components/wizard-icons';
 import {
   BRAND_HEADERS,
   brandById,
   CAR_HEADERS,
+  CUSTOM_GROUP,
+  CUSTOM_LINE,
   displayName,
   modelKey,
   productById,
+  trimTypedModel,
+  withCustom,
   type ModelGroup,
 } from '@/lib/catalogue';
 import { font, radius, tracking } from '@/lib/theme';
@@ -64,8 +69,11 @@ export default function ModelsScreen() {
   const { colors, shadows } = useTheme();
   const { state, patch } = useWizard();
   const [query, setQuery] = useState('');
+  const [draft, setDraft] = useState('');
 
-  const brand = brandById(state.brandId);
+  const found = brandById(state.brandId);
+  // whatever the user typed in becomes one more group of chips
+  const brand = found ? withCustom(found, state.customModels[found.id]) : undefined;
   // landing here without a brand (deep link, web refresh) would be a blank screen
   if (!brand) return <Redirect href="/new-search" />;
 
@@ -118,6 +126,37 @@ export default function ModelsScreen() {
     patch({ models });
   };
 
+
+  const addCustom = () => {
+    setDraft('');
+    if (!brand) return;
+    const name = trimTypedModel(brand, draft);
+    if (!name) return;
+    const already = brand.groups.some((g) => g.chips.some((c) => c.toLowerCase() === name.toLowerCase()));
+    if (already) return;
+    patch((s) => ({
+      customModels: { ...s.customModels, [brand.id]: [...(s.customModels[brand.id] ?? []), name] },
+      // a model you went to the trouble of typing is one you want
+      models: { ...s.models, [`${brand.id}:${CUSTOM_GROUP}:${name}`]: true },
+      // and on a brand with line pills, show the one holding it
+      ...(found?.lines ? { line: CUSTOM_LINE } : {}),
+    }));
+  };
+
+  const dropCustom = (name: string) => {
+    if (!brand) return;
+    patch((s) => {
+      const models = { ...s.models };
+      delete models[`${brand.id}:${CUSTOM_GROUP}:${name}`];
+      return {
+        models,
+        customModels: {
+          ...s.customModels,
+          [brand.id]: (s.customModels[brand.id] ?? []).filter((n) => n !== name),
+        },
+      };
+    });
+  };
 
   return (
     <View style={styles.screen}>
@@ -212,7 +251,8 @@ export default function ModelsScreen() {
             const rowChecked = chips.every((c) => picked(group, c));
             return (
               <View key={group.title} style={styles.group}>
-                {brand.groups.length === 1 ? null : group.title === 'No series' ? (
+                {group.title === 'Models' ? null : group.title === 'No series' ||
+                  group.title === CUSTOM_GROUP ? (
                   <Text style={[styles.groupTitle, { color: colors.textTag }]}>{group.title}</Text>
                 ) : (
                   <Pressable
@@ -241,6 +281,15 @@ export default function ModelsScreen() {
                             : { backgroundColor: colors.surfaceCard, borderColor: colors.borderButton },
                         ]}>
                         <Text style={[styles.chipText, { color: on ? '#fff' : colors.textTag }]}>{chip}</Text>
+                        {group.title === CUSTOM_GROUP ? (
+                          <Pressable
+                            onPress={() => dropCustom(chip)}
+                            hitSlop={8}
+                            accessibilityRole="button"
+                            accessibilityLabel={`Remove ${chip}`}>
+                            <CloseIcon color={on ? '#fff' : colors.textMuted} size={9} />
+                          </Pressable>
+                        ) : null}
                       </Pressable>
                     );
                   })}
@@ -248,6 +297,34 @@ export default function ModelsScreen() {
               </View>
             );
           })}
+          <View style={[styles.addCard, { backgroundColor: colors.accentFaint, borderColor: colors.accentChip }]}>
+            <Text style={[styles.addTitle, { color: colors.textPrimary }]}>Model not listed?</Text>
+            <Text style={[styles.addSub, { color: colors.textTertiary }]}>
+              Type it and it joins this search like any other model.
+            </Text>
+            <View style={styles.addRow}>
+              <TextInput
+                value={draft}
+                onChangeText={setDraft}
+                onSubmitEditing={addCustom}
+                submitBehavior="submit"
+                returnKeyType="done"
+                placeholder="e.g. Focus RS"
+                placeholderTextColor={colors.textPlaceholder}
+                autoCorrect={false}
+                style={[styles.addInput, { backgroundColor: colors.surfaceCard, borderColor: colors.borderField, color: colors.textPrimary }]}
+              />
+              <Pressable
+                onPress={addCustom}
+                disabled={!draft.trim()}
+                style={({ pressed }) => [
+                  styles.addBtn,
+                  { backgroundColor: colors.accentBrand, opacity: draft.trim() ? (pressed ? 0.85 : 1) : 0.4 },
+                ]}>
+                <Text style={styles.addBtnText}>Add</Text>
+              </Pressable>
+            </View>
+          </View>
         </ScrollView>
       </View>
 
@@ -332,7 +409,26 @@ const styles = StyleSheet.create({
   box: { borderRadius: 6, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
 
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 7 },
+  addCard: { borderRadius: radius.button, borderWidth: 1, padding: 13, gap: 4, marginTop: 4 },
+  addTitle: { fontFamily: font.heavy, fontSize: 13 },
+  addSub: { fontFamily: font.body, fontSize: 11, lineHeight: 16 },
+  addRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 5 },
+  addInput: {
+    flex: 1,
+    height: 42,
+    borderRadius: radius.tile,
+    borderWidth: 1,
+    paddingHorizontal: 12,
+    fontFamily: font.bold,
+    fontSize: 13.5,
+  },
+  addBtn: { paddingVertical: 11, paddingHorizontal: 16, borderRadius: radius.tile },
+  addBtnText: { fontFamily: font.heavy, fontSize: 12.5, color: '#fff' },
+
   chip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 7,
     paddingVertical: 9,
     paddingHorizontal: 15,
     borderRadius: radius.segment,

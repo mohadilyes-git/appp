@@ -5,6 +5,7 @@ import {
   modelKey,
   rootKeyword,
   withAlias,
+  withCustom,
   type Brand,
   type ModelGroup,
 } from './catalogue';
@@ -108,8 +109,10 @@ export function compileWizard(state: WizardState): { rows: NewSearchRow[]; skipp
     };
   }
 
-  const brand = brandById(state.brandId);
-  if (!brand) return null;
+  const found = brandById(state.brandId);
+  if (!found) return null;
+  // a model the user typed in is one more chip on the brand
+  const brand = withCustom(found, state.customModels[found.id]);
 
   const picked = brand.groups.flatMap((group) =>
     group.chips
