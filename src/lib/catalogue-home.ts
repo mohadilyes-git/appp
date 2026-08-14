@@ -182,7 +182,7 @@ export const TRAILERS_IFORWILLIAMS: Brand = {
 export const TRAILERS_BRIANJAMES: Brand = {
   id: 'brianjames',
   name: 'Brian James',
-  root: 'brian james trailer',
+  root: 'brian james',
   groups: [
     { title: 'Car transporters', prefix: '', chips: ['Clubman', 'A4 Transporter', 'C4 Blue', 'T4 Transporter', 'T6 Transporter', 'Tilt Bed', 'Minno Max'] },
     { title: 'Race & enclosed', prefix: '', chips: ['Race Transporter 4', 'Race Transporter 5', 'Race Transporter 6', 'Race Sport'] },
@@ -194,7 +194,7 @@ export const TRAILERS_BRIANJAMES: Brand = {
 export const TRAILERS_NUGENT: Brand = {
   id: 'nugent',
   name: 'Nugent',
-  root: 'nugent trailer',
+  root: 'nugent',
   groups: [
     { title: 'Box vans (B series)', prefix: '', chips: ['B2814', 'B3718', 'B4318', 'box 8x5', 'box 10x6', 'box 12x6', 'high top'] },
     { title: 'Tippers (T series)', prefix: '', chips: ['T3118', 'T3718', 'tipper 8x5', 'tipper 10x6', 'tipper 12x6', 'hydraulic tip'] },
@@ -218,7 +218,7 @@ export const TRAILERS_INDESPENSION: Brand = {
 export const TRAILERS_BATESON: Brand = {
   id: 'bateson',
   name: 'Bateson',
-  root: 'bateson trailer',
+  root: 'bateson',
   groups: [
     { title: 'Car transporter models', prefix: '', chips: ['1200', '1400', '1500', '1600', '1620', '1625', '1800'] },
     { title: 'Plant & box', prefix: '', chips: ['plant trailer', 'box trailer', '10x5 plant', '12x6 plant', 'digger trailer'] },
@@ -230,7 +230,7 @@ export const TRAILERS_BATESON: Brand = {
 export const TRAILERS_DALEKANE: Brand = {
   id: 'dalekane',
   name: 'Dale Kane',
-  root: 'dale kane trailer',
+  root: 'dale kane',
   groups: [
     { title: 'Tippers', prefix: '', chips: ['8x5 tipper', '10x5 tipper', '10x6 tipper', '12x6 tipper', 'hydraulic tip'] },
     { title: 'Plant & flatbed', prefix: '', chips: ['8x4 plant', '10x5 plant', '12x6 plant', 'flatbed', 'beavertail'] },
@@ -263,7 +263,7 @@ export const TRAILERS_BOXTRAILER: Brand = {
 export const TRAILERS_CARTRANSPORTER: Brand = {
   id: 'cartransporter',
   name: 'Car transporter',
-  root: 'car transporter trailer',
+  root: 'car transporter',
   groups: [
     { title: 'Bed length', prefix: '', chips: ['14ft', '16ft', '18ft', 'single axle', 'twin axle'] },
     { title: 'Type & kit', prefix: '', chips: ['tilt bed', 'beavertail', 'with winch', 'hydraulic tilt', 'alloy ramps', 'recovery spec'] },
@@ -331,7 +331,7 @@ export const TRAILERS_MOTORBIKETRAILER: Brand = {
 export const TRAILERS_CAMPINGTRAILER: Brand = {
   id: 'campingtrailer',
   name: 'Camping trailer',
-  root: 'teardrop trailer',
+  root: 'camping trailer',
   groups: [
     { title: 'Style', prefix: '', chips: ['teardrop', 'micro caravan', 'off road', 'roof tent', 'pop top', 'with kitchen'] },
     { title: 'Base trailer', prefix: '', chips: ['6x4', '8x4', '8x5', 'Erde 122', 'Daxara 148', 'Brenderup', '750kg unbraked'] },
