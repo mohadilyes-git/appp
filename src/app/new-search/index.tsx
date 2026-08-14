@@ -6,7 +6,7 @@ import AppBackground from '@/components/app-background';
 import { ChevronRightIcon } from '@/components/icons';
 import { WizardBar, WizardHeader } from '@/components/wizard-chrome';
 import { CategoryIcon } from '@/components/wizard-icons';
-import { CATEGORIES } from '@/lib/catalogue';
+import { CATEGORIES, householdList } from '@/lib/catalogue';
 import { font, radius } from '@/lib/theme';
 import { useTheme } from '@/lib/theme-context';
 import { useWizard } from '@/lib/wizard-context';
@@ -37,7 +37,12 @@ export default function CategoryScreen() {
       router.navigate('/new-search/car-make');
       return;
     }
-    // couches, trailers and the rest have no lists of their own, they search by words
+    if (householdList(picked.id)) {
+      patch({ productId: undefined, mode: 'models' });
+      router.navigate('/new-search/picker');
+      return;
+    }
+    // whatever is left has no list of its own, it searches by words
     patch({ mode: 'keyword' });
     router.navigate('/new-search/keyword');
   };

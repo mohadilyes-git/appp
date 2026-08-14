@@ -19,6 +19,7 @@ import {
   BRAND_HEADERS,
   brandById,
   CAR_HEADERS,
+  HOUSEHOLD_HEADERS,
   CUSTOM_GROUP,
   CUSTOM_LINE,
   displayName,
@@ -37,6 +38,7 @@ import { stepTotal, useWizard } from '@/lib/wizard-context';
 const HEADERS: Record<string, { title: string; accent: string; subtitle: string }> = {
   ...BRAND_HEADERS,
   ...CAR_HEADERS,
+  ...HOUSEHOLD_HEADERS,
   playstation: {
     title: 'Which PlayStation',
     accent: 'models?',

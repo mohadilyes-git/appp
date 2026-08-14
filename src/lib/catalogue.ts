@@ -3,6 +3,7 @@
 // the long tail (tvs, drones, lenses, cameras, gpus) sits in catalogue-electronics.
 
 import { CAR_MAKES } from './catalogue-cars';
+import { HOUSEHOLD } from './catalogue-home';
 import {
   CAMERA_BRANDS,
   DRONE_BRANDS,
@@ -17,6 +18,7 @@ import {
 
 export * from './catalogue-electronics';
 export * from './catalogue-cars';
+export * from './catalogue-home';
 
 export type ModelGroup = {
   title: string;
@@ -55,11 +57,10 @@ export const CATEGORIES: Category[] = [
   { id: 'consoles', name: 'Games Consoles', path: 'Console → edition → price', wired: true },
   { id: 'electronics', name: 'Electronics', path: 'Product → model → price', wired: true },
   { id: 'cars', name: 'Cars', path: 'Make → model → year → price', wired: true },
-  { id: 'couches', name: 'Couches', path: 'Seats → material → price', wired: false },
-  { id: 'furniture', name: 'Furniture', path: 'Type → material → price', wired: false },
-  { id: 'trailers', name: 'Trailers', path: 'Type → size → price', wired: false },
-  { id: 'kitchen', name: 'Kitchen / Utilities', path: 'Appliance → brand → price', wired: false },
-  { id: 'diabetic', name: 'Diabetic Supplies', path: 'Brand → type → price', wired: false },
+  { id: 'furniture', name: 'Furniture', path: 'Type → models → price each', wired: true },
+  { id: 'trailers', name: 'Trailers', path: 'Maker or type → models → price', wired: true },
+  { id: 'kitchen', name: 'Kitchen / Utilities', path: 'Appliance → brand → price', wired: true },
+  { id: 'diabetic', name: 'Diabetic Supplies', path: 'Brand → product → price', wired: true },
   { id: 'other', name: 'Other', path: 'Just your own keywords', wired: false },
 ];
 
@@ -424,6 +425,7 @@ const ALL_BRANDS: Brand[] = [
   ...DRONE_BRANDS.map((b) => b.brand),
   ...LENS_BRANDS.map((b) => b.brand),
   ...CAR_MAKES.map((m) => m.brand),
+  ...Object.values(HOUSEHOLD).flatMap((list) => list.entries.map((e) => e.brand)),
 ];
 
 export function brandById(id?: string) {
@@ -463,6 +465,11 @@ export function trimTypedModel(brand: Brand, typed: string) {
   }
   // typing nothing but the brand leaves us with the brand
   return out || cleaned;
+}
+
+// furniture, trailers, kitchen and diabetic supplies all pick from one screen
+export function householdList(category?: string) {
+  return category ? HOUSEHOLD[category] : undefined;
 }
 
 export function productById(id?: string) {
