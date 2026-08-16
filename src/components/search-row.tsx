@@ -1,23 +1,34 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { PencilIcon, TrashIcon } from '@/components/icons';
+
 import { money } from '@/lib/inventory';
 import { type SearchGroup } from '@/lib/use-searches';
 import { font, radius, tracking } from '@/lib/theme';
 import { useTheme } from '@/lib/theme-context';
 
+const PLATFORM_LABELS: Record<string, string> = {
+  facebook: 'FACEBOOK',
+  ebay: 'EBAY',
+  gumtree: 'GUMTREE',
+};
+
 type Props = {
   group: SearchGroup;
   onToggle: (key: string) => void;
+  onEdit: (key: string) => void;
+  onDelete: (key: string) => void;
 };
 
-export default function SearchRow({ group, onToggle }: Props) {
+export default function SearchRow({ group, onToggle, onEdit, onDelete }: Props) {
   const { colors, shadows } = useTheme();
   const active = group.active;
 
+  // where, how far and which marketplace: the three things you forget
   const chips: string[] = [];
-  if (group.location) chips.push(group.location.toUpperCase());
-  if (group.radiusKm) chips.push(`${group.radiusKm} KM`);
-  if (group.includeShipping) chips.push('SHIPS');
+  for (const p of group.platforms) chips.push(PLATFORM_LABELS[p] ?? p.toUpperCase());
+  if (group.location) chips.push(group.location.split(',')[0].toUpperCase());
+  if (group.radiusKm) chips.push(`${Math.round(group.radiusKm / 1.60934)} MI`);
 
   return (
     <View
@@ -46,7 +57,25 @@ export default function SearchRow({ group, onToggle }: Props) {
                 : '· paused'}
             </Text>
           </View>
-          <Toggle value={active} onPress={() => onToggle(group.key)} />
+          <View style={styles.actions}>
+            <Pressable
+              onPress={() => onEdit(group.key)}
+              hitSlop={8}
+              accessibilityRole="button"
+              accessibilityLabel={`Edit ${group.label}`}
+              style={({ pressed }) => [styles.iconBtn, { backgroundColor: colors.surfaceWash }, pressed && { opacity: 0.6 }]}>
+              <PencilIcon color={colors.textSecondary} size={13} />
+            </Pressable>
+            <Pressable
+              onPress={() => onDelete(group.key)}
+              hitSlop={8}
+              accessibilityRole="button"
+              accessibilityLabel={`Delete ${group.label}`}
+              style={({ pressed }) => [styles.iconBtn, { backgroundColor: colors.negativeTint }, pressed && { opacity: 0.6 }]}>
+              <TrashIcon color={colors.negative} size={13} />
+            </Pressable>
+            <Toggle value={active} onPress={() => onToggle(group.key)} />
+          </View>
         </View>
 
         {/* a paused search is one quiet line, details come back when it wakes */}
@@ -96,6 +125,15 @@ const styles = StyleSheet.create({
   dot: { width: 7, height: 7, borderRadius: 3.5 },
   keyword: { fontFamily: font.heavy, fontSize: 14, flexShrink: 1 },
   cap: { fontFamily: font.bold, fontSize: 11.5 },
+
+  actions: { flexDirection: 'row', alignItems: 'center', gap: 7 },
+  iconBtn: {
+    width: 27,
+    height: 27,
+    borderRadius: 13.5,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 
   track: { width: 40, height: 23, borderRadius: radius.pill },
   knob: {

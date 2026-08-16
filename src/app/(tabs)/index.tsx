@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import GreetingRow from '@/components/greeting-row';
@@ -10,14 +10,48 @@ import SearchRow from '@/components/search-row';
 import { font, radius, tracking } from '@/lib/theme';
 import { useTheme } from '@/lib/theme-context';
 import { useHomeSummary } from '@/lib/use-inventory';
+import { draftFromRows } from '@/lib/search-to-draft';
 import { useSearches } from '@/lib/use-searches';
+import { useWizard } from '@/lib/wizard-context';
 
 export default function HomeScreen() {
   const { colors, shadows } = useTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { summary, nudge } = useHomeSummary();
-  const { groups, loading, error, toggle } = useSearches();
+  const { groups, loading, error, toggle, remove } = useSearches();
+  const { patch, reset } = useWizard();
+
+  // editing reopens the wizard on the saved answers, so it is the same screens
+  const editSearch = (key: string) => {
+    const group = groups.find((g) => g.key === key);
+    if (!group) return;
+    reset();
+    patch((draft) => draftFromRows(group.rows, draft));
+    router.push('/new-search');
+  };
+
+  const confirmDelete = (key: string) => {
+    const group = groups.find((g) => g.key === key);
+    if (!group) return;
+    Alert.alert(
+      `Delete ${group.label}?`,
+      group.count > 1
+        ? `All ${group.count} models in this search stop being watched.`
+        : 'This search stops being watched.',
+      [
+        { text: 'Keep', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () =>
+            remove(key).catch((e) =>
+              Alert.alert("Couldn't delete", e instanceof Error ? e.message : 'Try again in a moment.'),
+            ),
+        },
+      ],
+    );
+  };
 
   const scanning = groups.filter((g) => g.active).length;
   const paused = groups.length - scanning;
@@ -40,7 +74,11 @@ export default function HomeScreen() {
           ) : null}
         </View>
         <Pressable
-          onPress={() => router.push('/new-search')}
+          onPress={() => {
+            // the draft outlives the wizard now, so a new search starts clean
+            reset();
+            router.push('/new-search');
+          }}
           style={({ pressed }) => [
             styles.newPill,
             { backgroundColor: colors.accentFill },
@@ -61,7 +99,15 @@ export default function HomeScreen() {
           No searches yet. They&apos;ll show up here when you create them.
         </Text>
       ) : (
-        groups.map((group) => <SearchRow key={group.key} group={group} onToggle={toggle} />)
+        groups.map((group) => (
+          <SearchRow
+            key={group.key}
+            group={group}
+            onToggle={toggle}
+            onEdit={editSearch}
+            onDelete={confirmDelete}
+          />
+        ))
       )}
     </ScrollView>
   );

@@ -118,3 +118,19 @@ export function BellIcon({ color, size = 19 }: IconProps) {
     </Svg>
   );
 }
+
+export function PencilIcon({ color, size = 15 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+      <Path d="M3 17.3V21h3.7L17.6 10.1l-3.7-3.7zm17.7-9.9a1 1 0 0 0 0-1.4l-2.7-2.7a1 1 0 0 0-1.4 0l-1.8 1.8 3.7 3.7z" />
+    </Svg>
+  );
+}
+
+export function TrashIcon({ color, size = 15 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+      <Path d="M6 7h12l-.9 12.1a2 2 0 0 1-2 1.9H8.9a2 2 0 0 1-2-1.9zm3.5-4h5l.8 1.3H19v1.8H5V4.3h3.7z" />
+    </Svg>
+  );
+}

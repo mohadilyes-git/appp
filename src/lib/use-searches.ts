@@ -2,7 +2,7 @@ import { useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { Alert } from 'react-native';
 
-import { listSearches, setSearchesActive, type Search } from './searches-db';
+import { deleteSearches, listSearches, setSearchesActive, type Search } from './searches-db';
 
 // what home actually renders: one card per wizard run, solo rows are a group of one
 export type SearchGroup = {
@@ -12,27 +12,52 @@ export type SearchGroup = {
   active: boolean;
   hits: number;
   location?: string;
+  lat?: number | null;
+  lng?: number | null;
   radiusKm?: number;
+  platforms: string[];
   includeShipping: boolean;
   priceMax?: number;
   ids: number[];
+  rows: Search[];
 };
+
+// "iPhone 13" and "iPhone 15 Pro" share a name, and that is the card's title.
+// the raw keyword is the machine's word, it reads badly on screen
+function sharedName(rows: Search[]) {
+  const names = rows.map((r) => r.label ?? r.keyword).filter(Boolean) as string[];
+  if (names.length === 0) return '';
+  if (names.length === 1) return names[0];
+  const words = names[0].split(' ');
+  let shared = 0;
+  // the whole of the shortest name can be the title: PS5 and PS5 Pro share "PS5"
+  while (shared < words.length) {
+    const candidate = words.slice(0, shared + 1).join(' ');
+    if (!names.every((n) => n === candidate || n.startsWith(candidate + ' '))) break;
+    shared += 1;
+  }
+  return words.slice(0, shared).join(' ');
+}
 
 function groupOf(rows: Search[]): SearchGroup {
   const first = rows[0];
   const maxes = rows.map((r) => r.priceMax).filter((n): n is number => n != null);
   return {
     key: first.groupId ?? `solo-${first.id}`,
-    label: first.groupId ? first.keyword : (first.label ?? first.keyword),
+    label: (first.groupId ? sharedName(rows) : first.label) || first.keyword,
     count: rows.length,
     // rows in a group are paused together, but tolerate a half-toggled one
     active: rows.some((r) => r.active),
     hits: rows.reduce((sum, r) => sum + r.hits, 0),
     location: first.location,
+    lat: first.lat,
+    lng: first.lng,
     radiusKm: first.radiusKm,
+    platforms: first.platforms,
     includeShipping: first.includeShipping,
     priceMax: maxes.length > 0 ? Math.max(...maxes) : undefined,
     ids: rows.map((r) => r.id),
+    rows,
   };
 }
 
@@ -83,5 +108,15 @@ export function useSearches() {
     [groups],
   );
 
-  return { groups, loading, error, toggle };
+  // the delete hits the database first: a card that vanishes and comes back
+  // is worse than waiting a beat for it to go
+  const remove = useCallback(async (key: string) => {
+    const target = groups.find((g) => g.key === key);
+    if (!target) return;
+    await deleteSearches(target.ids);
+    setGroups((list) => list.filter((g) => g.key !== key));
+  }, [groups]);
+
+
+  return { groups, loading, error, toggle, remove };
 }

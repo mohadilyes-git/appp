@@ -16,6 +16,7 @@ import { useEffect, useState } from 'react';
 
 import { supabase } from '@/lib/supabase';
 import { ThemeProvider } from '@/lib/theme-context';
+import { WizardProvider } from '@/lib/wizard-context';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
@@ -98,7 +99,9 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider>
-      <Stack screenOptions={{ headerShown: false }} />
+      <WizardProvider>
+        <Stack screenOptions={{ headerShown: false }} />
+      </WizardProvider>
     </ThemeProvider>
   );
 }

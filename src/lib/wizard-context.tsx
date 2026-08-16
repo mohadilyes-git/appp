@@ -8,6 +8,8 @@ export type WizardState = {
   category?: string;
   // the keyword path skips models entirely, so the save has to know which one you took
   mode: 'models' | 'keyword';
+  // set when the wizard was opened on a saved search, so saving replaces it
+  editingIds?: number[];
   brandId?: string;
   productId?: string;
   // selection keys are brand-scoped: 'iphone:13 series:Pro'

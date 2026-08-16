@@ -1,13 +1,7 @@
 import { Stack } from 'expo-router';
 
-import { WizardProvider } from '@/lib/wizard-context';
-
-// the provider lives here so the draft survives moving between steps
-// and gets thrown away with the stack when the wizard closes
+// the draft itself lives at the app root, because home fills it in before
+// opening this stack when you edit a saved search
 export default function NewSearchLayout() {
-  return (
-    <WizardProvider>
-      <Stack screenOptions={{ headerShown: false }} />
-    </WizardProvider>
-  );
+  return <Stack screenOptions={{ headerShown: false }} />;
 }

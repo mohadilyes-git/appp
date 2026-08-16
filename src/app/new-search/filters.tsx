@@ -19,7 +19,7 @@ import { ChevronRightIcon, CloseIcon } from '@/components/icons';
 import { WizardBar, WizardHeader } from '@/components/wizard-chrome';
 import { CheckIcon, PinIcon } from '@/components/wizard-icons';
 import { compileWizard } from '@/lib/search-compiler';
-import { createSearches } from '@/lib/searches-db';
+import { createSearches, deleteSearches } from '@/lib/searches-db';
 import { font, radius, tracking } from '@/lib/theme';
 import { useTheme } from '@/lib/theme-context';
 import { stepTotal, useWizard } from '@/lib/wizard-context';
@@ -137,6 +137,8 @@ export default function FiltersScreen() {
     setSaving(true);
     try {
       await createSearches(built.rows);
+      // the replacement is in before the original goes, so a failure loses nothing
+      if (state.editingIds?.length) await deleteSearches(state.editingIds);
       if (built.skipped.length) {
         Alert.alert(
           'Some models were left out',
@@ -182,7 +184,7 @@ export default function FiltersScreen() {
             />
           </View>
 
-          <View style={styles.section}>
+          <View style={[styles.section, styles.zLocation]}>
             <Text style={[styles.label, { color: colors.textLabel }]}>Location</Text>
             <View style={styles.anchor}>
             <View
@@ -225,7 +227,7 @@ export default function FiltersScreen() {
             </View>
           </View>
 
-          <View style={styles.section}>
+          <View style={[styles.section, styles.zRadius]}>
             <View style={styles.labelRow}>
               <Text style={[styles.label, { color: colors.textLabel }]}>Radius</Text>
               <Text style={[styles.radiusValue, { color: colors.accentText }]}>{miles} miles</Text>
@@ -266,7 +268,7 @@ export default function FiltersScreen() {
             </View>
           </View>
 
-          <View style={styles.section}>
+          <View style={[styles.section, styles.zPlatform]}>
             <Text style={[styles.label, { color: colors.textLabel }]}>Platform</Text>
             <View style={styles.anchor}>
             <Pressable
@@ -341,7 +343,13 @@ export default function FiltersScreen() {
       </View>
 
       <WizardBar
-        label={saving ? 'Starting…' : 'Start this search'}
+        label={
+          saving
+            ? 'Saving…'
+            : state.editingIds?.length
+              ? 'Save this search'
+              : 'Start this search'
+        }
         onPress={startSearch}
         disabled={saving}
         hero
@@ -428,6 +436,10 @@ const styles = StyleSheet.create({
   content: { flex: 1, paddingHorizontal: 18 },
   scrollPad: { paddingBottom: 110 },
   anchor: { position: 'relative', zIndex: 30 },
+  // a section holding a floating list has to outrank the sections drawn after it
+  zLocation: { zIndex: 40 },
+  zRadius: { zIndex: 30 },
+  zPlatform: { zIndex: 20 },
   floating: { position: 'absolute', top: 56, left: 0, right: 0, zIndex: 30, elevation: 8, borderWidth: 1.5 },
   floatingPlace: { position: 'absolute', top: 56, left: 0, right: 0, zIndex: 30, elevation: 8, borderWidth: 1.5 },
   listContent: { gap: 16 },

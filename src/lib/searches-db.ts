@@ -8,10 +8,19 @@ export type Search = {
   groupId?: string;
   platforms: string[];
   location?: string;
+  lat?: number | null;
+  lng?: number | null;
   radiusKm?: number;
   includeShipping: boolean;
   priceMin?: number;
   priceMax?: number;
+  yearMin?: number | null;
+  yearMax?: number | null;
+  mileageMin?: number | null;
+  mileageMax?: number | null;
+  transmission?: string | null;
+  fuel?: string | null;
+  body?: string | null;
   active: boolean;
   // how many listings have matched this search so far
   hits: number;
@@ -25,17 +34,26 @@ type Row = {
   group_id: string | null;
   platforms: string[] | null;
   location: string | null;
+  lat: number | null;
+  lng: number | null;
   radius_km: number | null;
   include_shipping: boolean;
   price_min: string | number | null;
   price_max: string | number | null;
+  year_min: number | null;
+  year_max: number | null;
+  mileage_min: number | null;
+  mileage_max: number | null;
+  transmission: string | null;
+  fuel: string | null;
+  body: string | null;
   active: boolean;
   matches: { count: number }[];
 };
 
 // matches(count) folds the join table into a hit counter per row
 const COLUMNS =
-  'id, keyword, label, group_id, platforms, location, radius_km, include_shipping, price_min, price_max, active, matches(count)';
+  'id, keyword, label, group_id, platforms, location, lat, lng, radius_km, include_shipping, price_min, price_max, year_min, year_max, mileage_min, mileage_max, transmission, fuel, body, active, matches(count)';
 
 function toSearch(row: Row): Search {
   return {
@@ -45,10 +63,19 @@ function toSearch(row: Row): Search {
     groupId: row.group_id ?? undefined,
     platforms: row.platforms ?? [],
     location: row.location ?? undefined,
+    lat: row.lat,
+    lng: row.lng,
     radiusKm: row.radius_km ?? undefined,
     includeShipping: row.include_shipping,
     priceMin: row.price_min == null ? undefined : Number(row.price_min),
     priceMax: row.price_max == null ? undefined : Number(row.price_max),
+    yearMin: row.year_min,
+    yearMax: row.year_max,
+    mileageMin: row.mileage_min,
+    mileageMax: row.mileage_max,
+    transmission: row.transmission,
+    fuel: row.fuel,
+    body: row.body,
     active: row.active,
     hits: row.matches?.[0]?.count ?? 0,
   };
@@ -67,6 +94,14 @@ export async function listSearches() {
 // a wizard search is several rows sharing a group, so pausing takes a list of ids
 export async function setSearchesActive(ids: number[], active: boolean) {
   const { error } = await supabase.from('searches').update({ active }).in('id', ids);
+  if (error) throw error;
+}
+
+export async function deleteSearches(ids: number[]) {
+  // matches point at these rows, so they go first
+  const { error: matchError } = await supabase.from('matches').delete().in('search_id', ids);
+  if (matchError) throw matchError;
+  const { error } = await supabase.from('searches').delete().in('id', ids);
   if (error) throw error;
 }
 
