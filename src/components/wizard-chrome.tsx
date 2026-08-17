@@ -46,6 +46,8 @@ export function WizardHeader({ eyebrow, step, title, accent, subtitle, onBack, c
         <Text style={[styles.eyebrow, { color: colors.textHint }]}>{eyebrow}</Text>
       </View>
 
+      {/* an edit is one screen, not a run, so it has no progress to show */}
+      {step.total > 0 ? (
       <View style={styles.progress}>
         {Array.from({ length: step.total }, (_, i) => (
           <View
@@ -57,6 +59,7 @@ export function WizardHeader({ eyebrow, step, title, accent, subtitle, onBack, c
           />
         ))}
       </View>
+      ) : null}
 
       <View style={styles.titleBlock}>
         <Text style={styles.titleLine}>

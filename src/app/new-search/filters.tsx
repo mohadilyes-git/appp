@@ -153,6 +153,7 @@ export default function FiltersScreen() {
     }
   };
 
+  const editing = Boolean(state.editingIds?.length);
   const currentPlatform = PLATFORMS.find((p) => p.id === state.platform) ?? PLATFORMS[0];
   // a list has to lift off whatever it covers or it reads as part of it
   const listSkin = {
@@ -175,11 +176,15 @@ export default function FiltersScreen() {
           <Pressable onPress={dismissAll} accessible={false} style={styles.listContent}>
           <View style={styles.headerWrap}>
             <WizardHeader
-              eyebrow="Last step"
-              step={{ filled: stepTotal(state), total: stepTotal(state) }}
+              eyebrow={editing ? 'Edit search' : 'Last step'}
+              step={{ filled: stepTotal(state), total: editing ? 0 : stepTotal(state) }}
               title="Where and"
               accent="what to skip"
-              subtitle="Last step — this part is the same for every category."
+              subtitle={
+                editing
+                  ? 'Change where it looks, how far, and the words to skip.'
+                  : 'Last step — this part is the same for every category.'
+              }
               onBack={() => router.back()}
             />
           </View>

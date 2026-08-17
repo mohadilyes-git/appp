@@ -22,13 +22,14 @@ export default function HomeScreen() {
   const { groups, loading, error, toggle, remove } = useSearches();
   const { patch, reset } = useWizard();
 
-  // editing reopens the wizard on the saved answers, so it is the same screens
+  // editing opens the last step with the search already filled in: location,
+  // radius, platform and the word filters are what people come back to change
   const editSearch = (key: string) => {
     const group = groups.find((g) => g.key === key);
     if (!group) return;
     reset();
     patch((draft) => draftFromRows(group.rows, draft));
-    router.push('/new-search');
+    router.push('/new-search/filters');
   };
 
   const confirmDelete = (key: string) => {
