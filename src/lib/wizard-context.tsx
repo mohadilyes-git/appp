@@ -56,7 +56,7 @@ export type WizardState = {
   >;
 };
 
-const INITIAL: WizardState = {
+export const INITIAL_DRAFT: WizardState = {
   mode: 'models',
   models: {},
   customModels: {},
@@ -104,14 +104,14 @@ type WizardValue = {
 const WizardContext = createContext<WizardValue | null>(null);
 
 export function WizardProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<WizardState>(INITIAL);
+  const [state, setState] = useState<WizardState>(INITIAL_DRAFT);
 
   // the function form reads the freshest state, for per-keystroke writes
   const patch = useCallback((p: Patch) => {
     setState((current) => ({ ...current, ...(typeof p === 'function' ? p(current) : p) }));
   }, []);
 
-  const reset = useCallback(() => setState(INITIAL), []);
+  const reset = useCallback(() => setState(INITIAL_DRAFT), []);
 
   const value = useMemo(() => ({ state, patch, reset }), [state, patch, reset]);
 

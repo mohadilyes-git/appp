@@ -10,9 +10,9 @@ import SearchRow from '@/components/search-row';
 import { font, radius, tracking } from '@/lib/theme';
 import { useTheme } from '@/lib/theme-context';
 import { useHomeSummary } from '@/lib/use-inventory';
-import { draftFromRows } from '@/lib/search-to-draft';
+import { draftFromRows, wizardTrail } from '@/lib/search-to-draft';
 import { useSearches } from '@/lib/use-searches';
-import { useWizard } from '@/lib/wizard-context';
+import { INITIAL_DRAFT, useWizard } from '@/lib/wizard-context';
 
 export default function HomeScreen() {
   const { colors, shadows } = useTheme();
@@ -22,14 +22,16 @@ export default function HomeScreen() {
   const { groups, loading, error, toggle, remove } = useSearches();
   const { patch, reset } = useWizard();
 
-  // editing opens the last step with the search already filled in: location,
-  // radius, platform and the word filters are what people come back to change
+  // an edit opens on the last step, because location, radius and the word
+  // filters are what people come back to change, but the rest of the run is
+  // pushed behind it so Back still reaches the models, prices and the brand
   const editSearch = (key: string) => {
     const group = groups.find((g) => g.key === key);
     if (!group) return;
     reset();
-    patch((draft) => draftFromRows(group.rows, draft));
-    router.push('/new-search/filters');
+    const draft = draftFromRows(group.rows, INITIAL_DRAFT);
+    patch(draft);
+    for (const route of wizardTrail(draft)) router.push(route);
   };
 
   const confirmDelete = (key: string) => {

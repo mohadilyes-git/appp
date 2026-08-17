@@ -1,3 +1,5 @@
+import { type Href } from 'expo-router';
+
 import {
   CAMERA_BRANDS,
   CAR_MAKES,
@@ -11,6 +13,7 @@ import {
   LENS_BRANDS,
   modelKey,
   PHONE_BRANDS,
+  productById,
   TV_BRANDS,
   brandById,
   type Brand,
@@ -18,22 +21,56 @@ import {
 import { type Search } from './searches-db';
 import { type WizardState } from './wizard-context';
 
+// the screens a draft would have walked through, in order. pushing all of them
+// puts an edit on the last step with the rest of the run still behind it, so
+// Back reaches the models, the brand and the category the usual way
+export function wizardTrail(state: WizardState): Href[] {
+  const trail: Href[] = ['/new-search'];
+  if (state.mode === 'keyword') return [...trail, '/new-search/keyword', '/new-search/filters'];
+
+  if (state.category === 'phones') trail.push('/new-search/brand');
+  else if (state.category === 'consoles') trail.push('/new-search/consoles');
+  else if (state.category === 'cars') trail.push('/new-search/car-make');
+  else if (state.category === 'electronics') {
+    trail.push('/new-search/products');
+    if (productById(state.productId)?.brandStep) trail.push('/new-search/elec-brand');
+  } else trail.push('/new-search/picker');
+
+  trail.push('/new-search/models');
+  if (state.category === 'cars') trail.push('/new-search/car-details');
+  trail.push('/new-search/prices', '/new-search/filters');
+  return trail;
+}
+
 const KM_PER_MILE = 1.60934;
 
 // every brand paired with the category it was picked from, so editing a search
 // drops you back on the same trail you walked the first time
-function shelf(): { brand: Brand; category: string }[] {
-  const out: { brand: Brand; category: string }[] = [];
+type Shelved = { brand: Brand; category: string; productId?: string };
+
+function shelf(): Shelved[] {
+  const out: Shelved[] = [];
   for (const b of PHONE_BRANDS) out.push({ brand: b.brand, category: 'phones' });
   for (const b of CONSOLE_BRANDS) out.push({ brand: b.brand, category: 'consoles' });
   for (const m of CAR_MAKES) out.push({ brand: m.brand, category: 'cars' });
   for (const [category, list] of Object.entries(HOUSEHOLD))
     for (const e of list.entries) out.push({ brand: e.brand, category });
-  for (const list of [LAPTOP_BRANDS, CAMERA_BRANDS, LENS_BRANDS, GPU_BRANDS, TV_BRANDS, DRONE_BRANDS])
-    for (const e of list) out.push({ brand: e.brand, category: 'electronics' });
+  // electronics also remembers which product the brand sat under, so the trail
+  // can put the product and brand screens back behind the models
+  const shelves: [{ brand: Brand }[], string][] = [
+    [LAPTOP_BRANDS, 'laptop'],
+    [CAMERA_BRANDS, 'camera'],
+    [LENS_BRANDS, 'lens'],
+    [GPU_BRANDS, 'gpu'],
+    [TV_BRANDS, 'tv'],
+    [DRONE_BRANDS, 'drone'],
+  ];
+  for (const [list, productId] of shelves)
+    for (const e of list) out.push({ brand: e.brand, category: 'electronics', productId });
+  // these products are one brand each, so the product id is the brand id
   for (const id of ['ipad', 'macbook', 'airpods', 'applewatch', 'gopro', 'insta360', 'osmo']) {
     const brand = brandById(id);
-    if (brand) out.push({ brand, category: 'electronics' });
+    if (brand) out.push({ brand, category: 'electronics', productId: id });
   }
   return out;
 }
@@ -83,7 +120,7 @@ export function draftFromRows(rows: Search[], base: WizardState): WizardState {
     };
   }
 
-  const { brand, category } = found;
+  const { brand, category, productId } = found;
   const models: Record<string, boolean> = {};
   const prices: Record<string, { min: string; max: string }> = {};
   const custom: string[] = [];
@@ -115,7 +152,7 @@ export function draftFromRows(rows: Search[], base: WizardState): WizardState {
     mode: 'models',
     category,
     brandId: brand.id,
-    productId: undefined,
+    productId,
     models,
     prices,
     customModels: custom.length > 0 ? { [brand.id]: custom } : {},

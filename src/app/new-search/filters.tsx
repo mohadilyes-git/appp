@@ -177,12 +177,12 @@ export default function FiltersScreen() {
           <View style={styles.headerWrap}>
             <WizardHeader
               eyebrow={editing ? 'Edit search' : 'Last step'}
-              step={{ filled: stepTotal(state), total: editing ? 0 : stepTotal(state) }}
+              step={{ filled: stepTotal(state), total: stepTotal(state) }}
               title="Where and"
               accent="what to skip"
               subtitle={
                 editing
-                  ? 'Change where it looks, how far, and the words to skip.'
+                  ? 'Change anything here, or step back for the models and prices.'
                   : 'Last step — this part is the same for every category.'
               }
               onBack={() => router.back()}
