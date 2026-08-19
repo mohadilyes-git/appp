@@ -111,6 +111,7 @@ export default function ElecBrandScreen() {
           contentContainerStyle={[styles.list, { paddingTop: insets.top + 8 }]}>
           <View style={styles.headerWrap}>
             <WizardHeader
+              here="/new-search/elec-brand"
               eyebrow="Step 3 of 6"
               step={{ filled: 3, total: 6 }}
               title={product.title}

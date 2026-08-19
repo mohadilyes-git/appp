@@ -5,6 +5,8 @@ import { Keyboard, Platform, Pressable, StyleSheet, Text, View } from 'react-nat
 import { ChevronLeftIcon, CloseIcon } from '@/components/icons';
 import { font, gradients, radius, tracking } from '@/lib/theme';
 import { useTheme } from '@/lib/theme-context';
+import { useWizard } from '@/lib/wizard-context';
+import { backHint } from '@/lib/wizard-trail';
 
 // the saturated blue stays the same in both themes, white text sits on it either way
 const WIZARD_BLUE = '#2f6fed';
@@ -16,12 +18,30 @@ type HeaderProps = {
   accent: string;
   subtitle: string;
   onBack: () => void;
+  // this screen's own route, so the hint names the screen behind it. taking it
+  // from the router instead would give whatever screen is on top, which is a
+  // different one on every screen still mounted underneath
+  here?: string;
   // the first screen closes the wizard instead of stepping back
   close?: boolean;
 };
 
-export function WizardHeader({ eyebrow, step, title, accent, subtitle, onBack, close }: HeaderProps) {
+export function WizardHeader({
+  eyebrow,
+  step,
+  title,
+  accent,
+  subtitle,
+  onBack,
+  here,
+  close,
+}: HeaderProps) {
   const { colors, shadows } = useTheme();
+  const { state } = useWizard();
+
+  // the back button names the screen behind it, so the earlier steps are
+  // findable rather than guessed at — reopening a search lands on the last one
+  const hint = close || !here ? undefined : backHint(state, here);
 
   return (
     <View style={styles.header}>
@@ -29,10 +49,11 @@ export function WizardHeader({ eyebrow, step, title, accent, subtitle, onBack, c
         <Pressable
           onPress={onBack}
           accessibilityRole="button"
-          accessibilityLabel={close ? 'Close' : 'Back'}
+          accessibilityLabel={close ? 'Close' : hint ? `Back to ${hint}` : 'Back'}
           hitSlop={8}
           style={({ pressed }) => [
             styles.backBtn,
+            hint ? styles.backPill : null,
             { backgroundColor: colors.surfaceCard, borderColor: colors.borderButton },
             shadows.button,
             pressed && { opacity: 0.7 },
@@ -42,6 +63,11 @@ export function WizardHeader({ eyebrow, step, title, accent, subtitle, onBack, c
           ) : (
             <ChevronLeftIcon color={colors.textPrimary} />
           )}
+          {hint ? (
+            <Text style={[styles.backHint, { color: colors.textTag }]} numberOfLines={1}>
+              Back to {hint}
+            </Text>
+          ) : null}
         </Pressable>
         <Text style={[styles.eyebrow, { color: colors.textHint }]}>{eyebrow}</Text>
       </View>
@@ -143,7 +169,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  // the hint sits inside the button, so the whole pill is the tap target
+  backPill: {
+    width: 'auto',
+    flexShrink: 1,
+    flexDirection: 'row',
+    gap: 5,
+    paddingLeft: 11,
+    paddingRight: 14,
+  },
+  backHint: { fontFamily: font.body, fontSize: 12.5 },
   eyebrow: {
+    flexShrink: 0,
     fontFamily: font.heavy,
     fontSize: 11,
     letterSpacing: tracking(11, 0.12),

@@ -1,5 +1,5 @@
 import Slider from '@react-native-community/slider';
-import { Redirect, useRouter } from 'expo-router';
+import { Redirect, useNavigation, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import {
   Alert,
@@ -22,7 +22,8 @@ import { compileWizard } from '@/lib/search-compiler';
 import { createSearches, deleteSearches } from '@/lib/searches-db';
 import { font, radius, tracking } from '@/lib/theme';
 import { useTheme } from '@/lib/theme-context';
-import { stepTotal, useWizard } from '@/lib/wizard-context';
+import { stepTotal, useStaging, useWizard } from '@/lib/wizard-context';
+import { screenName, wizardTrail } from '@/lib/wizard-trail';
 
 const RADIUS_CHOICES = [5, 10, 25, 50, 60];
 const MAX_MILES = 60;
@@ -61,7 +62,9 @@ export default function FiltersScreen() {
   const { width, height } = useWindowDimensions();
   const { colors, shadows, resolved } = useTheme();
   const { state, patch } = useWizard();
+  const { staging, setStaging } = useStaging();
   const scrollRef = useRef<ScrollView>(null);
+  const navigation = useNavigation();
 
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   // remembers the label the user tapped, so it doesn't re-trigger the search
@@ -91,6 +94,28 @@ export default function FiltersScreen() {
     }, 350);
     return () => clearTimeout(timer);
   }, [state.location]);
+
+  // a reopened search arrives here as one push, and the run it came from is
+  // slotted in behind this screen so Back walks the steps like a fresh one.
+  // inserting beats pushing them one at a time: expo-router works out every
+  // queued push against the state before the first of them lands, so a loop
+  // of pushes stacks whole wizards on the root instead of steps inside this
+  useEffect(() => {
+    if (!staging) return;
+    setStaging(false);
+    const behind = wizardTrail(state).slice(0, -1).map(screenName);
+    const stack = navigation.getState();
+    if (!stack || behind.length === 0) return;
+    // the screen already up keeps its key, so it is never rebuilt underneath us
+    const here = stack.routes[stack.index] ?? stack.routes[stack.routes.length - 1];
+    // typed routes want literal screen names, and these are read off the trail
+    navigation.reset({
+      ...stack,
+      index: behind.length,
+      routes: [...behind.map((name) => ({ name })), here],
+    } as Parameters<typeof navigation.reset>[0]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // landing here cold (deep link, web refresh) means the wizard never started
   if (state.mode === 'models' ? !state.brandId : !state.keyword.text.trim()) {
@@ -145,8 +170,9 @@ export default function FiltersScreen() {
           `${built.skipped.join(', ')} was never made in the years you picked, so it was skipped.`,
         );
       }
-      // home refetches on focus, the new card is already there
-      router.replace('/');
+      // home refetches on focus, the new card is already there. dismissTo pops
+      // back to the home already in the stack, replace would stack a second one
+      router.dismissTo('/');
     } catch (e) {
       Alert.alert("Couldn't start the search", e instanceof Error ? e.message : 'Try again in a moment.');
       setSaving(false);
@@ -176,6 +202,7 @@ export default function FiltersScreen() {
           <Pressable onPress={dismissAll} accessible={false} style={styles.listContent}>
           <View style={styles.headerWrap}>
             <WizardHeader
+              here="/new-search/filters"
               eyebrow={editing ? 'Edit search' : 'Last step'}
               step={{ filled: stepTotal(state), total: stepTotal(state) }}
               title="Where and"

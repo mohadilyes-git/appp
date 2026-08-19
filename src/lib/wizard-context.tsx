@@ -103,23 +103,45 @@ type WizardValue = {
 
 const WizardContext = createContext<WizardValue | null>(null);
 
+// true from reopening a saved search until its filters screen has slotted the
+// rest of the run in behind itself. it sits apart from the draft so the screens
+// that read it do not re-render on every keystroke the draft takes
+type StagingValue = { staging: boolean; setStaging: (value: boolean) => void };
+
+const StagingContext = createContext<StagingValue | null>(null);
+
 export function WizardProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<WizardState>(INITIAL_DRAFT);
+  const [staging, setStaging] = useState(false);
 
   // the function form reads the freshest state, for per-keystroke writes
   const patch = useCallback((p: Patch) => {
     setState((current) => ({ ...current, ...(typeof p === 'function' ? p(current) : p) }));
   }, []);
 
-  const reset = useCallback(() => setState(INITIAL_DRAFT), []);
+  const reset = useCallback(() => {
+    setState(INITIAL_DRAFT);
+    setStaging(false);
+  }, []);
 
   const value = useMemo(() => ({ state, patch, reset }), [state, patch, reset]);
+  const stagingValue = useMemo(() => ({ staging, setStaging }), [staging]);
 
-  return <WizardContext.Provider value={value}>{children}</WizardContext.Provider>;
+  return (
+    <StagingContext.Provider value={stagingValue}>
+      <WizardContext.Provider value={value}>{children}</WizardContext.Provider>
+    </StagingContext.Provider>
+  );
 }
 
 export function useWizard() {
   const value = useContext(WizardContext);
   if (!value) throw new Error('useWizard has to be used inside the new-search screens');
+  return value;
+}
+
+export function useStaging() {
+  const value = useContext(StagingContext);
+  if (!value) throw new Error('useStaging has to be used inside the new-search screens');
   return value;
 }

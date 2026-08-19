@@ -43,6 +43,7 @@ export default function KeywordScreen() {
           automaticallyAdjustKeyboardInsets
           contentContainerStyle={[styles.list, { paddingTop: insets.top + 8 }]}>
           <WizardHeader
+            here="/new-search/keyword"
             eyebrow="Keyword"
             step={{ filled: stepTotal(state) - 1, total: stepTotal(state) }}
             title="Search in"

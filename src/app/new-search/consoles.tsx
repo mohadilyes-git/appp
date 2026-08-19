@@ -36,6 +36,7 @@ export default function ConsolesScreen() {
 
       <View style={[styles.content, { paddingTop: insets.top + 8 }]}>
         <WizardHeader
+          here="/new-search/consoles"
           eyebrow="Console"
           step={{ filled: 2, total: 5 }}
           title="Which"

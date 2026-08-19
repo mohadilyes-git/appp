@@ -38,6 +38,7 @@ export default function BrandScreen() {
 
       <View style={[styles.content, { paddingTop: insets.top + 8 }]}>
         <WizardHeader
+          here="/new-search/brand"
           eyebrow="Brand"
           step={{ filled: 2, total: 5 }}
           title="Which"

@@ -93,6 +93,7 @@ export default function CarDetailsScreen() {
           <Pressable onPress={closeYear} accessible={false} style={styles.list}>
           <View style={styles.headerWrap}>
             <WizardHeader
+              here="/new-search/car-details"
               eyebrow="Step 4 of 6"
               step={{ filled: 4, total: 6 }}
               title="Year and"

@@ -47,6 +47,7 @@ export default function CarMakeScreen() {
           contentContainerStyle={[styles.list, { paddingTop: insets.top + 8 }]}>
           <View style={styles.headerWrap}>
             <WizardHeader
+              here="/new-search/car-make"
               eyebrow="Step 2 of 6"
               step={{ filled: 2, total: 6 }}
               title="Which"

@@ -10,9 +10,9 @@ import SearchRow from '@/components/search-row';
 import { font, radius, tracking } from '@/lib/theme';
 import { useTheme } from '@/lib/theme-context';
 import { useHomeSummary } from '@/lib/use-inventory';
-import { draftFromRows, wizardTrail } from '@/lib/search-to-draft';
+import { draftFromRows } from '@/lib/search-to-draft';
 import { useSearches } from '@/lib/use-searches';
-import { INITIAL_DRAFT, useWizard } from '@/lib/wizard-context';
+import { INITIAL_DRAFT, useStaging, useWizard } from '@/lib/wizard-context';
 
 export default function HomeScreen() {
   const { colors, shadows } = useTheme();
@@ -21,17 +21,20 @@ export default function HomeScreen() {
   const { summary, nudge } = useHomeSummary();
   const { groups, loading, error, toggle, remove } = useSearches();
   const { patch, reset } = useWizard();
+  const { setStaging } = useStaging();
 
   // an edit opens on the last step, because location, radius and the word
-  // filters are what people come back to change, but the rest of the run is
-  // pushed behind it so Back still reaches the models, prices and the brand
+  // filters are what people come back to change. the rest of the run is put
+  // behind it there, so Back still reaches the models, prices and the brand
   const editSearch = (key: string) => {
     const group = groups.find((g) => g.key === key);
     if (!group) return;
     reset();
-    const draft = draftFromRows(group.rows, INITIAL_DRAFT);
-    patch(draft);
-    for (const route of wizardTrail(draft)) router.push(route);
+    patch(draftFromRows(group.rows, INITIAL_DRAFT));
+    // one move, not a stack of pushes: the filters screen slots the rest of
+    // the run in behind itself once it is up
+    setStaging(true);
+    router.push('/new-search/filters');
   };
 
   const confirmDelete = (key: string) => {

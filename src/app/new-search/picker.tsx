@@ -52,6 +52,7 @@ export default function PickerScreen() {
           contentContainerStyle={[styles.list, { paddingTop: insets.top + 8 }]}>
           <View style={styles.headerWrap}>
             <WizardHeader
+              here="/new-search/picker"
               eyebrow="Step 2 of 5"
               step={{ filled: 2, total: 5 }}
               title={list.title}

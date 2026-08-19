@@ -81,6 +81,7 @@ export default function PricesScreen() {
           contentContainerStyle={[styles.listContent, { paddingTop: insets.top + 8 }]}>
           <View style={styles.headerWrap}>
             <WizardHeader
+              here="/new-search/prices"
               eyebrow="Prices"
               step={{ filled: stepTotal(state) - 1, total: stepTotal(state) }}
               title="Price"

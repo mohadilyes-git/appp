@@ -1,5 +1,3 @@
-import { type Href } from 'expo-router';
-
 import {
   CAMERA_BRANDS,
   CAR_MAKES,
@@ -13,34 +11,12 @@ import {
   LENS_BRANDS,
   modelKey,
   PHONE_BRANDS,
-  productById,
   TV_BRANDS,
   brandById,
   type Brand,
 } from './catalogue';
 import { type Search } from './searches-db';
 import { type WizardState } from './wizard-context';
-
-// the screens a draft would have walked through, in order. pushing all of them
-// puts an edit on the last step with the rest of the run still behind it, so
-// Back reaches the models, the brand and the category the usual way
-export function wizardTrail(state: WizardState): Href[] {
-  const trail: Href[] = ['/new-search'];
-  if (state.mode === 'keyword') return [...trail, '/new-search/keyword', '/new-search/filters'];
-
-  if (state.category === 'phones') trail.push('/new-search/brand');
-  else if (state.category === 'consoles') trail.push('/new-search/consoles');
-  else if (state.category === 'cars') trail.push('/new-search/car-make');
-  else if (state.category === 'electronics') {
-    trail.push('/new-search/products');
-    if (productById(state.productId)?.brandStep) trail.push('/new-search/elec-brand');
-  } else trail.push('/new-search/picker');
-
-  trail.push('/new-search/models');
-  if (state.category === 'cars') trail.push('/new-search/car-details');
-  trail.push('/new-search/prices', '/new-search/filters');
-  return trail;
-}
 
 const KM_PER_MILE = 1.60934;
 

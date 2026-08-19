@@ -81,6 +81,7 @@ export default function ProductsScreen() {
           contentContainerStyle={[styles.list, { paddingTop: insets.top + 8 }]}>
           <View style={styles.headerWrap}>
             <WizardHeader
+              here="/new-search/products"
               eyebrow="Product"
               step={{ filled: 2, total: 5 }}
               title="What"

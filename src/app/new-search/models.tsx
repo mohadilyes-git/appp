@@ -1,5 +1,5 @@
 import { Redirect, useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Pressable,
   ScrollView,
@@ -72,6 +72,14 @@ export default function ModelsScreen() {
   const { state, patch } = useWizard();
   const [query, setQuery] = useState('');
   const [draft, setDraft] = useState('');
+
+  // a keyword detour off a list screen leaves mode set to 'keyword'. backing
+  // out of it and carrying on here means the models path again, and the save
+  // reads mode to decide what it is building
+  useEffect(() => {
+    if (state.mode !== 'models') patch({ mode: 'models' });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const found = brandById(state.brandId);
   // whatever the user typed in becomes one more group of chips
@@ -173,6 +181,7 @@ export default function ModelsScreen() {
           contentContainerStyle={[styles.listContent, { paddingTop: insets.top + 8 }]}>
           <View style={styles.headerWrap}>
             <WizardHeader
+              here="/new-search/models"
               eyebrow={`Step ${detour ? 4 : 3} of ${total}`}
               step={{ filled: detour ? 4 : 3, total }}
               title={header.title}
