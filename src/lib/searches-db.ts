@@ -14,6 +14,9 @@ export type Search = {
   includeShipping: boolean;
   priceMin?: number;
   priceMax?: number;
+  // the words the user typed, without the fences the compiler adds
+  includeWords: string[];
+  excludeWords: string[];
   yearMin?: number | null;
   yearMax?: number | null;
   mileageMin?: number | null;
@@ -38,6 +41,8 @@ type Row = {
   lng: number | null;
   radius_km: number | null;
   include_shipping: boolean;
+  include_words: string | null;
+  exclude_words: string | null;
   price_min: string | number | null;
   price_max: string | number | null;
   year_min: number | null;
@@ -53,7 +58,12 @@ type Row = {
 
 // matches(count) folds the join table into a hit counter per row
 const COLUMNS =
-  'id, keyword, label, group_id, platforms, location, lat, lng, radius_km, include_shipping, price_min, price_max, year_min, year_max, mileage_min, mileage_max, transmission, fuel, body, active, matches(count)';
+  'id, keyword, label, group_id, platforms, location, lat, lng, radius_km, include_shipping, include_words, exclude_words, price_min, price_max, year_min, year_max, mileage_min, mileage_max, transmission, fuel, body, active, matches(count)';
+
+// stored comma joined, one word per chip on screen
+function splitWords(value: string | null) {
+  return value ? value.split(',').filter(Boolean) : [];
+}
 
 function toSearch(row: Row): Search {
   return {
@@ -67,6 +77,8 @@ function toSearch(row: Row): Search {
     lng: row.lng,
     radiusKm: row.radius_km ?? undefined,
     includeShipping: row.include_shipping,
+    includeWords: splitWords(row.include_words),
+    excludeWords: splitWords(row.exclude_words),
     priceMin: row.price_min == null ? undefined : Number(row.price_min),
     priceMax: row.price_max == null ? undefined : Number(row.price_max),
     yearMin: row.year_min,

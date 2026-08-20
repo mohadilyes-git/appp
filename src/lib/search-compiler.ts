@@ -74,6 +74,17 @@ function siblingExcludes(brand: Brand, group: ModelGroup, chip: string, alias: (
 
 // one wizard run fans out to one searches row per picked model,
 // all stamped with the same group so home shows a single card
+// the words the compiler puts on a row by itself: the model's own fence words
+// and the tokens that keep its siblings out. reopening a search takes these
+// back off the stored list, and what is left is what the user typed
+export function machineWords(brand: Brand, group: ModelGroup, chip: string, category?: string) {
+  const alias = category === 'cars' ? (t: string) => t : withAlias;
+  return {
+    include: includeWords(brand, displayName(brand, group, chip)).map(alias),
+    exclude: siblingExcludes(brand, group, chip, alias),
+  };
+}
+
 export function compileWizard(state: WizardState): { rows: NewSearchRow[]; skipped: string[] } | null {
   // the keyword path has no models to fan out, it is one row in the user's own words
   if (state.mode === 'keyword') {
